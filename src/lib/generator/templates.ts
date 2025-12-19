@@ -138,6 +138,12 @@ export function renderPage(website: Website, page: Page): string {
 
 // Generate CSS with brand colors
 export function generateCSS(colors: BrandColors): string {
+  // Extract RGB values for rgba usage
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 0, 0';
+  };
+
   return `
     :root {
       --primary: ${colors.primary};
@@ -147,7 +153,25 @@ export function generateCSS(colors: BrandColors): string {
       --text: ${colors.text};
       --text-light: ${adjustColor(colors.text, 40)};
       --primary-dark: ${adjustColor(colors.primary, -20)};
-      --primary-light: ${adjustColor(colors.primary, 20)};
+      --primary-light: ${adjustColor(colors.primary, 40)};
+      --secondary-dark: ${adjustColor(colors.secondary, -20)};
+      
+      /* RGB channels for rgba usage */
+      --primary-rgb: ${hexToRgb(colors.primary)};
+      --secondary-rgb: ${hexToRgb(colors.secondary)};
+      --accent-rgb: ${hexToRgb(colors.accent)};
+      --text-rgb: ${hexToRgb(colors.text)};
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+      --shadow-primary: 0 8px 24px rgba(var(--primary-rgb), 0.35);
+      
+      /* Transitions */
+      --transition-fast: 0.15s ease-in-out;
+      --transition: 0.3s ease-in-out;
+      --transition-slow: 0.5s ease-in-out;
     }
     
     * {
@@ -163,14 +187,36 @@ export function generateCSS(colors: BrandColors): string {
       background: var(--bg);
     }
     
+    /* Enhanced Link Styles */
     a {
       color: var(--primary);
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: var(--transition);
+      position: relative;
     }
     
     a:hover {
       color: var(--primary-dark);
+    }
+    
+    /* Underline animation for text links */
+    .link-hover {
+      position: relative;
+    }
+    
+    .link-hover::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width var(--transition);
+    }
+    
+    .link-hover:hover::after {
+      width: 100%;
     }
     
     .container {
@@ -541,14 +587,15 @@ export function generateCSS(colors: BrandColors): string {
       background: white;
       border-radius: 16px;
       padding: 30px;
-      box-shadow: 0 5px 30px rgba(0,0,0,0.08);
-      transition: all 0.3s ease;
-      border: 1px solid #eee;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: 2px solid transparent;
     }
     
     .service-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(var(--primary-rgb), 0.3);
     }
     
     .service-icon {
