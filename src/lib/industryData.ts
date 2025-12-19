@@ -300,6 +300,110 @@ const IMAGES = {
     },
 };
 
+// Map sub-niche industries to parent image categories
+const IMAGE_ALIASES: Record<string, keyof typeof IMAGES> = {
+    // HVAC & Energy
+    'ac-repair': 'hvac',
+    'heating-repair': 'hvac',
+    'air-duct-cleaning': 'hvac',
+    'insulation': 'hvac',
+    'solar-panel': 'solar',
+
+    // Plumbing
+    'drain-cleaning': 'plumbing',
+    'water-heater': 'plumbing',
+    'septic': 'plumbing',
+    'leak-detection': 'plumbing',
+
+    // Electrical
+    'electrician': 'electrical',
+    'generator': 'electrical',
+
+    // Construction & Remodeling
+    'general-contractor': 'remodeling',
+    'bathroom-remodeling': 'remodeling',
+    'kitchen-remodeling': 'remodeling',
+    'basement-remodeling': 'remodeling',
+    'home-builder': 'remodeling',
+    'deck-builder': 'fence',
+    'tile-installation': 'flooring',
+    'concrete': 'concrete',
+    'home-inspection': 'remodeling',
+    'cabinet-installation': 'remodeling',
+
+    // Painting & Surfaces
+    'interior-painting': 'painting',
+    'exterior-painting': 'painting',
+    'epoxy-flooring': 'flooring',
+    'drywall': 'painting',
+
+    // Roofing & Exterior
+    'roof-repair': 'roofing',
+    'roof-replacement': 'roofing',
+    'gutters': 'roofing',
+    'metal-roofing': 'roofing',
+    'chimney': 'roofing',
+
+    // Cleaning & Restoration
+    'carpet-cleaning': 'carpet',
+    'pressure-washing': 'pressure',
+    'junk-removal': 'cleaning',
+    'mold-remediation': 'restoration',
+    'water-restoration': 'restoration',
+    'fire-restoration': 'restoration',
+
+    // Windows & Doors
+    'windows': 'window',
+    'doors': 'window',
+    'garage-door': 'garage',
+    'glass-repair': 'window',
+
+    // Pest Control
+    'termite': 'pest',
+    'bed-bug': 'pest',
+    'wildlife-removal': 'pest',
+
+    // Landscaping & Outdoor
+    'lawn-care': 'landscaping',
+    'tree-service': 'tree',
+    'sprinkler': 'landscaping',
+    'hardscape': 'landscaping',
+    'pool-service': 'pool',
+    'driveway-paving': 'concrete',
+    'asphalt': 'concrete',
+
+    // Automotive
+    'auto-body': 'automotive',
+    'tire-shop': 'automotive',
+    'car-detailing': 'automotive',
+    'towing': 'towing',
+
+    // Professional & Lifestyle
+    'accountant': 'legal',
+    'consulting': 'legal',
+    'insurance': 'legal',
+    'marketing': 'legal',
+    'technology': 'legal',
+    'family-law': 'legal',
+    'personal-injury': 'legal',
+
+    // Health & Wellness
+    'physical-therapy': 'chiropractic',
+    'medical': 'dental',
+    'veterinary': 'default',
+    'fitness': 'chiropractic',
+    'salon': 'default',
+    'photography': 'default',
+    'restaurant': 'default'
+};
+
+// Apply aliases to IMAGES object
+Object.entries(IMAGE_ALIASES).forEach(([key, sourceKey]) => {
+    if (IMAGES[sourceKey]) {
+        (IMAGES as any)[key] = IMAGES[sourceKey];
+    }
+});
+
 // Comprehensive industry categories
 export const INDUSTRY_CATEGORIES: IndustryCategory[] = [
     // === HOME SERVICES ===
