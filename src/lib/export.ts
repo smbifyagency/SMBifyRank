@@ -16,27 +16,29 @@ export function generateSitemapXml(website: Website): string {
 
     let urls = '';
 
-    // Add all published pages
-    website.pages
-        .filter(p => p.isPublished)
-        .forEach(page => {
-            const loc = page.slug === '' ? baseUrl : `${baseUrl}/${page.slug}`;
-            const priority = page.type === 'home' ? '1.0' :
-                page.type === 'services' ? '0.9' :
-                    page.type === 'contact' ? '0.8' : '0.7';
-            urls += `
+    // Add core pages
+    const corePages = [
+        { path: '', priority: '1.0' },       // index.html
+        { path: 'about.html', priority: '0.8' },
+        { path: 'services.html', priority: '0.9' },
+        { path: 'contact.html', priority: '0.8' },
+        { path: 'blog.html', priority: '0.7' },
+    ];
+
+    corePages.forEach(page => {
+        urls += `
     <url>
-        <loc>${loc}</loc>
+        <loc>${baseUrl}/${page.path}</loc>
         <lastmod>${lastmod}</lastmod>
-        <priority>${priority}</priority>
+        <priority>${page.priority}</priority>
     </url>`;
-        });
+    });
 
     // Add service pages
     website.services.forEach(service => {
         urls += `
     <url>
-        <loc>${baseUrl}/services/${service.slug}</loc>
+        <loc>${baseUrl}/services/${service.slug}.html</loc>
         <lastmod>${lastmod}</lastmod>
         <priority>0.8</priority>
     </url>`;
@@ -46,7 +48,7 @@ export function generateSitemapXml(website: Website): string {
     website.locations.forEach(location => {
         urls += `
     <url>
-        <loc>${baseUrl}/locations/${location.slug}</loc>
+        <loc>${baseUrl}/locations/${location.slug}.html</loc>
         <lastmod>${lastmod}</lastmod>
         <priority>0.8</priority>
     </url>`;
@@ -58,7 +60,7 @@ export function generateSitemapXml(website: Website): string {
         .forEach(post => {
             urls += `
     <url>
-        <loc>${baseUrl}/blog/${post.slug}</loc>
+        <loc>${baseUrl}/blog/${post.slug}.html</loc>
         <lastmod>${lastmod}</lastmod>
         <priority>0.6</priority>
     </url>`;
@@ -112,13 +114,16 @@ export function exportWebsite(website: Website): ExportedFile[] {
     const { generateRichHomepageContent, generateRichHomepageCSS } = require('./generator/richContent');
     const { generateRichAboutContent, generateRichContactContent, generateRichServicesContent, generatePageCSS } = require('./generator/pageContent');
     const { generateCSS, renderHeader, renderFooter, generateJS } = require('./generator/templates');
+    const { renderBlogList, getBlogCSS } = require('./generator/blogRenderer');
 
     // Generate base CSS with brand colors
     const baseCSS = generateCSS(website.colors);
     const richCSS = generateRichHomepageCSS();
     const pageCSS = generatePageCSS();
+    const blogCSS = getBlogCSS();
     const fullHomeCSS = baseCSS + richCSS;
     const fullPageCSS = baseCSS + pageCSS;
+    const fullBlogCSS = baseCSS + blogCSS;
 
     // Helper to create full HTML page
     const createHtmlPage = (title: string, description: string, content: string, css: string) => `<!DOCTYPE html>
@@ -183,7 +188,14 @@ export function exportWebsite(website: Website): ExportedFile[] {
         files.push({ path: `locations/${location.slug}.html`, content: html });
     });
 
-    // 7. Export blog posts (if any)
+    // 7. Generate Blog Index Page (always generate, even if empty)
+    const blogIndexContent = renderBlogList(website.blogPosts || [], website);
+    files.push({
+        path: 'blog.html',
+        content: createHtmlPage('Blog', `Latest news and insights from ${website.businessName}`, blogIndexContent, fullBlogCSS)
+    });
+
+    // 8. Export blog posts (if any)
     (website.blogPosts || [])
         .filter(p => p.status === 'published')
         .forEach(post => {

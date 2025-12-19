@@ -92,7 +92,7 @@ export function renderBlogPost(post: BlogPost, website: Website): string {
                 <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(canonicalUrl)}&title=${encodeURIComponent(post.title)}" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             </div>
             
-            <a href="/blog" class="back-to-blog">← Back to Blog</a>
+            <a href="/blog.html" class="back-to-blog">← Back to Blog</a>
         </footer>
     </article>
     
@@ -127,7 +127,7 @@ export function renderBlogList(posts: BlogPost[], website: Website): string {
             <div class="blog-grid">
                 ${publishedPosts.map(post => `
                 <article class="blog-card">
-                    <a href="/blog/${post.slug}" class="blog-card-link">
+                    <a href="/blog/${post.slug}.html" class="blog-card-link">
                         ${post.featuredImage ? `
                         <div class="blog-card-image">
                             <img src="${post.featuredImage}" alt="${post.title}" loading="lazy" />
