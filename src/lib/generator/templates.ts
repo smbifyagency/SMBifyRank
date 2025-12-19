@@ -113,7 +113,7 @@ export function renderPage(website: Website, page: Page): string {
 }
 
 // Generate CSS with brand colors
-function generateCSS(colors: BrandColors): string {
+export function generateCSS(colors: BrandColors): string {
   return `
     :root {
       --primary: ${colors.primary};
@@ -976,7 +976,7 @@ function adjustColor(color: string, percent: number): string {
 }
 
 // Render header with enhanced navigation
-function renderHeader(website: Website): string {
+export function renderHeader(website: Website): string {
   const navPages = website.pages
     .filter(p => ['home', 'about', 'services', 'contact', 'blog'].includes(p.type))
     .sort((a, b) => a.order - b.order)
@@ -1052,7 +1052,7 @@ function renderHeader(website: Website): string {
 }
 
 // Render footer
-function renderFooter(website: Website): string {
+export function renderFooter(website: Website): string {
   // Get initials for logo
   const words = website.businessName.split(' ').filter(w => w.length > 0);
   const initials = words.length === 1 ? words[0].substring(0, 2).toUpperCase() : words.slice(0, 2).map(w => w[0]).join('').toUpperCase();
@@ -1521,7 +1521,7 @@ function renderFeaturesSection(content: Record<string, unknown>): string {
 }
 
 // Generate JavaScript
-function generateJS(): string {
+export function generateJS(): string {
   return `
     function toggleMobileMenu() {
       const nav = document.querySelector('.nav');

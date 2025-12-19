@@ -84,32 +84,107 @@ Sitemap: ${sitemapUrl}
 }
 
 // Export website to static HTML files
+// This function generates ALL pages using rich content, regardless of the pages array
 export function exportWebsite(website: Website): ExportedFile[] {
     const files: ExportedFile[] = [];
 
-    // Export all pages
-    website.pages
-        .filter(p => p.isPublished)
-        .forEach(page => {
-            const html = renderPage(website, page);
-            const path = page.slug === '' ? 'index.html' : `${page.slug}.html`;
-            files.push({ path, content: html });
-        });
+    // Build business info for content generators
+    const businessInfo = {
+        name: website.businessName,
+        industry: website.industry,
+        city: website.locations?.[0]?.city || 'Your Area',
+        phone: website.contactPhone || '(555) 123-4567',
+        email: website.contactEmail,
+        services: (website.services || []).map(s => ({
+            name: s.name,
+            slug: s.slug,
+            icon: s.icon || '✓',
+            description: s.description
+        })),
+        locations: (website.locations || []).map(l => ({
+            city: l.city,
+            state: l.state,
+            slug: l.slug
+        }))
+    };
 
-    // Export individual service pages
-    website.services.forEach(service => {
+    // Import rich content generators inline to avoid circular deps
+    const { generateRichHomepageContent, generateRichHomepageCSS } = require('./generator/richContent');
+    const { generateRichAboutContent, generateRichContactContent, generateRichServicesContent, generatePageCSS } = require('./generator/pageContent');
+    const { generateCSS, renderHeader, renderFooter, generateJS } = require('./generator/templates');
+
+    // Generate base CSS with brand colors
+    const baseCSS = generateCSS(website.colors);
+    const richCSS = generateRichHomepageCSS();
+    const pageCSS = generatePageCSS();
+    const fullHomeCSS = baseCSS + richCSS;
+    const fullPageCSS = baseCSS + pageCSS;
+
+    // Helper to create full HTML page
+    const createHtmlPage = (title: string, description: string, content: string, css: string) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} | ${website.businessName}</title>
+    <meta name="description" content="${description}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>${css}</style>
+</head>
+<body>
+    ${renderHeader(website)}
+    <main>
+        ${content}
+    </main>
+    ${renderFooter(website)}
+    <script>${generateJS()}</script>
+</body>
+</html>`;
+
+    // 1. Generate Home Page (ALWAYS use rich content)
+    const homeContent = generateRichHomepageContent(businessInfo);
+    files.push({
+        path: 'index.html',
+        content: createHtmlPage('Home', website.seoSettings?.siteDescription || 'Welcome', homeContent, fullHomeCSS)
+    });
+
+    // 2. Generate About Page
+    const aboutContent = generateRichAboutContent(businessInfo);
+    files.push({
+        path: 'about.html',
+        content: createHtmlPage('About Us', `Learn about ${website.businessName}`, aboutContent, fullPageCSS)
+    });
+
+    // 3. Generate Services Page
+    const servicesContent = generateRichServicesContent(businessInfo);
+    files.push({
+        path: 'services.html',
+        content: createHtmlPage('Our Services', `Professional services from ${website.businessName}`, servicesContent, fullPageCSS)
+    });
+
+    // 4. Generate Contact Page
+    const contactContent = generateRichContactContent(businessInfo);
+    files.push({
+        path: 'contact.html',
+        content: createHtmlPage('Contact Us', `Contact ${website.businessName}`, contactContent, fullPageCSS)
+    });
+
+    // 5. Export individual service pages
+    (website.services || []).forEach(service => {
         const html = renderServicePage(website, service);
         files.push({ path: `services/${service.slug}.html`, content: html });
     });
 
-    // Export individual location pages
-    website.locations.forEach(location => {
+    // 6. Export individual location pages
+    (website.locations || []).forEach(location => {
         const html = renderLocationPage(website, location);
         files.push({ path: `locations/${location.slug}.html`, content: html });
     });
 
-    // Export blog posts
-    website.blogPosts
+    // 7. Export blog posts (if any)
+    (website.blogPosts || [])
         .filter(p => p.status === 'published')
         .forEach(post => {
             const html = renderBlogPostPage(website, post);
