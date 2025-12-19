@@ -16,9 +16,12 @@ import {
 export function renderPage(website: Website, page: Page): string {
   const baseCSS = generateCSS(website.colors);
 
+  // Determine if this is the home page (by type OR by empty slug)
+  const isHomePage = page.type === 'home' || page.slug === '' || page.slug === '/';
+
   // Determine which rich CSS to use
   let richCSS = '';
-  if (page.type === 'home') {
+  if (isHomePage) {
     richCSS = generateRichHomepageCSS();
   } else if (['about', 'contact', 'services', 'locations', 'blog'].includes(page.type)) {
     richCSS = generatePageCSS();
@@ -45,38 +48,41 @@ export function renderPage(website: Website, page: Page): string {
     }))
   };
 
-  // Generate content based on page type
+  // Generate content based on page type (with home page fallback by slug)
   let mainContent: string;
-  switch (page.type) {
-    case 'home':
-      mainContent = generateRichHomepageContent(businessInfo);
-      break;
-    case 'about':
-      mainContent = generateRichAboutContent(businessInfo);
-      break;
-    case 'contact':
-      mainContent = generateRichContactContent(businessInfo);
-      break;
-    case 'services':
-      mainContent = generateRichServicesContent(businessInfo);
-      break;
-    case 'locations':
-      mainContent = generateRichLocationsContent(businessInfo);
-      break;
-    case 'blog':
-      mainContent = generateRichBlogContent(businessInfo, website.blogPosts.map(p => ({
-        title: p.title,
-        slug: p.slug,
-        excerpt: p.excerpt,
-        publishedAt: p.publishedAt
-      })));
-      break;
-    default:
-      // Fall back to section-based rendering
-      mainContent = page.content
-        .sort((a, b) => a.order - b.order)
-        .map(section => renderSection(section, website))
-        .join('\n');
+
+  // Home page - detect by type OR by empty slug
+  if (isHomePage) {
+    mainContent = generateRichHomepageContent(businessInfo);
+  } else {
+    switch (page.type) {
+      case 'about':
+        mainContent = generateRichAboutContent(businessInfo);
+        break;
+      case 'contact':
+        mainContent = generateRichContactContent(businessInfo);
+        break;
+      case 'services':
+        mainContent = generateRichServicesContent(businessInfo);
+        break;
+      case 'locations':
+        mainContent = generateRichLocationsContent(businessInfo);
+        break;
+      case 'blog':
+        mainContent = generateRichBlogContent(businessInfo, website.blogPosts.map(p => ({
+          title: p.title,
+          slug: p.slug,
+          excerpt: p.excerpt,
+          publishedAt: p.publishedAt
+        })));
+        break;
+      default:
+        // Fall back to section-based rendering
+        mainContent = page.content
+          .sort((a, b) => a.order - b.order)
+          .map(section => renderSection(section, website))
+          .join('\n');
+    }
   }
 
   return `<!DOCTYPE html>
