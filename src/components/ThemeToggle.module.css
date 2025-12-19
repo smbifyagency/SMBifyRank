@@ -1,0 +1,33 @@
+.themeToggle {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-secondary);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.themeBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    opacity: 0.5;
+}
+
+.themeBtn:hover {
+    background: var(--bg-tertiary);
+    opacity: 0.8;
+}
+
+.themeBtn.active {
+    background: var(--accent-primary);
+    opacity: 1;
+}

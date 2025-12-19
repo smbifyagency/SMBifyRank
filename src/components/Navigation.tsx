@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { ThemeToggle } from './ThemeToggle';
+import { useTheme } from './ThemeProvider';
 import styles from './Navigation.module.css';
 
 export default function Navigation() {
@@ -11,6 +14,7 @@ export default function Navigation() {
     const router = useRouter();
     const { data: session, status } = useSession();
     const [isGuest, setIsGuest] = useState(false);
+    const { resolvedTheme } = useTheme();
 
     useEffect(() => {
         const guestMode = localStorage.getItem('guest-mode');
@@ -42,14 +46,23 @@ export default function Navigation() {
             <nav className={styles.nav}>
                 <div className={styles.container}>
                     <Link href="/" className={styles.logo}>
-                        <span className={styles.logoIcon}>🚀</span>
-                        AI Website Builder
+                        <Image
+                            src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+                            alt="SMBify Rank"
+                            width={140}
+                            height={32}
+                            priority
+                        />
                     </Link>
 
                     <div className={styles.links}>
                         <a href="#features" className={styles.link}>
                             Features
                         </a>
+                        <a href="#pricing" className={styles.link}>
+                            Pricing
+                        </a>
+                        <ThemeToggle />
                         {isAuthenticated ? (
                             <Link href="/app" className={styles.createBtn}>
                                 Dashboard
@@ -60,7 +73,7 @@ export default function Navigation() {
                                     Sign In
                                 </Link>
                                 <Link href="/app" className={styles.createBtn}>
-                                    Get Started
+                                    Get Started Free
                                 </Link>
                             </>
                         )}
@@ -75,8 +88,13 @@ export default function Navigation() {
         <nav className={styles.nav}>
             <div className={styles.container}>
                 <Link href="/app" className={styles.logo}>
-                    <span className={styles.logoIcon}>🚀</span>
-                    AI Website Builder
+                    <Image
+                        src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+                        alt="SMBify Rank"
+                        width={140}
+                        height={32}
+                        priority
+                    />
                 </Link>
 
                 <div className={styles.links}>
