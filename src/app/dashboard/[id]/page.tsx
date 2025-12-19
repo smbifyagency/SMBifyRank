@@ -64,49 +64,38 @@ export default function DashboardPage() {
 
     const handleExport = async () => {
         if (!website) return;
-        try {
-            const response = await fetch('/api/export', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(website),
-            });
 
-            if (!response.ok) {
-                throw new Error('Export failed');
-            }
+        // Generate filename for the download
+        const safeName = (website.name || website.businessName || 'website')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '') || 'website';
 
-            // Generate filename from website name
-            const safeName = (website.name || website.businessName || 'website')
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-|-$/g, '') || 'website';
-            const filename = `${safeName}-website.zip`;
+        // Create a hidden form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/api/export';
+        form.style.display = 'none';
 
-            // Get blob data
-            const blob = await response.blob();
+        // Add website data as hidden input
+        const dataInput = document.createElement('input');
+        dataInput.type = 'hidden';
+        dataInput.name = 'websiteData';
+        dataInput.value = JSON.stringify(website);
+        form.appendChild(dataInput);
 
-            // Convert blob to base64 data URL using FileReader
-            const reader = new FileReader();
-            reader.onload = function () {
-                const dataUrl = reader.result as string;
+        // Add filename as hidden input
+        const filenameInput = document.createElement('input');
+        filenameInput.type = 'hidden';
+        filenameInput.name = 'filename';
+        filenameInput.value = `${safeName}-website.zip`;
+        form.appendChild(filenameInput);
 
-                // Create download link with data URL
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                link.download = filename;
-
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-            reader.readAsDataURL(blob);
-
-        } catch (error) {
-            console.error('Export failed:', error);
-            alert('Failed to export website');
-        }
+        // Submit form to trigger download
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
     };
 
     const handleDeploy = async () => {

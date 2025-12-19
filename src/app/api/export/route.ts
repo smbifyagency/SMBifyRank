@@ -259,9 +259,32 @@ export async function GET(request: NextRequest) {
 }
 
 // POST endpoint with proper headers for download
+// Supports both JSON body and form data submission
 export async function POST(request: NextRequest) {
     try {
-        const website: Website = await request.json();
+        let website: Website;
+        let filename = 'website.zip';
+
+        const contentType = request.headers.get('content-type') || '';
+
+        if (contentType.includes('application/x-www-form-urlencoded')) {
+            // Handle form data submission (for reliable Chrome downloads)
+            const formData = await request.formData();
+            const websiteData = formData.get('websiteData');
+            const filenameParam = formData.get('filename');
+
+            if (!websiteData || typeof websiteData !== 'string') {
+                return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
+            }
+
+            website = JSON.parse(websiteData);
+            if (filenameParam && typeof filenameParam === 'string') {
+                filename = filenameParam;
+            }
+        } else {
+            // Handle JSON body submission
+            website = await request.json();
+        }
 
         if (!website || !website.businessName) {
             return NextResponse.json({ error: 'Invalid website data' }, { status: 400 });
@@ -332,19 +355,20 @@ export async function POST(request: NextRequest) {
             compressionOptions: { level: 6 }
         });
 
-        // Create safe filename
-        const safeName = (website.name || website.businessName || 'website')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '') || 'website';
+        // Use filename from form if provided, otherwise generate from website name
+        const finalFilename = filename !== 'website.zip' ? filename :
+            `${(website.name || website.businessName || 'website')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '') || 'website'}-website.zip`;
 
         // Return response with proper headers for download
         return new NextResponse(Buffer.from(zipContent), {
             status: 200,
             headers: {
-                'Content-Type': 'application/octet-stream',
-                'Content-Disposition': `attachment; filename="${safeName}-website.zip"`,
+                'Content-Type': 'application/zip',
+                'Content-Disposition': `attachment; filename="${finalFilename}"`,
                 'Content-Length': zipContent.length.toString(),
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 'Pragma': 'no-cache',
