@@ -1,7 +1,7 @@
 // Static HTML/CSS/JS export functionality
 
 import { Website, Page, BlogPost } from './types';
-import { renderPage, renderBlogPostPage } from './generator/templates';
+import { renderPage, renderBlogPostPage, renderServicePage, renderLocationPage } from './generator/templates';
 import JSZip from 'jszip';
 
 export interface ExportedFile {
@@ -23,60 +23,63 @@ export function generateSitemapXml(website: Website): string {
             const loc = page.slug === '' ? baseUrl : `${baseUrl}/${page.slug}`;
             const priority = page.type === 'home' ? '1.0' :
                 page.type === 'services' ? '0.9' :
-                    page.type === 'service-single' ? '0.8' :
-                        page.type === 'location' ? '0.8' :
-                            page.type === 'contact' ? '0.7' : '0.6';
-            const changefreq = page.type === 'home' ? 'weekly' :
-                page.type === 'blog' ? 'daily' : 'monthly';
-
-            urls += `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-  </url>
-`;
+                    page.type === 'contact' ? '0.8' : '0.7';
+            urls += `
+    <url>
+        <loc>${loc}</loc>
+        <lastmod>${lastmod}</lastmod>
+        <priority>${priority}</priority>
+    </url>`;
         });
 
-    // Add published blog posts
+    // Add service pages
+    website.services.forEach(service => {
+        urls += `
+    <url>
+        <loc>${baseUrl}/services/${service.slug}</loc>
+        <lastmod>${lastmod}</lastmod>
+        <priority>0.8</priority>
+    </url>`;
+    });
+
+    // Add location pages
+    website.locations.forEach(location => {
+        urls += `
+    <url>
+        <loc>${baseUrl}/locations/${location.slug}</loc>
+        <lastmod>${lastmod}</lastmod>
+        <priority>0.8</priority>
+    </url>`;
+    });
+
+    // Add blog posts
     website.blogPosts
         .filter(p => p.status === 'published')
         .forEach(post => {
-            urls += `  <url>
-    <loc>${baseUrl}/blog/${post.slug}</loc>
-    <lastmod>${post.updatedAt.split('T')[0]}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-`;
+            urls += `
+    <url>
+        <loc>${baseUrl}/blog/${post.slug}</loc>
+        <lastmod>${lastmod}</lastmod>
+        <priority>0.6</priority>
+    </url>`;
         });
 
     return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-${urls}</urlset>`;
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
 }
 
-// Generate robots.txt for SEO
+// Generate robots.txt
 export function generateRobotsTxt(website: Website): string {
-    const baseUrl = website.netlifyUrl || 'https://example.com';
+    const sitemapUrl = website.netlifyUrl
+        ? `${website.netlifyUrl}/sitemap.xml`
+        : 'https://example.com/sitemap.xml';
 
-    return `# robots.txt for ${website.businessName}
-User-agent: *
+    return `User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: ${baseUrl}/sitemap.xml
-
-# Crawl-delay (optional, for respectful crawling)
-Crawl-delay: 1
-
-# Disallow admin/internal pages
-Disallow: /api/
-Disallow: /admin/
-Disallow: /*.json$
+Sitemap: ${sitemapUrl}
 `;
 }
 
@@ -92,6 +95,18 @@ export function exportWebsite(website: Website): ExportedFile[] {
             const path = page.slug === '' ? 'index.html' : `${page.slug}.html`;
             files.push({ path, content: html });
         });
+
+    // Export individual service pages
+    website.services.forEach(service => {
+        const html = renderServicePage(website, service);
+        files.push({ path: `services/${service.slug}.html`, content: html });
+    });
+
+    // Export individual location pages
+    website.locations.forEach(location => {
+        const html = renderLocationPage(website, location);
+        files.push({ path: `locations/${location.slug}.html`, content: html });
+    });
 
     // Export blog posts
     website.blogPosts
@@ -109,6 +124,7 @@ export function exportWebsite(website: Website): ExportedFile[] {
 
     return files;
 }
+
 
 // Create ZIP file from exported files using JSZip
 export async function createZipBlob(files: ExportedFile[]): Promise<Blob> {

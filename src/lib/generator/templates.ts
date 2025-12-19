@@ -1582,3 +1582,331 @@ export function renderBlogPostPage(website: Website, post: BlogPost): string {
 </body>
 </html>`;
 }
+
+// Render individual service page
+export function renderServicePage(website: Website, service: { name: string; slug: string; description: string; icon?: string }): string {
+  const css = generateCSS(website.colors) + generateRichHomepageCSS();
+  const phone = website.contactPhone || '(555) 123-4567';
+  const phoneClean = phone.replace(/[^0-9+]/g, '');
+  const city = website.locations[0]?.city || 'Your Area';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${service.name} in ${city} | ${website.businessName}</title>
+  <meta name="description" content="Professional ${service.name.toLowerCase()} services in ${city}. ${service.description} Call ${phone} for a free estimate.">
+  <meta name="keywords" content="${service.name}, ${service.name} ${city}, ${website.businessName}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>${css}</style>
+</head>
+<body>
+  ${renderHeader(website)}
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-emergency">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-main">
+            <div class="emergency-badge">
+              <span class="pulse"></span>
+              ${service.icon || '✓'} ${service.name}
+            </div>
+            <h1>${service.name} in ${city}</h1>
+            <h2>${website.businessName} - Professional ${service.name} Services</h2>
+            <p class="hero-description">
+              ${service.description} Our team of experienced professionals is ready to help you with 
+              all your ${service.name.toLowerCase()} needs. We serve ${city} and the surrounding areas 
+              with fast, reliable service. Call us today for a free estimate!
+            </p>
+            <div class="hero-urgency">
+              <span>⚡ Fast Response</span>
+              <span>🆓 Free Estimates</span>
+              <span>🕐 Available 24/7</span>
+            </div>
+          </div>
+          <div class="hero-call-box">
+            <div class="call-box-header">Need ${service.name}?</div>
+            <p>Speak directly with a specialist who can help you immediately.</p>
+            <a href="tel:${phoneClean}" class="call-box-button">
+              <span class="call-icon">📱</span>
+              <span>
+                <small>Tap to Call</small>
+                <strong>${phone}</strong>
+              </span>
+            </a>
+            <p class="call-box-note">Available 24 hours a day, 7 days a week</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Service Details -->
+    <section class="services-pro">
+      <div class="container">
+        <div class="section-intro">
+          <span class="section-label">${service.icon || '✓'} About This Service</span>
+          <h2>${service.name} Services in ${city}</h2>
+          <p class="intro-text">
+            ${website.businessName} offers professional ${service.name.toLowerCase()} services to homeowners and 
+            businesses throughout ${city}. Our experienced technicians are equipped with the latest tools and 
+            technology to handle any job, big or small. We pride ourselves on quality workmanship, transparent 
+            pricing, and exceptional customer service.
+          </p>
+        </div>
+
+        <div class="edu-grid">
+          <div class="edu-card">
+            <h3>Why Choose Us for ${service.name}?</h3>
+            <ul class="edu-list">
+              <li><span>✓</span> Licensed and insured professionals</li>
+              <li><span>✓</span> Upfront, transparent pricing</li>
+              <li><span>✓</span> Same-day service available</li>
+              <li><span>✓</span> 100% satisfaction guarantee</li>
+              <li><span>✓</span> Local experts who know ${city}</li>
+            </ul>
+            <a href="tel:${phoneClean}" class="edu-call-btn">Call Now: ${phone}</a>
+          </div>
+          <div class="edu-card">
+            <h3>Our ${service.name} Process</h3>
+            <ul class="edu-list">
+              <li><span>1️⃣</span> Call us for a free consultation</li>
+              <li><span>2️⃣</span> We'll assess your needs and provide a quote</li>
+              <li><span>3️⃣</span> Our team completes the work professionally</li>
+              <li><span>4️⃣</span> We follow up to ensure your satisfaction</li>
+              <li><span>5️⃣</span> Enjoy our workmanship guarantee</li>
+            </ul>
+            <a href="tel:${phoneClean}" class="edu-call-btn">Get Started: ${phone}</a>
+          </div>
+        </div>
+
+        <div class="services-cta-box">
+          <h3>Ready for Professional ${service.name}?</h3>
+          <p>Don't wait - call us now for immediate assistance with your ${service.name.toLowerCase()} needs.</p>
+          <a href="tel:${phoneClean}" class="big-call-button">
+            📞 Call Now: ${phone}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Service Areas -->
+    ${website.locations.length > 0 ? `
+    <section class="areas-pro">
+      <div class="container">
+        <div class="section-intro centered">
+          <span class="section-label">Service Areas</span>
+          <h2>${service.name} Near You</h2>
+          <p class="intro-text">
+            We provide ${service.name.toLowerCase()} services throughout ${city} and the surrounding areas.
+          </p>
+        </div>
+        <div class="areas-grid-pro">
+          ${website.locations.map(l => `
+          <a href="/locations/${l.slug}.html" class="area-card-pro">
+            <span class="area-pin">📍</span>
+            <span class="area-city">${l.city}${l.state ? `, ${l.state}` : ''}</span>
+            <span class="area-arrow">→</span>
+          </a>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+    ` : ''}
+
+    <!-- Final CTA -->
+    <section class="final-cta-pro">
+      <div class="container">
+        <div class="cta-box-pro">
+          <h2>Get ${service.name} Today!</h2>
+          <p>Pick up the phone and call us now for fast, professional service.</p>
+          <a href="tel:${phoneClean}" class="mega-phone-cta">
+            <span class="mega-icon">📞</span>
+            <span class="mega-content">
+              <span class="mega-label">Call Now - We're Ready to Help!</span>
+              <span class="mega-number">${phone}</span>
+            </span>
+          </a>
+          <p class="cta-subtext">Free estimates • Same-day service • ${city} and surrounding areas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Call Button -->
+    <a href="tel:${phoneClean}" class="floating-call-btn" aria-label="Call Now">
+      📞 <span>Call Now</span>
+    </a>
+  </main>
+  ${renderFooter(website)}
+  <script>${generateJS()}</script>
+</body>
+</html>`;
+}
+
+// Render individual location page
+export function renderLocationPage(website: Website, location: { city: string; state?: string; slug: string; description?: string }): string {
+  const css = generateCSS(website.colors) + generateRichHomepageCSS();
+  const phone = website.contactPhone || '(555) 123-4567';
+  const phoneClean = phone.replace(/[^0-9+]/g, '');
+  const locationName = location.state ? `${location.city}, ${location.state}` : location.city;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${website.industry} Services in ${locationName} | ${website.businessName}</title>
+  <meta name="description" content="Professional ${website.industry.toLowerCase()} services in ${locationName}. ${website.businessName} serves ${location.city} with fast, reliable service. Call ${phone} today!">
+  <meta name="keywords" content="${website.industry} ${location.city}, ${location.city} ${website.industry}, ${website.businessName} ${location.city}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>${css}</style>
+</head>
+<body>
+  ${renderHeader(website)}
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-emergency">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-main">
+            <div class="emergency-badge">
+              <span class="pulse"></span>
+              📍 Serving ${locationName}
+            </div>
+            <h1>${website.industry} Services in ${locationName}</h1>
+            <h2>${website.businessName} - Your Local ${website.industry} Experts</h2>
+            <p class="hero-description">
+              ${location.description || `Looking for reliable ${website.industry.toLowerCase()} services in ${locationName}? 
+              ${website.businessName} is proud to serve the ${location.city} community with professional, high-quality services. 
+              Our team of local experts understands the unique needs of ${location.city} residents and businesses.`}
+            </p>
+            <div class="hero-urgency">
+              <span>📍 Local Experts</span>
+              <span>⚡ Fast Response</span>
+              <span>🆓 Free Estimates</span>
+            </div>
+          </div>
+          <div class="hero-call-box">
+            <div class="call-box-header">Need Help in ${location.city}?</div>
+            <p>We're your local ${website.industry.toLowerCase()} specialists, ready to help!</p>
+            <a href="tel:${phoneClean}" class="call-box-button">
+              <span class="call-icon">📱</span>
+              <span>
+                <small>Call ${location.city}</small>
+                <strong>${phone}</strong>
+              </span>
+            </a>
+            <p class="call-box-note">Serving ${locationName} and nearby areas</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services in this Location -->
+    <section class="services-pro">
+      <div class="container">
+        <div class="section-intro">
+          <span class="section-label">Our Services in ${location.city}</span>
+          <h2>${website.industry} Services Available in ${locationName}</h2>
+          <p class="intro-text">
+            ${website.businessName} offers a comprehensive range of ${website.industry.toLowerCase()} services to 
+            residents and businesses in ${location.city}. No matter what you need, our experienced local team is here to help.
+          </p>
+        </div>
+
+        <div class="services-grid-pro">
+          ${website.services.slice(0, 6).map((s, i) => `
+          <div class="service-card-pro" data-delay="${i * 100}">
+            <div class="service-icon-box">
+              <span>${s.icon || '✓'}</span>
+            </div>
+            <h3>${s.name}</h3>
+            <p>${s.description}</p>
+            <a href="/services/${s.slug}.html" class="service-call-btn">
+              Learn More →
+            </a>
+          </div>
+          `).join('')}
+        </div>
+
+        <div class="services-cta-box">
+          <h3>Need ${website.industry} Help in ${location.city}?</h3>
+          <p>Our local team is ready to assist you with any ${website.industry.toLowerCase()} needs.</p>
+          <a href="tel:${phoneClean}" class="big-call-button">
+            📞 Call Now: ${phone}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Choose Us for This Location -->
+    <section class="why-choose-pro">
+      <div class="container">
+        <div class="why-content">
+          <span class="section-label">Why ${location.city} Chooses Us</span>
+          <h2>${website.businessName} in ${locationName}</h2>
+          <p class="lead-paragraph">
+            As a trusted ${website.industry.toLowerCase()} provider in ${location.city}, we've built our reputation 
+            on quality workmanship, honest pricing, and exceptional customer service. Our team knows ${location.city} 
+            and understands the specific needs of local homes and businesses.
+          </p>
+          
+          <div class="benefits-grid">
+            <div class="benefit-card">
+              <span class="benefit-icon">📍</span>
+              <h4>Local to ${location.city}</h4>
+              <p>We're part of the ${location.city} community and treat every customer like a neighbor.</p>
+            </div>
+            <div class="benefit-card">
+              <span class="benefit-icon">⚡</span>
+              <h4>Fast Response</h4>
+              <p>Because we're local, we can often provide same-day service to ${location.city} customers.</p>
+            </div>
+            <div class="benefit-card">
+              <span class="benefit-icon">🆓</span>
+              <h4>Free Estimates</h4>
+              <p>Get a free, no-obligation quote for any ${website.industry.toLowerCase()} project in ${location.city}.</p>
+            </div>
+            <div class="benefit-card">
+              <span class="benefit-icon">✅</span>
+              <h4>Satisfaction Guarantee</h4>
+              <p>We stand behind our work with a 100% satisfaction guarantee.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta-pro">
+      <div class="container">
+        <div class="cta-box-pro">
+          <h2>Ready for ${website.industry} Service in ${location.city}?</h2>
+          <p>Call your local ${website.industry.toLowerCase()} experts today!</p>
+          <a href="tel:${phoneClean}" class="mega-phone-cta">
+            <span class="mega-icon">📞</span>
+            <span class="mega-content">
+              <span class="mega-label">Call ${location.city} Now!</span>
+              <span class="mega-number">${phone}</span>
+            </span>
+          </a>
+          <p class="cta-subtext">Free estimates • Local experts • Serving ${locationName}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Floating Call Button -->
+    <a href="tel:${phoneClean}" class="floating-call-btn" aria-label="Call Now">
+      📞 <span>Call Now</span>
+    </a>
+  </main>
+  ${renderFooter(website)}
+  <script>${generateJS()}</script>
+</body>
+</html>`;
+}
