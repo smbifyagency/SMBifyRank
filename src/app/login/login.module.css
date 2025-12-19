@@ -1,0 +1,180 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    background: var(--bg-primary);
+}
+
+.card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.header {
+    margin-bottom: var(--space-xl);
+}
+
+.icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: var(--space-md);
+}
+
+.header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.googleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.googleBtn:hover {
+    background: #f5f5f5;
+    box-shadow: var(--shadow-md);
+}
+
+.googleIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.terms {
+    margin-top: var(--space-lg);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.userInfo {
+    margin-bottom: var(--space-xl);
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: var(--space-md);
+    border: 3px solid var(--accent-primary);
+}
+
+.userInfo h2 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.email {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.dashboardBtn {
+    padding: var(--space-md) var(--space-lg);
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-base);
+}
+
+.dashboardBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.signOutBtn {
+    padding: var(--space-md) var(--space-lg);
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.signOutBtn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.loading {
+    padding: var(--space-xl);
+    color: var(--text-muted);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: var(--space-lg) 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider span {
+    padding: 0 var(--space-md);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.guestBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.guestBtn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+}

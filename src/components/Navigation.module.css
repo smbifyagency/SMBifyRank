@@ -1,0 +1,193 @@
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.logoIcon {
+    font-size: 1.5rem;
+}
+
+.links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.link {
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.95rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.link:hover {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+}
+
+.link.active {
+    color: var(--accent-primary);
+}
+
+.createBtn {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all var(--transition-base);
+}
+
+.createBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+@media (max-width: 640px) {
+    .logo span:last-child {
+        display: none;
+    }
+
+    .link {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.875rem;
+    }
+
+    .createBtn {
+        padding: var(--space-xs) var(--space-md);
+    }
+}
+
+/* User Profile Styles */
+.userLoading {
+    color: var(--text-muted);
+    padding: var(--space-sm);
+}
+
+.userMenu {
+    position: relative;
+}
+
+.userAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color var(--transition-fast);
+}
+
+.userAvatar:hover {
+    border-color: var(--accent-primary);
+}
+
+.guestAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color var(--transition-fast);
+}
+
+.guestAvatar:hover {
+    border-color: var(--accent-primary);
+}
+
+.userMenu:hover .userDropdown {
+    display: block;
+}
+
+.userDropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--space-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    min-width: 200px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1001;
+}
+
+.userName {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.userEmail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.signOutBtn {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.signOutBtn:hover {
+    background: var(--bg-tertiary);
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+.loginBtn {
+    padding: var(--space-sm) var(--space-lg);
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all var(--transition-base);
+}
+
+.loginBtn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+}
