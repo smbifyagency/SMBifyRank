@@ -51,6 +51,7 @@ export default function Navigation() {
                             alt="SMBify Rank"
                             width={140}
                             height={32}
+                            className={styles.logoImage}
                             priority
                         />
                     </Link>
@@ -93,6 +94,7 @@ export default function Navigation() {
                         alt="SMBify Rank"
                         width={140}
                         height={32}
+                        className={styles.logoImage}
                         priority
                     />
                 </Link>

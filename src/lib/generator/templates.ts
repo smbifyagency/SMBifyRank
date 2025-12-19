@@ -85,6 +85,10 @@ export function renderPage(website: Website, page: Page): string {
     }
   }
 
+  // Build canonical URL
+  const baseUrl = website.netlifyUrl || '';
+  const canonicalUrl = page.slug ? `${baseUrl}/${page.slug}` : baseUrl || '/';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,9 +97,28 @@ export function renderPage(website: Website, page: Page): string {
   <title>${page.seo.title}</title>
   <meta name="description" content="${page.seo.description}">
   <meta name="keywords" content="${page.seo.keywords.join(', ')}">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="${canonicalUrl}">
+  
+  <!-- Open Graph Tags -->
   <meta property="og:title" content="${page.seo.title}">
   <meta property="og:description" content="${page.seo.description}">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:image" content="${page.seo.ogImage || website.logoUrl || ''}">
+  <meta property="og:site_name" content="${website.businessName}">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${page.seo.title}">
+  <meta name="twitter:description" content="${page.seo.description}">
+  <meta name="twitter:image" content="${page.seo.ogImage || website.logoUrl || ''}">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="${website.logoUrl || '/favicon.ico'}" type="image/x-icon">
+  <link rel="apple-touch-icon" href="${website.logoUrl || '/favicon.ico'}">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -1165,6 +1188,13 @@ export function renderFooter(website: Website): string {
         </div>
         <div class="footer-bottom">
           <p>&copy; ${new Date().getFullYear()} ${website.businessName}. All rights reserved.</p>
+          <div class="footer-social">
+            ${website.seoSettings?.socialLinks?.facebook ? `<a href="${website.seoSettings.socialLinks.facebook}" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="social-icon">📘</a>` : ''}
+            ${website.seoSettings?.socialLinks?.twitter ? `<a href="${website.seoSettings.socialLinks.twitter}" target="_blank" rel="noopener noreferrer" aria-label="Twitter" class="social-icon">🐦</a>` : ''}
+            ${website.seoSettings?.socialLinks?.instagram ? `<a href="${website.seoSettings.socialLinks.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-icon">📷</a>` : ''}
+            ${website.seoSettings?.socialLinks?.linkedin ? `<a href="${website.seoSettings.socialLinks.linkedin}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon">💼</a>` : ''}
+            ${website.seoSettings?.socialLinks?.youtube ? `<a href="${website.seoSettings.socialLinks.youtube}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="social-icon">📺</a>` : ''}
+          </div>
           <div class="footer-legal">
             <a href="/privacy-policy">Privacy Policy</a>
             <span>|</span>
@@ -1173,6 +1203,9 @@ export function renderFooter(website: Website): string {
         </div>
       </div>
     </footer>
+    
+    <!-- Back to Top Button -->
+    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Back to top" style="position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 999; transition: all 0.3s ease;">↑</button>
   `;
 }
 
@@ -1547,6 +1580,18 @@ export function generateJS(): string {
         this.reset();
       });
     });
+    
+    // Back to top button visibility
+    const backToTopBtn = document.getElementById('backToTop');
+    if (backToTopBtn) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+          backToTopBtn.style.display = 'flex';
+        } else {
+          backToTopBtn.style.display = 'none';
+        }
+      });
+    }
   `;
 }
 

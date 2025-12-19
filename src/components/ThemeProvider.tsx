@@ -74,8 +74,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     };
 
     // Prevent flash of wrong theme
+    // We must still provide the context even if not mounted, otherwise useTheme throws
     if (!mounted) {
-        return <>{children}</>;
+        // Return null or a loader if we want to block rendering, but better to render with default context
+        // to allow hydration to complete.
+        // However, to fix the crash, we just proceed to render the Provider.
+        // Ideally we use next-themes but here we just render.
     }
 
     return (
