@@ -699,3 +699,138 @@
     margin-top: var(--space-xs);
     display: block;
 }
+
+/* Palette Section */
+.paletteSection {
+    margin-bottom: var(--space-xl);
+}
+
+.paletteSection h3 {
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.paletteGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-md);
+}
+
+.paletteCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-md);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.paletteCard:hover {
+    border-color: var(--text-muted);
+    transform: translateY(-2px);
+}
+
+.paletteCard.selected {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.paletteColors {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.paletteColors>div {
+    flex: 1;
+}
+
+.paletteName {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-align: center;
+}
+
+.recommended {
+    font-size: 0.7rem;
+    color: var(--accent-success);
+    font-weight: 600;
+    margin-top: var(--space-xs);
+}
+
+/* Custom Color Section */
+.customColorSection {
+    margin-top: var(--space-lg);
+}
+
+.customColorSection h3 {
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+/* Logo Upload */
+.logoUploadWrapper {
+    display: flex;
+    gap: var(--space-lg);
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.logoOrDivider {
+    display: flex;
+    align-items: center;
+    padding: var(--space-lg) 0;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.fileInput {
+    padding: var(--space-sm);
+    background: var(--bg-tertiary);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.fileInput:hover {
+    border-color: var(--accent-primary);
+}
+
+.logoPreview {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.logoPreview img {
+    max-width: 200px;
+    max-height: 100px;
+    object-fit: contain;
+}
+
+@media (max-width: 640px) {
+    .paletteGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .logoUploadWrapper {
+        flex-direction: column;
+    }
+
+    .logoOrDivider {
+        padding: var(--space-sm) 0;
+    }
+}

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { IntakeFormData, INDUSTRIES, WEBSITE_GOALS, DEFAULT_COLORS, ServiceInput, LocationInput, BrandColors } from '@/lib/types';
 import { generateWebsiteWithAI } from '@/lib/generator';
 import { saveWebsite } from '@/lib/storage';
 import { SAMPLE_BUSINESSES, SampleBusiness } from '@/lib/sampleData';
+import { COLOR_PALETTES, getPaletteForIndustry, ColorPalette } from '@/lib/colorPalettes';
 import styles from './create.module.css';
 
 const STEPS = ['Business Info', 'Services', 'Locations', 'Brand Colors', 'Final Details'];
@@ -17,6 +18,7 @@ export default function CreateWebsitePage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [generateProgress, setGenerateProgress] = useState({ message: '', progress: 0 });
     const [showSampleSelector, setShowSampleSelector] = useState(false);
+    const [selectedPaletteId, setSelectedPaletteId] = useState<string>('modern-blue');
 
     const [formData, setFormData] = useState<IntakeFormData>({
         businessName: '',
@@ -93,6 +95,35 @@ export default function CreateWebsitePage() {
             ...prev,
             colors: { ...prev.colors, [key]: value },
         }));
+    };
+
+    // Apply a color palette
+    const applyPalette = (palette: ColorPalette) => {
+        setSelectedPaletteId(palette.id);
+        setFormData(prev => ({
+            ...prev,
+            colors: { ...palette.colors },
+        }));
+    };
+
+    // Auto-select palette when industry changes
+    useEffect(() => {
+        if (formData.industry) {
+            const palette = getPaletteForIndustry(formData.industry);
+            applyPalette(palette);
+        }
+    }, [formData.industry]);
+
+    // Handle logo file upload
+    const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                updateFormData({ logoUrl: reader.result as string });
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const canProceed = () => {
@@ -360,10 +391,36 @@ export default function CreateWebsitePage() {
                                 <div className={styles.stepPanel}>
                                     <h2>Choose your brand colors</h2>
                                     <p className={styles.stepDescription}>
-                                        Select colors that represent your brand. These will be used throughout your website.
+                                        Select a color palette or customize your own colors.
                                     </p>
 
-                                    <div className={styles.colorGrid}>
+                                    {/* Color Palette Grid */}
+                                    <div className={styles.paletteSection}>
+                                        <h3>🎨 Quick Select Palette</h3>
+                                        <div className={styles.paletteGrid}>
+                                            {COLOR_PALETTES.map(palette => (
+                                                <div
+                                                    key={palette.id}
+                                                    className={`${styles.paletteCard} ${selectedPaletteId === palette.id ? styles.selected : ''}`}
+                                                    onClick={() => applyPalette(palette)}
+                                                >
+                                                    <div className={styles.paletteColors}>
+                                                        <div style={{ background: palette.colors.primary }}></div>
+                                                        <div style={{ background: palette.colors.secondary }}></div>
+                                                        <div style={{ background: palette.colors.accent }}></div>
+                                                    </div>
+                                                    <span className={styles.paletteName}>{palette.name}</span>
+                                                    {palette.categories.includes(formData.industry) && (
+                                                        <span className={styles.recommended}>✓ Recommended</span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Manual Color Customization */}
+                                    <div className={styles.customColorSection}>
+                                        <h3>🖌️ Customize Colors</h3>
                                         <div className={styles.colorPicker}>
                                             <label>Primary Color</label>
                                             <div className={styles.colorInputWrapper}>
@@ -463,16 +520,50 @@ export default function CreateWebsitePage() {
                                         </div>
                                     </div>
 
+                                    {/* Logo Section */}
+                                    <div className={styles.formSection}>
+                                        <h3>🖼️ Logo</h3>
+                                        <div className={styles.logoUploadWrapper}>
+                                            <div className={styles.formGroup}>
+                                                <label>Upload Logo</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/png,image/jpeg,image/svg+xml"
+                                                    onChange={handleLogoUpload}
+                                                    className={styles.fileInput}
+                                                />
+                                                <small className={styles.fieldHint}>PNG, JPG, or SVG (recommended)</small>
+                                            </div>
+                                            <div className={styles.logoOrDivider}>OR</div>
+                                            <div className={styles.formGroup}>
+                                                <label>Logo URL</label>
+                                                <input
+                                                    type="url"
+                                                    className={styles.input}
+                                                    placeholder="https://yourdomain.com/logo.png"
+                                                    value={formData.logoUrl || ''}
+                                                    onChange={(e) => updateFormData({ logoUrl: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                        {formData.logoUrl && (
+                                            <div className={styles.logoPreview}>
+                                                <img src={formData.logoUrl} alt="Logo preview" />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Main Website URL for Parasite Sites */}
                                     <div className={styles.formGroup}>
-                                        <label>Logo URL (optional)</label>
+                                        <label>Main Website URL (optional)</label>
                                         <input
                                             type="url"
                                             className={styles.input}
-                                            placeholder="https://yourdomain.com/logo.png"
-                                            value={formData.logoUrl || ''}
-                                            onChange={(e) => updateFormData({ logoUrl: e.target.value })}
+                                            placeholder="https://yourmainwebsite.com"
+                                            value={formData.mainWebsiteUrl || ''}
+                                            onChange={(e) => updateFormData({ mainWebsiteUrl: e.target.value })}
                                         />
-                                        <small className={styles.fieldHint}>Enter a URL to your logo image (PNG, JPG, or SVG recommended)</small>
+                                        <small className={styles.fieldHint}>For parasite sites: we&apos;ll add backlinks to your main site</small>
                                     </div>
 
                                     <div className={styles.formSection}>
