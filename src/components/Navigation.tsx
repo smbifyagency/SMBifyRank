@@ -90,7 +90,7 @@ export default function Navigation() {
             <div className={styles.container}>
                 <Link href="/app" className={styles.logo}>
                     <Image
-                        src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+                        src="/logo-dark.png"
                         alt="SMBify Rank"
                         width={140}
                         height={32}
@@ -105,12 +105,6 @@ export default function Navigation() {
                         className={`${styles.link} ${pathname === '/app' ? styles.active : ''}`}
                     >
                         My Websites
-                    </Link>
-                    <Link
-                        href="/app/blog-manager"
-                        className={`${styles.link} ${pathname === '/app/blog-manager' ? styles.active : ''}`}
-                    >
-                        Blog Manager
                     </Link>
                     <Link
                         href="/app/settings"
