@@ -30,6 +30,12 @@ export function getApiConfig(): ApiConfig {
     return {};
 }
 
+// Save API config to localStorage
+export function saveApiConfig(config: ApiConfig): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('api-config', JSON.stringify(config));
+}
+
 // Check if AI is available
 export function isAiAvailable(): boolean {
     const config = getApiConfig();

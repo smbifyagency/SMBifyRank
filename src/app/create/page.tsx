@@ -1,19 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { IntakeFormData, INDUSTRIES, WEBSITE_GOALS, DEFAULT_COLORS, ServiceInput, LocationInput, BrandColors } from '@/lib/types';
 import { generateWebsiteWithAI } from '@/lib/generator';
 import { saveWebsite } from '@/lib/storage';
+import { getApiConfig, saveApiConfig } from '@/lib/ai';
 import styles from './create.module.css';
 
-const STEPS = ['Business Info', 'Services', 'Locations', 'Brand Colors', 'Final Details'];
+const STEPS = ['Business Info', 'Services', 'Locations', 'Brand Colors', 'AI Settings', 'Final Details'];
 
 export default function CreateWebsitePage() {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(0);
     const [isGenerating, setIsGenerating] = useState(false);
     const [generateProgress, setGenerateProgress] = useState({ message: '', progress: 0 });
+
+    // AI Settings state
+    const [openaiApiKey, setOpenaiApiKey] = useState('');
+    const [useAiContent, setUseAiContent] = useState(true);
+
+    // Load saved API key on mount
+    useEffect(() => {
+        const config = getApiConfig();
+        if (config.openaiApiKey) {
+            setOpenaiApiKey(config.openaiApiKey);
+        }
+    }, []);
 
     const [formData, setFormData] = useState<IntakeFormData>({
         businessName: '',
@@ -96,8 +109,10 @@ export default function CreateWebsitePage() {
             case 2:
                 return formData.locations.some(l => l.city.trim());
             case 3:
-                return true;
+                return true; // Brand colors always valid
             case 4:
+                return true; // AI settings always valid (API key optional)
+            case 5:
                 return formData.contactEmail.trim() || formData.contactPhone.trim();
             default:
                 return true;
@@ -117,6 +132,11 @@ export default function CreateWebsitePage() {
     };
 
     const handleSubmit = async () => {
+        // Save API key before generating
+        if (openaiApiKey.trim()) {
+            saveApiConfig({ openaiApiKey: openaiApiKey.trim() });
+        }
+
         setIsGenerating(true);
         setGenerateProgress({ message: 'Starting website generation...', progress: 0 });
 
@@ -436,6 +456,62 @@ export default function CreateWebsitePage() {
                             )}
 
                             {currentStep === 4 && (
+                                <div className={styles.stepPanel}>
+                                    <h2>AI Content Generation</h2>
+                                    <p className={styles.stepDescription}>
+                                        Enter your OpenAI API key to generate unique, SEO-optimized content for your website.
+                                        Without an API key, we&apos;ll use professional template content instead.
+                                    </p>
+
+                                    <div className={styles.aiSettingsCard}>
+                                        <div className={styles.formGroup}>
+                                            <label>🔑 OpenAI API Key</label>
+                                            <input
+                                                type="password"
+                                                className={styles.input}
+                                                placeholder="sk-..."
+                                                value={openaiApiKey}
+                                                onChange={(e) => setOpenaiApiKey(e.target.value)}
+                                            />
+                                            <span className={styles.hint}>
+                                                Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">OpenAI Dashboard</a>.
+                                                Your key is stored locally and never sent to our servers.
+                                            </span>
+                                        </div>
+
+                                        <div className={styles.toggleGroup}>
+                                            <label className={styles.toggleLabel}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={useAiContent}
+                                                    onChange={(e) => setUseAiContent(e.target.checked)}
+                                                />
+                                                <span className={styles.toggleSlider}></span>
+                                                <span>Generate unique AI content for all pages</span>
+                                            </label>
+                                        </div>
+
+                                        <div className={styles.aiInfoBox}>
+                                            <h4>✨ What AI generates:</h4>
+                                            <ul>
+                                                <li>SEO-optimized homepage content</li>
+                                                <li>Unique descriptions for each service</li>
+                                                <li>Location-specific content for local SEO</li>
+                                                <li>Professional about and contact page copy</li>
+                                            </ul>
+                                        </div>
+
+                                        {!openaiApiKey.trim() && (
+                                            <div className={styles.noKeyNotice}>
+                                                <strong>📝 No API key?</strong> No problem! We&apos;ll use professional
+                                                template content that you can customize later.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {currentStep === 5 && (
                                 <div className={styles.stepPanel}>
                                     <h2>Final details</h2>
                                     <p className={styles.stepDescription}>
