@@ -14,6 +14,8 @@ interface ContentGenerationParams {
     locationState?: string;
     pageType: 'home' | 'about' | 'service' | 'location' | 'contact';
     targetWords?: number;
+    services?: Array<{ name: string; slug?: string }>;
+    locations?: Array<{ city: string; state: string; slug?: string }>;
 }
 
 // Get API config from localStorage
@@ -61,34 +63,62 @@ export async function generateAiContent(params: ContentGenerationParams): Promis
 }
 
 function buildPrompt(params: ContentGenerationParams, targetWords: number): string {
-    const { businessName, industry, serviceName, locationCity, locationState, pageType } = params;
+    const { businessName, industry, serviceName, locationCity, locationState, pageType, services, locations } = params;
     const location = locationState ? `${locationCity}, ${locationState}` : locationCity || 'local area';
+
+    // Build internal linking context
+    const serviceLinks = services?.map(s => `- ${s.name} (/services/${slugify(s.name)})`).join('\n') || '';
+    const locationLinks = locations?.map(l => `- ${l.city}, ${l.state} (/locations/${slugify(l.city)})`).join('\n') || '';
+
+    const semanticEntityGuidance = `
+SEMANTIC ENTITIES REQUIREMENT:
+Include relevant semantic entities naturally throughout the content. These are related concepts, attributes, and entities that search engines use to understand topic depth. Examples:
+- For water damage: moisture detection, structural drying, dehumidification, water extraction, mold prevention
+- For HVAC: energy efficiency, SEER rating, indoor air quality, ductwork, thermostat
+- For plumbing: pipe repair, drain cleaning, water heater, sewer line, leak detection
+
+INTERNAL LINKING REQUIREMENT:
+Naturally work in contextual references to other pages. Use this format: [INTERNAL_LINK: anchor text | /path/to/page]
+Available internal pages:
+${serviceLinks}
+${locationLinks}
+- About Us (/about)
+- Contact Us (/contact)
+- All Services (/services)
+`;
 
     switch (pageType) {
         case 'home':
             return `Write a compelling, SEO-optimized homepage content for "${businessName}", a ${industry} company serving ${location}.
 
+${semanticEntityGuidance}
+
 Requirements:
 - Write approximately ${targetWords} words
 - Use H2 and H3 headings appropriately  
-- Include relevant keywords naturally
+- Include relevant keywords naturally with 1-2% density
 - Focus on lead generation and trust building
 - Highlight key benefits and unique value propositions
 - Include a strong call-to-action focus
 - Write in a professional but approachable tone
 - Do NOT include the business name in every sentence
+- Include 5-10 semantic entities related to ${industry}
+- Add 2-3 internal links to service pages
 
 Structure the content with:
 1. A compelling introduction about the company
-2. Why choose this company (trust factors)
-3. Overview of services offered
-4. Service area coverage
-5. Call to action
+2. Why choose this company (trust factors, credentials)
+3. Overview of services offered (with internal links)
+4. Service area coverage (with location links)
+5. Social proof elements (reviews mention, certifications)
+6. Call to action
 
 Return ONLY the HTML content (using h2, h3, p, ul, li tags). Do not include doctype, html, head, or body tags.`;
 
         case 'about':
             return `Write a compelling, SEO-optimized About Us page for "${businessName}", a ${industry} company serving ${location}.
+
+${semanticEntityGuidance}
 
 Requirements:
 - Write approximately ${targetWords} words
@@ -98,53 +128,87 @@ Requirements:
 - Include team/culture information
 - Use professional but warm tone
 - Include trust indicators
+- Add 2-3 internal links to service and contact pages
+- Include semantic entities related to ${industry} expertise
 
 Return ONLY the HTML content (using h2, h3, p, ul, li tags). Do not include doctype, html, head, or body tags.`;
 
         case 'service':
-            return `Write a comprehensive, SEO-optimized service page for "${serviceName}" offered by "${businessName}", a ${industry} company.
+            return `Write a comprehensive, SEO-optimized service page for "${serviceName}" offered by "${businessName}", a ${industry} company serving ${location}.
+
+${semanticEntityGuidance}
 
 Requirements:
 - Write approximately ${targetWords} words
-- Target the keyword "${serviceName}" and related terms
-- Explain what the service includes
-- Describe the process step-by-step
-- List benefits of choosing this company
-- Include FAQ-style content
-- Add a strong call-to-action
-- Be specific and detailed
+- Target the keyword "${serviceName}" and related long-tail variations
+- Explain what the service includes in detail
+- Describe the step-by-step process customers can expect
+- List 5+ benefits of choosing this company for this service
+- Include FAQ-style content (3-4 questions)
+- Add a strong call-to-action for quotes/consultation
+- Be specific and detailed with technical terminology
+- Include 8-12 semantic entities related to this specific service
+- Add internal links to related services and location pages
+- Mention the service area naturally
+
+Structure:
+1. Introduction with keyword
+2. What this service includes
+3. Our process (numbered steps)
+4. Benefits of choosing us
+5. FAQ section
+6. Call to action
 
 Return ONLY the HTML content (using h2, h3, p, ul, li, ol tags). Do not include doctype, html, head, or body tags.`;
 
         case 'location':
             return `Write a comprehensive, SEO-optimized location page for "${businessName}" serving "${location}".
 
+${semanticEntityGuidance}
+
 Requirements:
-- Write approximately ${targetWords} words
-- Target local SEO keywords for ${location}
-- Mention specific services available in the area
-- Include local benefits (fast response times, knowledge of local codes, etc.)
-- Add trust indicators and social proof
-- Include a strong call-to-action
-- Make it feel personalized for the local community
+- Write approximately ${targetWords} words  
+- Target local SEO keywords: "${industry} in ${location}", "${industry} near ${location}", "${location} ${industry}"
+- Mention ALL services available in this area with internal links
+- Include local benefits (fast response, knowledge of local regulations, nearby team)
+- Add trust indicators and social proof specific to this location
+- Include local landmarks, neighborhoods, or areas we serve
+- Strong call-to-action with local phone emphasis
+- Make it feel personalized for the ${location} community
+- Include 8-12 semantic entities related to ${industry}
+- Link to at least 3 service pages
+
+Structure:
+1. Introduction about serving ${location}
+2. Services available in ${location} (with internal links)
+3. Why local customers choose us
+4. Areas we serve near ${location}
+5. Call to action
 
 Return ONLY the HTML content (using h2, h3, p, ul, li tags). Do not include doctype, html, head, or body tags.`;
 
         case 'contact':
-            return `Write a brief but effective Contact page introduction for "${businessName}", a ${industry} company.
+            return `Write a brief but effective Contact page introduction for "${businessName}", a ${industry} company serving ${location}.
 
 Requirements:
 - Write approximately 200 words
-- Encourage visitors to get in touch
-- Mention response time expectations
+- Encourage visitors to get in touch for free quotes
+- Mention response time expectations (e.g., "We respond within 1 hour")
 - Be friendly and professional
-- Include reassurance about the contact process
+- Include reassurance about no-obligation consultations
+- Mention multiple ways to contact (phone, email, form)
+- Add urgency for emergency services if applicable
 
 Return ONLY the HTML content (using h2, h3, p tags). Do not include doctype, html, head, or body tags.`;
 
         default:
-            return `Write ${targetWords} words of SEO-optimized content for "${businessName}", a ${industry} company.`;
+            return `Write ${targetWords} words of SEO-optimized content for "${businessName}", a ${industry} company serving ${location}.`;
     }
+}
+
+// Helper function to create URL-friendly slugs
+function slugify(text: string): string {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
