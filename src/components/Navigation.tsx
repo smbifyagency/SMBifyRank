@@ -88,7 +88,7 @@ export default function Navigation() {
     return (
         <nav className={styles.nav}>
             <div className={styles.container}>
-                <Link href="/app" className={styles.logo}>
+                <Link href="/" className={styles.logo}>
                     <Image
                         src="/logo-dark.png"
                         alt="SMBify Rank"
@@ -101,6 +101,12 @@ export default function Navigation() {
 
                 <div className={styles.links}>
                     <Link
+                        href="/"
+                        className={styles.link}
+                    >
+                        🏠 Home
+                    </Link>
+                    <Link
                         href="/app"
                         className={`${styles.link} ${pathname === '/app' ? styles.active : ''}`}
                     >
@@ -112,6 +118,7 @@ export default function Navigation() {
                     >
                         Settings
                     </Link>
+                    <ThemeToggle />
                     <Link
                         href="/app/create"
                         className={styles.createBtn}
@@ -132,28 +139,32 @@ export default function Navigation() {
                                 />
                             )}
                             <div className={styles.userDropdown}>
-                                <div className={styles.userName}>{session.user.name}</div>
-                                <div className={styles.userEmail}>{session.user.email}</div>
-                                <button
-                                    onClick={() => signOut({ callbackUrl: '/login' })}
-                                    className={styles.signOutBtn}
-                                >
-                                    Sign Out
-                                </button>
+                                <div className={styles.userDropdownInner}>
+                                    <div className={styles.userName}>{session.user.name}</div>
+                                    <div className={styles.userEmail}>{session.user.email}</div>
+                                    <button
+                                        onClick={() => signOut({ callbackUrl: '/login' })}
+                                        className={styles.signOutBtn}
+                                    >
+                                        Sign Out
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ) : isGuest ? (
                         <div className={styles.userMenu}>
                             <div className={styles.guestAvatar}>👤</div>
                             <div className={styles.userDropdown}>
-                                <div className={styles.userName}>Guest User</div>
-                                <div className={styles.userEmail}>Testing Mode</div>
-                                <button
-                                    onClick={handleExitGuest}
-                                    className={styles.signOutBtn}
-                                >
-                                    Exit Guest Mode
-                                </button>
+                                <div className={styles.userDropdownInner}>
+                                    <div className={styles.userName}>Guest User</div>
+                                    <div className={styles.userEmail}>Testing Mode</div>
+                                    <button
+                                        onClick={handleExitGuest}
+                                        className={styles.signOutBtn}
+                                    >
+                                        Exit Guest Mode
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ) : (
