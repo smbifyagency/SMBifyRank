@@ -9,6 +9,8 @@ import { getWebsite, saveWebsite, deleteBlogPost, generateId } from '@/lib/stora
 import { downloadWebsiteZip, getPagePreviewHtml, getBlogPostPreviewHtml } from '@/lib/export';
 import { deployWebsite, verifyNetlifyToken } from '@/lib/netlify';
 import { generateBlogPost, slugify } from '@/lib/generator';
+import RichTextEditor from '@/components/RichTextEditor';
+import { processPastedContent, generateExcerpt } from '@/lib/htmlSanitizer';
 import styles from './dashboard.module.css';
 
 type Tab = 'pages' | 'blog' | 'services' | 'locations' | 'seo' | 'deploy';
@@ -28,6 +30,11 @@ export default function DashboardPage() {
     // Blog state
     const [newBlogTitle, setNewBlogTitle] = useState('');
     const [newBlogContent, setNewBlogContent] = useState('');
+    const [newBlogFeaturedImage, setNewBlogFeaturedImage] = useState('');
+    const [newBlogFeaturedImageAlt, setNewBlogFeaturedImageAlt] = useState('');
+    const [newBlogSlug, setNewBlogSlug] = useState('');
+    const [newBlogMetaTitle, setNewBlogMetaTitle] = useState('');
+    const [newBlogMetaDesc, setNewBlogMetaDesc] = useState('');
     const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
 
     // Service state
@@ -145,14 +152,43 @@ export default function DashboardPage() {
     const handleAddBlogPost = () => {
         if (!website || !newBlogTitle.trim()) return;
 
-        const post = generateBlogPost(newBlogTitle, newBlogContent, website.id);
+        const slug = newBlogSlug || slugify(newBlogTitle);
+        const excerpt = generateExcerpt(newBlogContent);
+
+        const post: BlogPost = {
+            id: generateId(),
+            title: newBlogTitle,
+            slug: slug,
+            content: newBlogContent,
+            excerpt: excerpt,
+            author: website.businessName,
+            publishedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            status: 'draft',
+            tags: [],
+            featuredImage: newBlogFeaturedImage || undefined,
+            seo: {
+                title: newBlogMetaTitle || newBlogTitle,
+                description: newBlogMetaDesc || excerpt,
+                keywords: [],
+                ogImage: newBlogFeaturedImage || undefined,
+            },
+        };
+
         const updatedWebsite = {
             ...website,
             blogPosts: [...website.blogPosts, post],
         };
         handleSave(updatedWebsite);
+
+        // Reset all fields
         setNewBlogTitle('');
         setNewBlogContent('');
+        setNewBlogFeaturedImage('');
+        setNewBlogFeaturedImageAlt('');
+        setNewBlogSlug('');
+        setNewBlogMetaTitle('');
+        setNewBlogMetaDesc('');
     };
 
     const handleUpdateBlogPost = () => {
@@ -586,12 +622,72 @@ export default function DashboardPage() {
                                     onChange={(e) => setNewBlogTitle(e.target.value)}
                                     className={styles.input}
                                 />
-                                <textarea
-                                    placeholder="Post content (HTML supported for backlinks)"
+                                {/* Rich Text Editor */}
+                                <RichTextEditor
                                     value={newBlogContent}
-                                    onChange={(e) => setNewBlogContent(e.target.value)}
-                                    className={styles.textarea}
+                                    onChange={setNewBlogContent}
+                                    placeholder="Write your blog post content here... (paste from WordPress, Google Docs, etc.)"
                                 />
+
+                                {/* SEO Fields */}
+                                <div className={styles.seoSection}>
+                                    <h4>SEO Settings</h4>
+                                    <div className={styles.formRow}>
+                                        <div className={styles.field}>
+                                            <label>Featured Image URL</label>
+                                            <input
+                                                type="text"
+                                                placeholder="https://..."
+                                                value={newBlogFeaturedImage}
+                                                onChange={(e) => setNewBlogFeaturedImage(e.target.value)}
+                                                className={styles.input}
+                                            />
+                                        </div>
+                                        <div className={styles.field}>
+                                            <label>Image Alt Text</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Describe the image"
+                                                value={newBlogFeaturedImageAlt}
+                                                onChange={(e) => setNewBlogFeaturedImageAlt(e.target.value)}
+                                                className={styles.input}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className={styles.formRow}>
+                                        <div className={styles.field}>
+                                            <label>URL Slug</label>
+                                            <input
+                                                type="text"
+                                                placeholder={slugify(newBlogTitle) || 'auto-generated-from-title'}
+                                                value={newBlogSlug}
+                                                onChange={(e) => setNewBlogSlug(e.target.value)}
+                                                className={styles.input}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className={styles.field}>
+                                        <label>Meta Title (SEO)</label>
+                                        <input
+                                            type="text"
+                                            placeholder={newBlogTitle || 'Page title for search engines'}
+                                            value={newBlogMetaTitle}
+                                            onChange={(e) => setNewBlogMetaTitle(e.target.value)}
+                                            className={styles.input}
+                                        />
+                                    </div>
+                                    <div className={styles.field}>
+                                        <label>Meta Description</label>
+                                        <textarea
+                                            placeholder="A brief description for search results (150-160 characters)"
+                                            value={newBlogMetaDesc}
+                                            onChange={(e) => setNewBlogMetaDesc(e.target.value)}
+                                            className={styles.textarea}
+                                            rows={2}
+                                        />
+                                    </div>
+                                </div>
+
                                 <button onClick={handleAddBlogPost} className={styles.addBtn}>
                                     + Add Post
                                 </button>
@@ -609,10 +705,10 @@ export default function DashboardPage() {
                                                     onChange={(e) => setEditingBlog({ ...editingBlog, title: e.target.value })}
                                                     className={styles.input}
                                                 />
-                                                <textarea
+                                                <RichTextEditor
                                                     value={editingBlog.content}
-                                                    onChange={(e) => setEditingBlog({ ...editingBlog, content: e.target.value })}
-                                                    className={styles.textarea}
+                                                    onChange={(content) => setEditingBlog({ ...editingBlog, content })}
+                                                    placeholder="Edit your blog post content..."
                                                 />
                                                 <div className={styles.editActions}>
                                                     <button onClick={handleUpdateBlogPost} className={styles.saveBtn}>Save</button>

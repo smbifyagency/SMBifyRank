@@ -510,6 +510,25 @@
     gap: var(--space-md);
 }
 
+.seoSection {
+    margin-top: var(--space-lg);
+    padding: var(--space-lg);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.seoSection h4 {
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.field {
+    flex: 1;
+    margin-bottom: var(--space-sm);
+}
+
 .field label {
     display: block;
     font-size: 0.875rem;
