@@ -107,10 +107,10 @@ export default function Navigation() {
                         My Websites
                     </Link>
                     <Link
-                        href="/app/blog-writer"
-                        className={`${styles.link} ${pathname === '/app/blog-writer' ? styles.active : ''}`}
+                        href="/app/blog-manager"
+                        className={`${styles.link} ${pathname === '/app/blog-manager' ? styles.active : ''}`}
                     >
-                        Blog Writer
+                        Blog Manager
                     </Link>
                     <Link
                         href="/app/settings"

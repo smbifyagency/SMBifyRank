@@ -11,6 +11,7 @@ import {
   generateRichBlogContent,
   generatePageCSS
 } from './pageContent';
+import { renderBlogPost as renderBlogPostContent, renderBlogList as renderBlogListContent, getBlogCSS, processContentForOutput } from './blogRenderer';
 
 // Generate complete HTML for a page
 export function renderPage(website: Website, page: Page): string {
@@ -1597,7 +1598,13 @@ export function generateJS(): string {
 
 // Render blog post page
 export function renderBlogPostPage(website: Website, post: BlogPost): string {
-  const css = generateCSS(website.colors);
+  const baseCSS = generateCSS(website.colors);
+  const blogCSS = getBlogCSS();
+  const fullCSS = baseCSS + blogCSS;
+
+  const baseUrl = website.netlifyUrl || '';
+  const canonicalUrl = `${baseUrl}/blog/${post.slug}`;
+  const processedContent = renderBlogPostContent(post, website);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1606,27 +1613,40 @@ export function renderBlogPostPage(website: Website, post: BlogPost): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${post.seo.title} | ${website.businessName}</title>
   <meta name="description" content="${post.seo.description}">
+  <meta name="keywords" content="${post.seo.keywords?.join(', ') || ''}">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="${canonicalUrl}">
+  
+  <!-- Open Graph Article Tags -->
+  <meta property="og:title" content="${post.seo.title}">
+  <meta property="og:description" content="${post.seo.description}">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${canonicalUrl}">
+  <meta property="og:image" content="${post.featuredImage || post.seo.ogImage || website.logoUrl || ''}">
+  <meta property="og:site_name" content="${website.businessName}">
+  <meta property="article:published_time" content="${post.publishedAt}">
+  <meta property="article:modified_time" content="${post.updatedAt || post.publishedAt}">
+  <meta property="article:author" content="${post.author}">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${post.seo.title}">
+  <meta name="twitter:description" content="${post.seo.description}">
+  <meta name="twitter:image" content="${post.featuredImage || post.seo.ogImage || website.logoUrl || ''}">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="${website.logoUrl || '/favicon.ico'}" type="image/x-icon">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>${css}</style>
+  <style>${fullCSS}</style>
 </head>
 <body>
   ${renderHeader(website)}
   <main>
-    <section class="hero" style="padding: 60px 0;">
-      <div class="container">
-        <h1 style="font-size: 2.5rem;">${post.title}</h1>
-        <p>Published on ${new Date(post.publishedAt).toLocaleDateString()} by ${post.author}</p>
-      </div>
-    </section>
-    <section>
-      <div class="container">
-        <div class="custom-content">
-          ${post.content}
-        </div>
-      </div>
-    </section>
+    ${processedContent}
   </main>
   ${renderFooter(website)}
   <script>${generateJS()}</script>
