@@ -316,12 +316,31 @@ export function generateCSS(colors: BrandColors): string {
       padding: 10px 15px;
       color: var(--text);
       font-weight: 500;
-      transition: color 0.3s ease;
+      transition: var(--transition);
       text-decoration: none;
+      position: relative;
+      border-radius: 6px;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 5px;
+      left: 15px;
+      right: 15px;
+      height: 2px;
+      background: var(--primary);
+      transform: scaleX(0);
+      transition: transform var(--transition);
     }
     
     .nav-link:hover {
       color: var(--primary);
+      background: rgba(var(--primary-rgb), 0.05);
+    }
+    
+    .nav-link:hover::after {
+      transform: scaleX(1);
     }
     
     .nav-dropdown {
@@ -504,9 +523,26 @@ export function generateCSS(colors: BrandColors): string {
       border-radius: 8px;
       font-weight: 600;
       font-size: 1rem;
-      transition: all 0.3s ease;
+      transition: var(--transition);
       cursor: pointer;
       border: none;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: var(--transition);
+    }
+    
+    .btn:hover::before {
+      left: 100%;
     }
     
     .btn-primary {
@@ -515,13 +551,13 @@ export function generateCSS(colors: BrandColors): string {
     }
     
     .btn-primary:hover {
-      background: var(--bg);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      background: #f0f0f0;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
     }
     
     .btn-secondary {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.15);
       color: white;
       border: 2px solid white;
     }
@@ -529,6 +565,8 @@ export function generateCSS(colors: BrandColors): string {
     .btn-secondary:hover {
       background: white;
       color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.2);
     }
     
     .btn-accent {
@@ -538,7 +576,8 @@ export function generateCSS(colors: BrandColors): string {
     
     .btn-accent:hover {
       background: ${adjustColor('#f59e0b', -15)};
-      transform: translateY(-2px);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(var(--accent-rgb), 0.4);
     }
     
     .phone-number {
@@ -909,11 +948,18 @@ export function generateCSS(colors: BrandColors): string {
     
     .footer-col a {
       color: rgba(255,255,255,0.7);
-      transition: color 0.3s ease;
+      transition: var(--transition);
+      display: inline-block;
     }
     
     .footer-col a:hover {
       color: white;
+      padding-left: 8px;
+    }
+    
+    .footer-col a:hover::before {
+      content: '→ ';
+      margin-left: -18px;
     }
     
     .footer-bottom {
