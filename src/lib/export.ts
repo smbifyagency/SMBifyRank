@@ -85,6 +85,131 @@ Sitemap: ${sitemapUrl}
 `;
 }
 
+// Generate search.html page with client-side search
+export function generateSearchPage(website: Website): string {
+    const baseUrl = website.netlifyUrl || '';
+
+    // Build searchable content array
+    const searchableItems = [
+        { title: 'Home', url: '/', description: website.seoSettings.siteDescription || '', type: 'page' },
+        { title: 'About Us', url: '/about.html', description: `About ${website.businessName}`, type: 'page' },
+        { title: 'Services', url: '/services.html', description: 'Our services', type: 'page' },
+        { title: 'Contact', url: '/contact.html', description: 'Contact us', type: 'page' },
+        { title: 'Blog', url: '/blog.html', description: 'Latest articles and insights', type: 'page' },
+        ...website.services.map(s => ({
+            title: s.name,
+            url: `/services/${s.slug}.html`,
+            description: s.description,
+            type: 'service'
+        })),
+        ...website.locations.map(l => ({
+            title: `${l.city}${l.state ? `, ${l.state}` : ''}`,
+            url: `/locations/${l.slug}.html`,
+            description: l.description || `Services in ${l.city}`,
+            type: 'location'
+        })),
+        ...website.blogPosts.filter(p => p.status === 'published').map(p => ({
+            title: p.title,
+            url: `/blog/${p.slug}.html`,
+            description: p.excerpt,
+            type: 'blog'
+        }))
+    ];
+
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search | ${website.businessName}</title>
+    <meta name="description" content="Search ${website.businessName} for services, articles, and information.">
+    <link rel="icon" href="${website.logoUrl || '/favicon.ico'}" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f8f9fa; min-height: 100vh; }
+        .search-container { max-width: 800px; margin: 0 auto; padding: 60px 20px; }
+        h1 { font-size: 2.5rem; margin-bottom: 30px; color: #1f2937; text-align: center; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 40px; }
+        .search-input { flex: 1; padding: 15px 20px; font-size: 1.1rem; border: 2px solid #e5e7eb; border-radius: 10px; }
+        .search-input:focus { outline: none; border-color: ${website.colors.primary}; }
+        .search-btn { padding: 15px 30px; background: ${website.colors.primary}; color: white; border: none; border-radius: 10px; font-size: 1.1rem; cursor: pointer; }
+        .search-btn:hover { opacity: 0.9; }
+        .results { display: flex; flex-direction: column; gap: 20px; }
+        .result-item { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .result-item:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .result-item a { text-decoration: none; color: inherit; }
+        .result-title { font-size: 1.3rem; color: ${website.colors.primary}; margin-bottom: 8px; }
+        .result-type { font-size: 0.75rem; background: #e5e7eb; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-bottom: 8px; text-transform: uppercase; }
+        .result-desc { color: #6b7280; line-height: 1.6; }
+        .no-results { text-align: center; color: #6b7280; padding: 40px; }
+        .back-link { display: inline-block; margin-bottom: 30px; color: ${website.colors.primary}; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <a href="/" class="back-link">← Back to Home</a>
+        <h1>🔍 Search ${website.businessName}</h1>
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search for services, articles..." autofocus>
+            <button class="search-btn" onclick="performSearch()">Search</button>
+        </div>
+        <div class="results" id="results"></div>
+    </div>
+    <script>
+        const searchData = ${JSON.stringify(searchableItems)};
+        
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const resultsEl = document.getElementById('results');
+            
+            if (!query) {
+                resultsEl.innerHTML = '<div class="no-results">Enter a search term to find content.</div>';
+                return;
+            }
+            
+            const results = searchData.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.description.toLowerCase().includes(query)
+            );
+            
+            if (results.length === 0) {
+                resultsEl.innerHTML = '<div class="no-results">No results found. Try different keywords.</div>';
+                return;
+            }
+            
+            resultsEl.innerHTML = results.map(item => \`
+                <div class="result-item">
+                    <a href="\${item.url}">
+                        <span class="result-type">\${item.type}</span>
+                        <h3 class="result-title">\${item.title}</h3>
+                        <p class="result-desc">\${item.description}</p>
+                    </a>
+                </div>
+            \`).join('');
+        }
+        
+        // Search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        // Check for query param
+        const urlParams = new URLSearchParams(window.location.search);
+        const q = urlParams.get('q');
+        if (q) {
+            document.getElementById('searchInput').value = q;
+            performSearch();
+        }
+    </script>
+</body>
+</html>`;
+}
+
+
 // Export website to static HTML files
 // This function generates ALL pages using rich content, regardless of the pages array
 export function exportWebsite(website: Website): ExportedFile[] {
@@ -208,6 +333,10 @@ export function exportWebsite(website: Website): ExportedFile[] {
 
     // Add robots.txt
     files.push({ path: 'robots.txt', content: generateRobotsTxt(website) });
+
+    // Add search.html page with client-side search
+    const searchPageContent = generateSearchPage(website);
+    files.push({ path: 'search.html', content: searchPageContent });
 
     return files;
 }

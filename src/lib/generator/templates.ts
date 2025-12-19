@@ -12,6 +12,7 @@ import {
   generatePageCSS
 } from './pageContent';
 import { renderBlogPost as renderBlogPostContent, renderBlogList as renderBlogListContent, getBlogCSS, processContentForOutput } from './blogRenderer';
+import { generatePageSchemas } from './schema';
 
 // Generate complete HTML for a page
 export function renderPage(website: Website, page: Page): string {
@@ -124,6 +125,9 @@ export function renderPage(website: Website, page: Page): string {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>${fullCSS}</style>
+  
+  <!-- Structured Data (JSON-LD) -->
+  ${generatePageSchemas(page, website)}
 </head>
 <body>
   ${renderHeader(website)}
@@ -1130,26 +1134,27 @@ export function renderHeader(website: Website): string {
           </a>
           <nav class="nav">
             <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About</a>
+            <a href="/about.html" class="nav-link">About</a>
             <div class="nav-dropdown">
-              <a href="/services" class="nav-link dropdown-toggle">Services <span class="arrow">▼</span></a>
+              <a href="/services.html" class="nav-link dropdown-toggle">Services <span class="arrow">▼</span></a>
               <div class="dropdown-menu">
                 ${servicesHtml}
-                <a href="/services" class="dropdown-item view-all">View All Services →</a>
+                <a href="/services.html" class="dropdown-item view-all">View All Services →</a>
               </div>
             </div>
             ${website.locations.length > 0 ? `
             <div class="nav-dropdown">
-              <a href="#" class="nav-link dropdown-toggle">Areas <span class="arrow">▼</span></a>
+              <a href="/locations.html" class="nav-link dropdown-toggle">Areas <span class="arrow">▼</span></a>
               <div class="dropdown-menu">
                 ${locationsHtml}
               </div>
             </div>
             ` : ''}
-            <a href="/blog" class="nav-link">Blog</a>
-            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/blog.html" class="nav-link">Blog</a>
+            <a href="/contact.html" class="nav-link">Contact</a>
           </nav>
           <div class="header-actions">
+            <a href="/search.html" class="header-search" aria-label="Search">🔍</a>
             <a href="tel:${phone.replace(/[^0-9+]/g, '')}" class="header-cta">📞 Call Now</a>
           </div>
           <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
@@ -1157,11 +1162,11 @@ export function renderHeader(website: Website): string {
       </div>
       <div class="mobile-menu" id="mobileMenu">
         <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/services">Services</a>
-        ${website.services.slice(0, 4).map(s => `<a href="/services/${s.slug}" class="mobile-submenu">${s.name}</a>`).join('')}
-        <a href="/blog">Blog</a>
-        <a href="/contact">Contact</a>
+        <a href="/about.html">About</a>
+        <a href="/services.html">Services</a>
+        ${website.services.slice(0, 4).map(s => `<a href="/services/${s.slug}.html" class="mobile-submenu">${s.name}</a>`).join('')}
+        <a href="/blog.html">Blog</a>
+        <a href="/contact.html">Contact</a>
         <a href="tel:${phone.replace(/[^0-9+]/g, '')}" class="mobile-phone">📞 ${phone}</a>
       </div>
     </header>
@@ -1176,12 +1181,12 @@ export function renderFooter(website: Website): string {
 
   const serviceLinks = website.services
     .slice(0, 6)
-    .map(s => `<li><a href="/services/${s.slug}">${s.name}</a></li>`)
+    .map(s => `<li><a href="/services/${s.slug}.html">${s.name}</a></li>`)
     .join('');
 
   const locationLinks = website.locations
     .slice(0, 6)
-    .map(l => `<li><a href="/locations/${l.slug}">${l.city}${l.state ? `, ${l.state}` : ''}</a></li>`)
+    .map(l => `<li><a href="/locations/${l.slug}.html">${l.city}${l.state ? `, ${l.state}` : ''}</a></li>`)
     .join('');
 
   const phone = website.contactPhone || '(555) 123-4567';
@@ -1272,11 +1277,18 @@ export function renderFooter(website: Website): string {
             <h4>Quick Links</h4>
             <ul>
               <li><a href="/">Home</a></li>
-              <li><a href="/about">About Us</a></li>
-              <li><a href="/services">All Services</a></li>
-              <li><a href="/blog">Blog</a></li>
-              <li><a href="/contact">Contact</a></li>
-              <li><a href="/sitemap">Sitemap</a></li>
+              <li><a href="/about.html">About Us</a></li>
+              <li><a href="/services.html">All Services</a></li>
+              <li><a href="/blog.html">Blog</a></li>
+              <li><a href="/contact.html">Contact</a></li>
+              <li><a href="/sitemap.xml">Sitemap</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Contact Us</h4>
+            <ul>
+              <li><a href="tel:${phone.replace(/[^0-9+]/g, '')}">📞 ${phone}</a></li>
+              <li><a href="mailto:${email}">✉️ ${email}</a></li>
             </ul>
           </div>
         </div>
@@ -1290,9 +1302,9 @@ export function renderFooter(website: Website): string {
             ${website.seoSettings?.socialLinks?.youtube ? `<a href="${website.seoSettings.socialLinks.youtube}" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="social-icon">📺</a>` : ''}
           </div>
           <div class="footer-legal">
-            <a href="/privacy-policy">Privacy Policy</a>
+            <a href="/privacy-policy.html">Privacy Policy</a>
             <span>|</span>
-            <a href="/terms-of-service">Terms of Service</a>
+            <a href="/terms-of-service.html">Terms of Service</a>
           </div>
         </div>
       </div>
