@@ -3,16 +3,23 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signOut as nextAuthSignOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { ThemeToggle } from './ThemeToggle';
 import { useTheme } from './ThemeProvider';
+import { useAuth } from '@/lib/useAuth';
 import styles from './Navigation.module.css';
 
 export default function Navigation() {
     const pathname = usePathname();
     const router = useRouter();
+
+    // NextAuth (legacy)
     const { data: session, status } = useSession();
+
+    // Supabase auth (new)
+    const { user: supabaseUser, loading: supabaseLoading, signOut: supabaseSignOut } = useAuth();
+
     const [isGuest, setIsGuest] = useState(false);
     const { resolvedTheme } = useTheme();
 
@@ -38,7 +45,22 @@ export default function Navigation() {
         router.push('/login');
     };
 
-    const isAuthenticated = session?.user || isGuest;
+    const handleSignOut = async () => {
+        // Sign out from both auth systems
+        if (supabaseUser) {
+            await supabaseSignOut();
+        }
+        if (session) {
+            await nextAuthSignOut({ callbackUrl: '/login' });
+        } else {
+            router.push('/login');
+        }
+    };
+
+    // Combined auth state (Supabase takes priority)
+    const currentUser = supabaseUser || session?.user;
+    const isLoading = supabaseLoading || status === 'loading';
+    const isAuthenticated = currentUser || isGuest;
 
     // Public homepage navigation
     if (!isAppArea) {
@@ -127,23 +149,30 @@ export default function Navigation() {
                     </Link>
 
                     {/* User Profile / Guest / Login */}
-                    {status === 'loading' ? (
+                    {isLoading ? (
                         <div className={styles.userLoading}>...</div>
-                    ) : session?.user ? (
+                    ) : currentUser ? (
                         <div className={styles.userMenu}>
-                            {session.user.image && (
+                            {(supabaseUser?.user_metadata?.avatar_url || session?.user?.image) && (
                                 <img
-                                    src={session.user.image}
-                                    alt={session.user.name || 'User'}
+                                    src={supabaseUser?.user_metadata?.avatar_url || session?.user?.image}
+                                    alt={supabaseUser?.user_metadata?.full_name || session?.user?.name || 'User'}
                                     className={styles.userAvatar}
                                 />
                             )}
+                            {!supabaseUser?.user_metadata?.avatar_url && !session?.user?.image && (
+                                <div className={styles.guestAvatar}>👤</div>
+                            )}
                             <div className={styles.userDropdown}>
                                 <div className={styles.userDropdownInner}>
-                                    <div className={styles.userName}>{session.user.name}</div>
-                                    <div className={styles.userEmail}>{session.user.email}</div>
+                                    <div className={styles.userName}>
+                                        {supabaseUser?.user_metadata?.full_name || session?.user?.name || supabaseUser?.email || 'User'}
+                                    </div>
+                                    <div className={styles.userEmail}>
+                                        {supabaseUser?.email || session?.user?.email}
+                                    </div>
                                     <button
-                                        onClick={() => signOut({ callbackUrl: '/login' })}
+                                        onClick={handleSignOut}
                                         className={styles.signOutBtn}
                                     >
                                         Sign Out
