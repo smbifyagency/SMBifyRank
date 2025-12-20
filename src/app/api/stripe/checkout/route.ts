@@ -107,7 +107,7 @@ export async function POST(request: Request) {
 
         // Build checkout session options
         const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-        const sessionOptions: Parameters<typeof stripe.checkout.sessions.create>[0] = {
+        const sessionOptions: Stripe.Checkout.SessionCreateParams = {
             customer: customerId,
             mode: planType === 'monthly' ? 'subscription' : 'payment',
             payment_method_types: ['card'],
