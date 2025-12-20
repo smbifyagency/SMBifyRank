@@ -1,9 +1,36 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import styles from './pricing.module.css';
 
 export default function PricingPage() {
+    const [loading, setLoading] = useState<'monthly' | 'lifetime' | null>(null);
+
+    const handleUpgrade = async (planType: 'monthly' | 'lifetime') => {
+        setLoading(planType);
+
+        try {
+            const response = await fetch('/api/stripe/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ planType }),
+            });
+
+            const data = await response.json();
+
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                alert(data.error || 'Failed to start checkout');
+                setLoading(null);
+            }
+        } catch (error) {
+            alert('Failed to start checkout');
+            setLoading(null);
+        }
+    };
+
     return (
         <div className={styles.page}>
             <div className={styles.container}>
@@ -14,11 +41,11 @@ export default function PricingPage() {
                 </div>
 
                 <div className={styles.pricingGrid}>
-                    {/* Free Plan */}
+                    {/* Free Trial */}
                     <div className={styles.pricingCard}>
                         <div className={styles.planHeader}>
-                            <h2>Free</h2>
-                            <p className={styles.planDescription}>Perfect for trying out</p>
+                            <h2>Free Trial</h2>
+                            <p className={styles.planDescription}>Try before you buy</p>
                             <div className={styles.price}>
                                 <span className={styles.amount}>$0</span>
                                 <span className={styles.period}>forever</span>
@@ -35,7 +62,7 @@ export default function PricingPage() {
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
-                                Basic AI Content Generation
+                                AI Content Generation
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
@@ -43,7 +70,7 @@ export default function PricingPage() {
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
-                                Manual ZIP Export
+                                Preview & ZIP Export
                             </li>
                             <li className={styles.excluded}>
                                 <span className={styles.xIcon}>✕</span>
@@ -51,75 +78,26 @@ export default function PricingPage() {
                             </li>
                             <li className={styles.excluded}>
                                 <span className={styles.xIcon}>✕</span>
-                                One-Click Deploy
+                                Netlify Deployment
                             </li>
                             <li className={styles.excluded}>
                                 <span className={styles.xIcon}>✕</span>
-                                Priority Support
+                                Auto Updates
                             </li>
                         </ul>
-                        <Link href="/app" className={styles.btn}>
+                        <Link href="/login" className={styles.btn}>
                             Get Started Free
                         </Link>
                     </div>
 
-                    {/* Pro Plan */}
+                    {/* Monthly Plan */}
                     <div className={`${styles.pricingCard} ${styles.popular}`}>
                         <div className={styles.popularBadge}>Most Popular</div>
                         <div className={styles.planHeader}>
-                            <h2>Pro</h2>
-                            <p className={styles.planDescription}>For growing businesses</p>
+                            <h2>Monthly</h2>
+                            <p className={styles.planDescription}>For active businesses</p>
                             <div className={styles.price}>
-                                <span className={styles.amount}>$29</span>
-                                <span className={styles.period}>/month</span>
-                            </div>
-                        </div>
-                        <ul className={styles.features}>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                5 Websites
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                All 31 Industry Templates
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                Advanced AI Content (GPT-4)
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                Visual Page Editor
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                One-Click Netlify Deploy
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                Full Blog System
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                AI Blog Post Writer
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                Email Support
-                            </li>
-                        </ul>
-                        <Link href="/app" className={styles.btnPrimary}>
-                            Start Pro Trial
-                        </Link>
-                    </div>
-
-                    {/* Agency Plan */}
-                    <div className={styles.pricingCard}>
-                        <div className={styles.planHeader}>
-                            <h2>Agency</h2>
-                            <p className={styles.planDescription}>For agencies & teams</p>
-                            <div className={styles.price}>
-                                <span className={styles.amount}>$99</span>
+                                <span className={styles.amount}>$19</span>
                                 <span className={styles.period}>/month</span>
                             </div>
                         </div>
@@ -134,15 +112,7 @@ export default function PricingPage() {
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
-                                Advanced AI Content (GPT-4)
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                White-Label Option
-                            </li>
-                            <li className={styles.included}>
-                                <span className={styles.checkIcon}>✓</span>
-                                API Access
+                                AI Content Generation
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
@@ -150,16 +120,82 @@ export default function PricingPage() {
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
-                                Bulk Blog Generation
+                                One-Click Netlify Deploy
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                Auto Live Updates
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                SEO & Schema Markup
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                Email Support
+                            </li>
+                        </ul>
+                        <button
+                            onClick={() => handleUpgrade('monthly')}
+                            className={styles.btnPrimary}
+                            disabled={loading === 'monthly'}
+                        >
+                            {loading === 'monthly' ? 'Loading...' : 'Start Monthly'}
+                        </button>
+                    </div>
+
+                    {/* Lifetime Plan */}
+                    <div className={styles.pricingCard}>
+                        <div className={styles.lifetimeBadge}>Best Value</div>
+                        <div className={styles.planHeader}>
+                            <h2>Lifetime</h2>
+                            <p className={styles.planDescription}>Pay once, use forever</p>
+                            <div className={styles.price}>
+                                <span className={styles.amount}>$129</span>
+                                <span className={styles.period}>one-time</span>
+                            </div>
+                        </div>
+                        <ul className={styles.features}>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                Everything in Monthly
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                Unlimited Websites Forever
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                No Recurring Fees
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                All Future Updates
                             </li>
                             <li className={styles.included}>
                                 <span className={styles.checkIcon}>✓</span>
                                 Priority Support
                             </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                AppSumo Compatible
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                Commercial License
+                            </li>
+                            <li className={styles.included}>
+                                <span className={styles.checkIcon}>✓</span>
+                                Early Access Features
+                            </li>
                         </ul>
-                        <Link href="/app" className={styles.btn}>
-                            Contact Sales
-                        </Link>
+                        <button
+                            onClick={() => handleUpgrade('lifetime')}
+                            className={styles.btn}
+                            disabled={loading === 'lifetime'}
+                        >
+                            {loading === 'lifetime' ? 'Loading...' : 'Get Lifetime Access'}
+                        </button>
                     </div>
                 </div>
 
@@ -168,20 +204,20 @@ export default function PricingPage() {
                     <h2>Frequently Asked Questions</h2>
                     <div className={styles.faqGrid}>
                         <div className={styles.faqItem}>
-                            <h3>Can I upgrade or downgrade anytime?</h3>
-                            <p>Yes! You can change your plan at any time. Upgrades take effect immediately, downgrades at the end of your billing cycle.</p>
+                            <h3>Can I upgrade from Free to paid anytime?</h3>
+                            <p>Yes! You can upgrade at any time. Your existing website will be preserved, and you&apos;ll unlock unlimited websites instantly.</p>
                         </div>
                         <div className={styles.faqItem}>
-                            <h3>Do I need my own OpenAI API key?</h3>
-                            <p>Yes, you&apos;ll need to provide your own OpenAI API key for AI content generation. This keeps costs transparent and gives you full control.</p>
+                            <h3>What&apos;s the difference between Monthly and Lifetime?</h3>
+                            <p>Both have the same features. Monthly is $19/month recurring. Lifetime is $129 one-time and you never pay again.</p>
                         </div>
                         <div className={styles.faqItem}>
                             <h3>What happens to my websites if I cancel?</h3>
-                            <p>Your exported websites are yours forever! They&apos;re static HTML files you can host anywhere. You just won&apos;t be able to edit or create new ones.</p>
+                            <p>Your exported websites are yours forever! They&apos;re static HTML files you can host anywhere. You just won&apos;t be able to create new ones.</p>
                         </div>
                         <div className={styles.faqItem}>
                             <h3>Is there a refund policy?</h3>
-                            <p>Yes, we offer a 14-day money-back guarantee. If you&apos;re not satisfied, contact us for a full refund.</p>
+                            <p>Yes, we offer a 14-day money-back guarantee for both Monthly and Lifetime plans. No questions asked.</p>
                         </div>
                     </div>
                 </div>
