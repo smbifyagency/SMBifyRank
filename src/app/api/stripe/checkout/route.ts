@@ -1,9 +1,11 @@
 // Stripe Checkout Session API
 // POST /api/stripe/checkout - Create checkout session for upgrade
 
+import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase-server';
-import { stripe, STRIPE_PRICES } from '@/lib/stripe';
+import Stripe from 'stripe';  // ADD THIS LINE
+import { stripe, PRICE_IDS } from '@/lib/stripe';
+// ... rest of imports
 
 export async function POST(request: Request) {
     try {
