@@ -169,7 +169,7 @@ export default function Navigation() {
                         + New Website
                     </Link>
 
-                    {/* User Profile / Guest / Login */}
+                    {/* User Profile / Login */}
                     {isLoading ? (
                         <div className={styles.userLoading}>...</div>
                     ) : currentUser ? (
@@ -182,7 +182,9 @@ export default function Navigation() {
                                 />
                             )}
                             {!supabaseUser?.user_metadata?.avatar_url && !session?.user?.image && (
-                                <div className={styles.guestAvatar}>👤</div>
+                                <div className={styles.guestAvatar}>
+                                    {(supabaseUser?.user_metadata?.full_name || supabaseUser?.email || 'U').charAt(0).toUpperCase()}
+                                </div>
                             )}
                             <div className={styles.userDropdown}>
                                 <div className={styles.userDropdownInner}>
@@ -192,27 +194,19 @@ export default function Navigation() {
                                     <div className={styles.userEmail}>
                                         {supabaseUser?.email || session?.user?.email}
                                     </div>
+                                    <div className={styles.dropdownLinks}>
+                                        <Link href="/app/profile" className={styles.dropdownLink}>
+                                            👤 Profile
+                                        </Link>
+                                        <Link href="/app/billing" className={styles.dropdownLink}>
+                                            💳 Billing
+                                        </Link>
+                                    </div>
                                     <button
                                         onClick={handleSignOut}
                                         className={styles.signOutBtn}
                                     >
-                                        Sign Out
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ) : isGuest ? (
-                        <div className={styles.userMenu}>
-                            <div className={styles.guestAvatar}>👤</div>
-                            <div className={styles.userDropdown}>
-                                <div className={styles.userDropdownInner}>
-                                    <div className={styles.userName}>Guest User</div>
-                                    <div className={styles.userEmail}>Testing Mode</div>
-                                    <button
-                                        onClick={handleExitGuest}
-                                        className={styles.signOutBtn}
-                                    >
-                                        Exit Guest Mode
+                                        🚪 Sign Out
                                     </button>
                                 </div>
                             </div>
