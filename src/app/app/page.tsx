@@ -7,15 +7,19 @@ import { useSession } from 'next-auth/react';
 import { Website } from '@/lib/types';
 import { getAllWebsites, deleteWebsite, saveWebsite } from '@/lib/storage';
 import { generateDemoWebsite } from '@/lib/demoData';
+import { DeployModal } from '@/components/DeployModal';
+import { useToast } from '@/components/Toast';
 import styles from './app.module.css';
 
 export default function AppDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
+    const toast = useToast();
     const [websites, setWebsites] = useState<Website[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isGuest, setIsGuest] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+    const [deployModal, setDeployModal] = useState<{ id: string; name: string } | null>(null);
 
     useEffect(() => {
         // Check authentication
@@ -117,6 +121,12 @@ export default function AppDashboard() {
                                         Preview
                                     </Link>
                                     <button
+                                        className={styles.deployBtn}
+                                        onClick={() => setDeployModal({ id: website.id, name: website.businessName })}
+                                    >
+                                        🚀
+                                    </button>
+                                    <button
                                         className={styles.deleteBtn}
                                         onClick={() => handleDeleteClick(website.id, website.businessName)}
                                     >
@@ -169,6 +179,21 @@ export default function AppDashboard() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Deploy Modal */}
+            {deployModal && (
+                <DeployModal
+                    isOpen={!!deployModal}
+                    onClose={() => setDeployModal(null)}
+                    siteName={deployModal.name}
+                    siteId={deployModal.id}
+                    onDeploySuccess={(url) => {
+                        toast.success(`Website deployed to ${url}`);
+                        setWebsites(getAllWebsites());
+                        setDeployModal(null);
+                    }}
+                />
             )}
         </div>
     );
