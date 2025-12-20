@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './checkout.module.css';
@@ -44,7 +44,7 @@ const PLAN_PRICES = {
     lifetime: 129,
 };
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -360,5 +360,22 @@ export default function CheckoutPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// Default export with Suspense boundary for useSearchParams
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className={styles.page}>
+                <div className={styles.container}>
+                    <div style={{ textAlign: 'center', padding: '4rem' }}>
+                        <p>Loading checkout...</p>
+                    </div>
+                </div>
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
     );
 }

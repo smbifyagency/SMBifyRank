@@ -41,11 +41,14 @@ export async function POST(request: Request) {
                 code: trimmedCode,
                 active: true,
                 limit: 1,
+                expand: ['data.coupon'],
             });
 
             if (promoCodes.data.length > 0) {
                 const promo = promoCodes.data[0];
-                const coupon = promo.coupon;
+                // Access coupon with type assertion - Stripe types don't always match API response
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const coupon = (promo as any).coupon;
 
                 const response: CouponValidationResponse = {
                     valid: true,

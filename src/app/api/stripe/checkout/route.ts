@@ -3,9 +3,8 @@
 
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';  // ADD THIS LINE
-import { stripe, PRICE_IDS } from '@/lib/stripe';
-// ... rest of imports
+import { stripe, STRIPE_PRICES } from '@/lib/stripe';
+import { createServerSupabaseClient } from '@/lib/supabase-server';
 
 export async function POST(request: Request) {
     try {

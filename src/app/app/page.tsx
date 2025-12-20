@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -13,7 +13,8 @@ import { UpgradeModal } from '@/components/UpgradeModal';
 import { useToast } from '@/components/Toast';
 import styles from './app.module.css';
 
-export default function AppDashboard() {
+// Wrapper component to handle Suspense for useSearchParams
+function AppDashboardContent() {
     const { data: session, status } = useSession();
     const { user: supabaseUser, loading: supabaseLoading } = useAuth();
     const router = useRouter();
@@ -273,5 +274,19 @@ export default function AppDashboard() {
                 websiteLimit={1}
             />
         </div>
+    );
+}
+
+// Default export with Suspense boundary for useSearchParams
+export default function AppDashboard() {
+    return (
+        <Suspense fallback={
+            <div className={styles.loading}>
+                <div className={styles.spinner}></div>
+                <p>Loading...</p>
+            </div>
+        }>
+            <AppDashboardContent />
+        </Suspense>
     );
 }
