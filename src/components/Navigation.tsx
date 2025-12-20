@@ -34,9 +34,30 @@ export default function Navigation() {
         pathname.startsWith('/editor') ||
         pathname === '/create';
 
-    // Don't show navigation on login page
+    // Show simple navigation on login page
     if (pathname === '/login') {
-        return null;
+        return (
+            <nav className={styles.nav}>
+                <div className={styles.container}>
+                    <Link href="/" className={styles.logo}>
+                        <Image
+                            src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+                            alt="SMBify Rank"
+                            width={140}
+                            height={32}
+                            className={styles.logoImage}
+                            priority
+                        />
+                    </Link>
+                    <div className={styles.links}>
+                        <Link href="/" className={styles.link}>
+                            ← Back to Home
+                        </Link>
+                        <ThemeToggle />
+                    </div>
+                </div>
+            </nav>
+        );
     }
 
     const handleExitGuest = () => {
