@@ -48,6 +48,25 @@ export interface DbDeployment {
     deploy_logs: string | null;
 }
 
+export type PlanType = 'free' | 'monthly' | 'lifetime';
+export type SubscriptionStatus = 'active' | 'expired' | 'canceled' | 'past_due';
+export type SubscriptionSource = 'direct' | 'appsumo' | 'coupon';
+
+export interface DbUserSubscription {
+    id: string;
+    user_id: string;
+    plan_type: PlanType;
+    status: SubscriptionStatus;
+    website_limit: number;
+    websites_created: number;
+    stripe_customer_id: string | null;
+    stripe_subscription_id: string | null;
+    source: SubscriptionSource;
+    expires_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 // JSON field types
 export interface PagesData {
     pages: PageConfig[];
