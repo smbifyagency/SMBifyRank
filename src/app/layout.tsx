@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Navigation from "@/components/Navigation";
 import AuthProvider from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ToastProvider } from "@/components/Toast";
+import "@/styles/animations.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,11 +35,16 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
-            <Navigation />
-            {children}
+            <ToastProvider>
+              <Navigation />
+              <main className="page-enter">
+                {children}
+              </main>
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
   );
 }
+

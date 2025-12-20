@@ -1,0 +1,394 @@
+/* SaaS-Style Global Animations
+   Subtle, smooth, professional feel */
+
+/* ================================
+   PAGE TRANSITIONS
+   ================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ================================
+   PAGE ENTER ANIMATIONS
+   ================================ */
+
+.page-enter {
+    animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.page-enter-fast {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* ================================
+   CARD & COMPONENT ANIMATIONS
+   ================================ */
+
+.card-enter {
+    animation: scaleIn 0.25s ease-out forwards;
+}
+
+.stagger-1 {
+    animation-delay: 0.05s;
+}
+
+.stagger-2 {
+    animation-delay: 0.1s;
+}
+
+.stagger-3 {
+    animation-delay: 0.15s;
+}
+
+.stagger-4 {
+    animation-delay: 0.2s;
+}
+
+.stagger-5 {
+    animation-delay: 0.25s;
+}
+
+/* ================================
+   HOVER LIFT EFFECT
+   ================================ */
+
+.hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* ================================
+   BUTTON ANIMATIONS
+   ================================ */
+
+.btn-animated {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.btn-animated:hover {
+    transform: translateY(-2px);
+}
+
+.btn-animated:active {
+    transform: translateY(0);
+    transition: transform 0.1s ease;
+}
+
+/* Button loading state */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ================================
+   MODAL ANIMATIONS
+   ================================ */
+
+@keyframes modalBackdropIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalContentIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes modalBackdropOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes modalContentOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+}
+
+.modal-backdrop-enter {
+    animation: modalBackdropIn 0.2s ease-out forwards;
+}
+
+.modal-content-enter {
+    animation: modalContentIn 0.25s ease-out forwards;
+}
+
+/* ================================
+   DROPDOWN ANIMATIONS
+   ================================ */
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dropdown-enter {
+    animation: dropdownIn 0.15s ease-out forwards;
+}
+
+/* ================================
+   TOAST NOTIFICATIONS
+   ================================ */
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.toast-enter {
+    animation: toastIn 0.3s ease-out forwards;
+}
+
+.toast-exit {
+    animation: toastOut 0.2s ease-in forwards;
+}
+
+/* ================================
+   SAVE/STATUS ANIMATIONS
+   ================================ */
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes checkmark {
+    0% {
+        stroke-dashoffset: 100;
+    }
+
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+.saving-pulse {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.success-check {
+    animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* ================================
+   SKELETON LOADING
+   ================================ */
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--bg-secondary) 25%,
+            var(--bg-tertiary) 50%,
+            var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+/* ================================
+   PROGRESS BAR ANIMATION
+   ================================ */
+
+@keyframes progressGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px var(--accent-primary);
+    }
+
+    50% {
+        box-shadow: 0 0 15px var(--accent-primary);
+    }
+}
+
+.progress-animated {
+    transition: width 0.3s ease;
+    animation: progressGlow 2s ease-in-out infinite;
+}
+
+/* ================================
+   FOCUS RING ANIMATION
+   ================================ */
+
+@keyframes focusRing {
+    0% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(99, 102, 241, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+}
+
+.focus-ring:focus {
+    animation: focusRing 0.4s ease-out;
+}
+
+/* ================================
+   GPU ACCELERATION
+   ================================ */
+
+.gpu-accelerated {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
