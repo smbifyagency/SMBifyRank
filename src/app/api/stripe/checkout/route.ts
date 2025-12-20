@@ -1,5 +1,6 @@
 // Stripe Checkout Session API
 // POST /api/stripe/checkout - Create checkout session for upgrade
+// Build fix: 2025-12-21
 
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
