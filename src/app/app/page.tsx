@@ -4,36 +4,45 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useAuth } from '@/lib/useAuth';
 import { Website } from '@/lib/types';
 import { getAllWebsites, deleteWebsite, saveWebsite } from '@/lib/storage';
 import { generateDemoWebsite } from '@/lib/demoData';
 import { DeployModal } from '@/components/DeployModal';
+import { UpgradeModal } from '@/components/UpgradeModal';
 import { useToast } from '@/components/Toast';
 import styles from './app.module.css';
 
 export default function AppDashboard() {
     const { data: session, status } = useSession();
+    const { user: supabaseUser, loading: supabaseLoading } = useAuth();
     const router = useRouter();
     const toast = useToast();
     const [websites, setWebsites] = useState<Website[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isGuest, setIsGuest] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
     const [deployModal, setDeployModal] = useState<{ id: string; name: string } | null>(null);
+    const [showUpgrade, setShowUpgrade] = useState(false);
+
+    // Combined auth check - must be authenticated with either NextAuth or Supabase
+    const isAuthenticated = session?.user || supabaseUser;
+    const authLoading = status === 'loading' || supabaseLoading;
 
     useEffect(() => {
-        // Check authentication
-        const guestMode = localStorage.getItem('guest-mode');
-        if (guestMode === 'true') {
-            setIsGuest(true);
-        } else if (status === 'unauthenticated') {
+        // Clear any old guest mode data
+        localStorage.removeItem('guest-mode');
+
+        // Require authentication - no guest mode
+        if (!authLoading && !isAuthenticated) {
             router.push('/login');
             return;
         }
 
-        setWebsites(getAllWebsites());
-        setIsLoading(false);
-    }, [status, router]);
+        if (isAuthenticated) {
+            setWebsites(getAllWebsites());
+            setIsLoading(false);
+        }
+    }, [authLoading, isAuthenticated, router]);
 
     const handleDeleteClick = (id: string, name: string) => {
         setDeleteConfirm({ id, name });
@@ -51,13 +60,7 @@ export default function AppDashboard() {
         setDeleteConfirm(null);
     };
 
-    const handleLoadDemo = () => {
-        const demoWebsite = generateDemoWebsite();
-        saveWebsite(demoWebsite);
-        setWebsites(getAllWebsites());
-    };
-
-    if (status === 'loading' || isLoading) {
+    if (authLoading || isLoading) {
         return (
             <div className={styles.loading}>
                 <div className={styles.spinner}></div>
@@ -66,10 +69,39 @@ export default function AppDashboard() {
         );
     }
 
-    // If not guest and not authenticated, redirect handled above
-    if (!isGuest && !session) {
+    // Must be authenticated - redirect handled above
+    if (!isAuthenticated) {
         return null;
     }
+
+    // Plan limit check - Free users get 1 website max
+    const handleCreateNew = () => {
+        // TODO: Check from Supabase subscription
+        // For now, check localStorage websites count
+        const currentCount = websites.length;
+        const isPaidUser = false; // TODO: Check from subscription
+
+        if (!isPaidUser && currentCount >= 1) {
+            setShowUpgrade(true);
+            return;
+        }
+        router.push('/create');
+    };
+
+    // Demo also counts toward limit
+    const handleLoadDemo = () => {
+        const currentCount = websites.length;
+        const isPaidUser = false; // TODO: Check from subscription
+
+        if (!isPaidUser && currentCount >= 1) {
+            setShowUpgrade(true);
+            return;
+        }
+        const demoWebsite = generateDemoWebsite();
+        saveWebsite(demoWebsite);
+        setWebsites(getAllWebsites());
+        toast.success('Demo website loaded!');
+    };
 
     return (
         <div className={styles.page}>
@@ -84,9 +116,9 @@ export default function AppDashboard() {
                         <button onClick={handleLoadDemo} className={styles.demoBtn}>
                             📦 Load Demo
                         </button>
-                        <Link href="/app/create" className={styles.createBtn}>
+                        <button onClick={handleCreateNew} className={styles.createBtn}>
                             + New Website
-                        </Link>
+                        </button>
                     </div>
                 </div>
 
@@ -195,6 +227,15 @@ export default function AppDashboard() {
                     }}
                 />
             )}
+
+            {/* Upgrade Modal */}
+            <UpgradeModal
+                isOpen={showUpgrade}
+                onClose={() => setShowUpgrade(false)}
+                currentPlan="free"
+                websitesCreated={websites.length}
+                websiteLimit={1}
+            />
         </div>
     );
 }

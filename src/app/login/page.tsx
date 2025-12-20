@@ -16,10 +16,7 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleGuestLogin = () => {
-        localStorage.setItem('guest-mode', 'true');
-        router.push('/app');
-    };
+    // Guest mode removed - all users must authenticate
 
     const handleGoogleLogin = async () => {
         try {
@@ -179,16 +176,7 @@ export default function LoginPage() {
                     {isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up'}
                 </button>
 
-                <div className={styles.divider}>
-                    <span>or</span>
-                </div>
 
-                <button
-                    onClick={handleGuestLogin}
-                    className={styles.guestBtn}
-                >
-                    👤 Continue as Guest
-                </button>
 
                 <p className={styles.terms}>
                     By signing in, you agree to our Terms of Service and Privacy Policy
