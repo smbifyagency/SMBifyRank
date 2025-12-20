@@ -267,12 +267,13 @@ export default function HomePage() {
           <div className={styles.footerContent}>
             <div className={styles.footerBrand}>
               <Image
-                src="/logo-dark.png"
+                src="/logo-brand.png"
                 alt="SMBify Rank"
-                width={140}
-                height={32}
+                width={160}
+                height={40}
+                className={styles.footerLogo}
               />
-              <p>AI-powered website builder for local businesses</p>
+              <p>AI-powered website builder for local businesses. Build SEO-optimized websites in minutes.</p>
             </div>
             <div className={styles.footerLinks}>
               <div className={styles.footerColumn}>
