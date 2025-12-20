@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useAuth } from '@/lib/useAuth';
 import { Website } from '@/lib/types';
@@ -17,16 +17,35 @@ export default function AppDashboard() {
     const { data: session, status } = useSession();
     const { user: supabaseUser, loading: supabaseLoading } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const toast = useToast();
     const [websites, setWebsites] = useState<Website[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
     const [deployModal, setDeployModal] = useState<{ id: string; name: string } | null>(null);
     const [showUpgrade, setShowUpgrade] = useState(false);
+    const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
+    const [upgradedPlan, setUpgradedPlan] = useState<string | null>(null);
 
     // Combined auth check - must be authenticated with either NextAuth or Supabase
     const isAuthenticated = session?.user || supabaseUser;
     const authLoading = status === 'loading' || supabaseLoading;
+
+    // Check for upgrade success from Stripe checkout
+    useEffect(() => {
+        const upgraded = searchParams.get('upgraded');
+        const plan = searchParams.get('plan');
+
+        if (upgraded === 'true') {
+            setShowUpgradeBanner(true);
+            setUpgradedPlan(plan);
+            toast.success(`🎉 Welcome to ${plan === 'lifetime' ? 'Lifetime' : 'Pro'}! You now have unlimited access.`);
+
+            // Clean up URL params without reload
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+        }
+    }, [searchParams, toast]);
 
     useEffect(() => {
         // Clear any old guest mode data
@@ -106,6 +125,23 @@ export default function AppDashboard() {
     return (
         <div className={styles.page}>
             <div className={styles.container}>
+                {/* Upgrade Success Banner */}
+                {showUpgradeBanner && (
+                    <div className={styles.successBanner}>
+                        <span className={styles.successIcon}>🎉</span>
+                        <div className={styles.successContent}>
+                            <h3>Welcome to {upgradedPlan === 'lifetime' ? 'Lifetime' : 'Pro'}!</h3>
+                            <p>You now have unlimited access to all features. Start building!</p>
+                        </div>
+                        <button
+                            className={styles.dismissBtn}
+                            onClick={() => setShowUpgradeBanner(false)}
+                        >
+                            ×
+                        </button>
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className={styles.header}>
                     <div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import styles from './UpgradeModal.module.css';
 import { LoadingButton } from './Animations';
 
@@ -125,6 +126,10 @@ export function UpgradeModal({
                 <p className={styles.secure}>
                     🔒 Secure payment powered by Stripe
                 </p>
+
+                <Link href="/checkout" className={styles.checkoutLink} onClick={onClose}>
+                    Have a coupon? Go to full checkout →
+                </Link>
             </div>
         </div>
     );

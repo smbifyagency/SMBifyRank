@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { planType } = body; // 'monthly' or 'lifetime'
+        const { planType, couponCode } = body; // 'monthly' or 'lifetime', optional coupon
 
         if (!planType || !['monthly', 'lifetime'].includes(planType)) {
             return NextResponse.json(
@@ -30,10 +30,17 @@ export async function POST(request: Request) {
 
         if (authError || !user) {
             return NextResponse.json(
-                { error: 'Unauthorized' },
+                { error: 'Unauthorized. Please log in to continue.' },
                 { status: 401 }
             );
         }
+
+        // Get user profile for pre-filling checkout
+        const { data: userProfile } = await supabase
+            .from('users')
+            .select('name, email')
+            .eq('id', user.id)
+            .single();
 
         // Get or create Stripe customer
         const { data: subscription } = await supabase
@@ -45,9 +52,10 @@ export async function POST(request: Request) {
         let customerId = subscription?.stripe_customer_id;
 
         if (!customerId) {
-            // Create Stripe customer
+            // Create Stripe customer with user details
             const customer = await stripe.customers.create({
                 email: user.email,
+                name: userProfile?.name || undefined,
                 metadata: {
                     user_id: user.id,
                 },
@@ -71,8 +79,35 @@ export async function POST(request: Request) {
             );
         }
 
-        // Create checkout session
-        const session = await stripe.checkout.sessions.create({
+        // Validate coupon if provided
+        let discounts: { coupon?: string; promotion_code?: string }[] | undefined;
+        if (couponCode) {
+            try {
+                // First try as a promotion code
+                const promoCodes = await stripe.promotionCodes.list({
+                    code: couponCode,
+                    active: true,
+                    limit: 1,
+                });
+
+                if (promoCodes.data.length > 0) {
+                    discounts = [{ promotion_code: promoCodes.data[0].id }];
+                } else {
+                    // Try as a direct coupon ID
+                    const coupon = await stripe.coupons.retrieve(couponCode);
+                    if (coupon && coupon.valid) {
+                        discounts = [{ coupon: coupon.id }];
+                    }
+                }
+            } catch {
+                // Coupon not found or invalid - continue without discount
+                console.log(`Coupon "${couponCode}" not found or invalid`);
+            }
+        }
+
+        // Build checkout session options
+        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+        const sessionOptions: Parameters<typeof stripe.checkout.sessions.create>[0] = {
             customer: customerId,
             mode: planType === 'monthly' ? 'subscription' : 'payment',
             payment_method_types: ['card'],
@@ -82,13 +117,27 @@ export async function POST(request: Request) {
                     quantity: 1,
                 },
             ],
-            success_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/app?upgraded=true`,
-            cancel_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/pricing?canceled=true`,
+            success_url: `${baseUrl}/app?upgraded=true&plan=${planType}`,
+            cancel_url: `${baseUrl}/checkout?plan=${planType}&canceled=true`,
             metadata: {
                 user_id: user.id,
                 plan_type: planType,
             },
-        });
+            // Allow customers to enter promotion codes on Stripe checkout page
+            allow_promotion_codes: !discounts,
+            // Pre-fill customer email
+            customer_update: {
+                address: 'auto',
+            },
+        };
+
+        // Apply discounts if we have them
+        if (discounts) {
+            sessionOptions.discounts = discounts;
+        }
+
+        // Create checkout session
+        const session = await stripe.checkout.sessions.create(sessionOptions);
 
         return NextResponse.json({
             url: session.url,
@@ -98,7 +147,7 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error('Stripe checkout error:', error);
         return NextResponse.json(
-            { error: 'Failed to create checkout session' },
+            { error: 'Failed to create checkout session. Please try again.' },
             { status: 500 }
         );
     }
