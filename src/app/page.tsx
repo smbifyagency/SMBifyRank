@@ -1,10 +1,37 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './page.module.css';
 
 export default function HomePage() {
+  const [loading, setLoading] = useState<'monthly' | 'lifetime' | null>(null);
+
+  const handleUpgrade = async (planType: 'monthly' | 'lifetime') => {
+    setLoading(planType);
+
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planType }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Failed to start checkout');
+        setLoading(null);
+      }
+    } catch (error) {
+      alert('Failed to start checkout');
+      setLoading(null);
+    }
+  };
+
   return (
     <div className={styles.page}>
       {/* Hero Section */}
@@ -139,9 +166,10 @@ export default function HomePage() {
           <p className={styles.pricingSubtext}>Start free, upgrade when you need more</p>
 
           <div className={styles.pricingGrid}>
+            {/* Free Trial */}
             <div className={styles.pricingCard}>
               <div className={styles.pricingHeader}>
-                <h3>Free</h3>
+                <h3>Free Trial</h3>
                 <div className={styles.price}>
                   <span className={styles.priceAmount}>$0</span>
                   <span className={styles.priceLabel}>forever</span>
@@ -150,60 +178,71 @@ export default function HomePage() {
               <ul className={styles.pricingFeatures}>
                 <li>✓ 1 Website</li>
                 <li>✓ All 31 Industry Templates</li>
-                <li>✓ Basic AI Content</li>
-                <li>✓ Manual ZIP Export</li>
+                <li>✓ AI Content Generation</li>
                 <li>✓ Visual Editor</li>
+                <li>✓ Preview & ZIP Export</li>
+                <li className={styles.featureDisabled}>✕ Netlify Deployment</li>
                 <li className={styles.featureDisabled}>✕ Blog System</li>
-                <li className={styles.featureDisabled}>✕ Priority Support</li>
               </ul>
-              <Link href="/app" className={styles.pricingBtn}>
+              <Link href="/login" className={styles.pricingBtn}>
                 Get Started Free
               </Link>
             </div>
 
+            {/* Monthly Plan */}
             <div className={`${styles.pricingCard} ${styles.pricingPopular}`}>
               <div className={styles.popularBadge}>Most Popular</div>
               <div className={styles.pricingHeader}>
-                <h3>Pro</h3>
+                <h3>Monthly</h3>
                 <div className={styles.price}>
-                  <span className={styles.priceAmount}>$29</span>
-                  <span className={styles.priceLabel}>/month</span>
-                </div>
-              </div>
-              <ul className={styles.pricingFeatures}>
-                <li>✓ 5 Websites</li>
-                <li>✓ All 31 Industry Templates</li>
-                <li>✓ Advanced AI Content</li>
-                <li>✓ One-Click Netlify Deploy</li>
-                <li>✓ Visual Editor</li>
-                <li>✓ Full Blog System</li>
-                <li>✓ Email Support</li>
-              </ul>
-              <Link href="/app" className={styles.pricingBtnPrimary}>
-                Start Pro Trial
-              </Link>
-            </div>
-
-            <div className={styles.pricingCard}>
-              <div className={styles.pricingHeader}>
-                <h3>Agency</h3>
-                <div className={styles.price}>
-                  <span className={styles.priceAmount}>$99</span>
+                  <span className={styles.priceAmount}>$19</span>
                   <span className={styles.priceLabel}>/month</span>
                 </div>
               </div>
               <ul className={styles.pricingFeatures}>
                 <li>✓ Unlimited Websites</li>
                 <li>✓ All 31 Industry Templates</li>
-                <li>✓ Advanced AI Content</li>
+                <li>✓ AI Content Generation</li>
+                <li>✓ Full Blog System</li>
                 <li>✓ One-Click Netlify Deploy</li>
-                <li>✓ White-Label Option</li>
-                <li>✓ API Access</li>
-                <li>✓ Priority Support</li>
+                <li>✓ Auto Live Updates</li>
+                <li>✓ Email Support</li>
               </ul>
-              <Link href="/app" className={styles.pricingBtn}>
-                Contact Sales
-              </Link>
+              <button
+                onClick={() => handleUpgrade('monthly')}
+                className={styles.pricingBtnPrimary}
+                disabled={loading === 'monthly'}
+              >
+                {loading === 'monthly' ? 'Loading...' : 'Start Monthly'}
+              </button>
+            </div>
+
+            {/* Lifetime Plan */}
+            <div className={styles.pricingCard}>
+              <div className={styles.lifetimeBadge}>Best Value</div>
+              <div className={styles.pricingHeader}>
+                <h3>Lifetime</h3>
+                <div className={styles.price}>
+                  <span className={styles.priceAmount}>$129</span>
+                  <span className={styles.priceLabel}>one-time</span>
+                </div>
+              </div>
+              <ul className={styles.pricingFeatures}>
+                <li>✓ Everything in Monthly</li>
+                <li>✓ Unlimited Websites Forever</li>
+                <li>✓ No Recurring Fees</li>
+                <li>✓ All Future Updates</li>
+                <li>✓ Priority Support</li>
+                <li>✓ Commercial License</li>
+                <li>✓ AppSumo Compatible</li>
+              </ul>
+              <button
+                onClick={() => handleUpgrade('lifetime')}
+                className={styles.pricingBtn}
+                disabled={loading === 'lifetime'}
+              >
+                {loading === 'lifetime' ? 'Loading...' : 'Get Lifetime Access'}
+              </button>
             </div>
           </div>
         </div>
@@ -239,7 +278,7 @@ export default function HomePage() {
               <div className={styles.footerColumn}>
                 <h4>Product</h4>
                 <Link href="#features">Features</Link>
-                <Link href="#pricing">Pricing</Link>
+                <Link href="/pricing">Pricing</Link>
                 <Link href="#how-it-works">How It Works</Link>
               </div>
               <div className={styles.footerColumn}>

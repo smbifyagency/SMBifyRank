@@ -103,9 +103,9 @@ export default function Navigation() {
                         <a href="#features" className={styles.link}>
                             Features
                         </a>
-                        <a href="#pricing" className={styles.link}>
+                        <Link href="/pricing" className={styles.link}>
                             Pricing
-                        </a>
+                        </Link>
                         <ThemeToggle />
                         {isAuthenticated ? (
                             <Link href="/app" className={styles.createBtn}>
