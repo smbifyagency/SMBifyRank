@@ -538,6 +538,25 @@ export default function EditorPage() {
 
                 <div className={styles.toolbarRight}>
                     <button
+                        className={styles.saveAllBtn}
+                        onClick={() => {
+                            if (website) {
+                                saveWebsite(website);
+                                alert('✅ All changes saved!');
+                            }
+                        }}
+                        title="Save all changes"
+                    >
+                        💾 Save
+                    </button>
+                    <Link
+                        href={`/dashboard/${website.id}?deploy=true`}
+                        className={styles.deployBtn}
+                        title="Deploy changes to Netlify"
+                    >
+                        🚀 Deploy
+                    </Link>
+                    <button
                         className={styles.exportBtn}
                         onClick={handleExport}
                         title="Download website as ZIP"

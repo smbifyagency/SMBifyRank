@@ -129,6 +129,41 @@
     transform: translateY(-1px);
 }
 
+.saveAllBtn {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--accent-primary);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.saveAllBtn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.deployBtn {
+    padding: var(--space-sm) var(--space-md);
+    background: linear-gradient(135deg, #B4F500, #9AE000);
+    border: none;
+    border-radius: var(--radius-md);
+    color: #000;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.deployBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(180, 245, 0, 0.4);
+}
+
 /* Main Layout */
 .main {
     flex: 1;
