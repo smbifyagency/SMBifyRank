@@ -86,16 +86,64 @@ export default function EditorPage() {
                 setEditingVideoElementId(event.data.data.elementId);
                 setShowVideoEditor(true);
             } else if (event.data.type === 'content-updated') {
-                // Handle content update from inline editing
-                console.log('Content updated:', event.data.data);
-                // For now, we show a toast/notification that changes are visual only
-                // Full save requires regenerating content from templates
+                // Handle content update from inline editing - persist changes
+                const { elementId, elementType, newContent } = event.data.data;
+
+                if (website && currentPage) {
+                    // Parse element ID to find matching section
+                    // Element IDs are like 'heading-0', 'text-1', etc.
+                    const [type, indexStr] = elementId.split('-');
+
+                    // Update the appropriate section based on element type
+                    const updatedSections = currentPage.content.map((section, sectionIndex) => {
+                        const content = section.content as Record<string, unknown>;
+
+                        // Match by section type and update appropriate field
+                        if (section.type === 'hero') {
+                            if (elementType === 'heading' && typeof content.headline === 'string') {
+                                return { ...section, content: { ...content, headline: newContent.replace(/<[^>]*>/g, '') } };
+                            }
+                            if (elementType === 'text' && typeof content.subheadline === 'string') {
+                                return { ...section, content: { ...content, subheadline: newContent } };
+                            }
+                        }
+                        if (section.type === 'cta' || section.type === 'text-block' || section.type === 'features') {
+                            if (elementType === 'heading' && typeof content.title === 'string') {
+                                return { ...section, content: { ...content, title: newContent.replace(/<[^>]*>/g, '') } };
+                            }
+                            if (elementType === 'text' && typeof content.subtitle === 'string') {
+                                return { ...section, content: { ...content, subtitle: newContent } };
+                            }
+                            if (elementType === 'text' && typeof content.content === 'string') {
+                                return { ...section, content: { ...content, content: newContent } };
+                            }
+                        }
+                        if (section.type === 'about-intro') {
+                            if (elementType === 'text' && typeof content.description === 'string') {
+                                return { ...section, content: { ...content, description: newContent } };
+                            }
+                        }
+
+                        return section;
+                    });
+
+                    // Save the updated website
+                    const updatedPage = { ...currentPage, content: updatedSections };
+                    const updatedWebsite = {
+                        ...website,
+                        pages: website.pages.map(p =>
+                            p.id === currentPage.id ? updatedPage : p
+                        ),
+                    };
+
+                    handleSave(updatedWebsite);
+                }
             }
         };
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, []);
+    }, [website, currentPage]);
 
     // Handle image upload for selected element
     const handleImageUpload = useCallback((imageUrl: string, altText: string) => {
