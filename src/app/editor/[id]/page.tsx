@@ -13,7 +13,7 @@ import RichTextEditor from '@/components/RichTextEditor';
 import { DeployModal } from '@/components/DeployModal';
 import styles from './editor.module.css';
 
-type EditTab = 'website' | 'page' | 'sections' | 'branding' | 'blog';
+type EditTab = 'content' | 'website' | 'page' | 'sections' | 'branding' | 'blog';
 
 export default function EditorPage() {
     const params = useParams();
@@ -30,7 +30,7 @@ export default function EditorPage() {
     const [showEditor, setShowEditor] = useState(true);
     const [editingSection, setEditingSection] = useState<PageSection | null>(null);
     const [sectionContent, setSectionContent] = useState<Record<string, unknown>>({});
-    const [editTab, setEditTab] = useState<EditTab>('website');
+    const [editTab, setEditTab] = useState<EditTab>('content');
     const [showImageUploader, setShowImageUploader] = useState(false);
     const [showLogoUploader, setShowLogoUploader] = useState(false);
     const [showVideoEditor, setShowVideoEditor] = useState(false);
@@ -986,16 +986,16 @@ export default function EditorPage() {
                                 {/* Tab Navigation */}
                                 <div className={styles.tabNav}>
                                     <button
+                                        className={`${styles.tabBtn} ${editTab === 'content' ? styles.activeTab : ''}`}
+                                        onClick={() => setEditTab('content')}
+                                    >
+                                        ✏️ Content
+                                    </button>
+                                    <button
                                         className={`${styles.tabBtn} ${editTab === 'website' ? styles.activeTab : ''}`}
                                         onClick={() => setEditTab('website')}
                                     >
                                         🏢 Website
-                                    </button>
-                                    <button
-                                        className={`${styles.tabBtn} ${editTab === 'page' ? styles.activeTab : ''}`}
-                                        onClick={() => setEditTab('page')}
-                                    >
-                                        📄 This Page
                                     </button>
                                     <button
                                         className={`${styles.tabBtn} ${editTab === 'sections' ? styles.activeTab : ''}`}
@@ -1016,6 +1016,90 @@ export default function EditorPage() {
                                         ✍️ Blog
                                     </button>
                                 </div>
+
+                                {/* Content Tab - Rich Text Editing for all page content */}
+                                {editTab === 'content' && website && (
+                                    <>
+                                        <div className={styles.editorSection}>
+                                            <div className={styles.hint} style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
+                                                ✏️ <strong>Rich Text Editor</strong> - Format text, add links, change colors using the toolbar above each field.
+                                            </div>
+                                        </div>
+
+                                        {/* Hero Content */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🎯 Hero Section</h3>
+                                            <div className={styles.field}>
+                                                <label>Main Headline</label>
+                                                <RichTextEditor
+                                                    value={website.heroHeadline || website.businessName || ''}
+                                                    onChange={(val) => updateWebsiteField('heroHeadline', val)}
+                                                    placeholder="Your main headline..."
+                                                />
+                                            </div>
+                                            <div className={styles.field}>
+                                                <label>Subheadline / Description</label>
+                                                <RichTextEditor
+                                                    value={website.heroSubheadline || ''}
+                                                    onChange={(val) => updateWebsiteField('heroSubheadline', val)}
+                                                    placeholder="Your subheadline or description..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* About Content */}
+                                        <div className={styles.editorSection}>
+                                            <h3>ℹ️ About Section</h3>
+                                            <div className={styles.field}>
+                                                <label>About Us Content</label>
+                                                <RichTextEditor
+                                                    value={website.aboutContent || ''}
+                                                    onChange={(val) => updateWebsiteField('aboutContent', val)}
+                                                    placeholder="Tell visitors about your business..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Services Overview */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🛠️ Services Description</h3>
+                                            <div className={styles.field}>
+                                                <label>Services Overview</label>
+                                                <RichTextEditor
+                                                    value={website.servicesDescription || ''}
+                                                    onChange={(val) => updateWebsiteField('servicesDescription', val)}
+                                                    placeholder="Describe your services..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Contact Info */}
+                                        <div className={styles.editorSection}>
+                                            <h3>📞 Contact Content</h3>
+                                            <div className={styles.field}>
+                                                <label>Contact Page Message</label>
+                                                <RichTextEditor
+                                                    value={website.contactContent || ''}
+                                                    onChange={(val) => updateWebsiteField('contactContent', val)}
+                                                    placeholder="Contact page message or instructions..."
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Footer Content */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🦶 Footer Content</h3>
+                                            <div className={styles.field}>
+                                                <label>Footer Text</label>
+                                                <RichTextEditor
+                                                    value={website.footerContent || ''}
+                                                    onChange={(val) => updateWebsiteField('footerContent', val)}
+                                                    placeholder="Footer content..."
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
 
                                 {/* Website Settings Tab */}
                                 {editTab === 'website' && website && (

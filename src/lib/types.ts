@@ -23,6 +23,13 @@ export interface Website {
     contactEmail?: string;
     logoUrl?: string;
     faviconUrl?: string;
+    // Content fields for rich text editing
+    heroHeadline?: string;
+    heroSubheadline?: string;
+    aboutContent?: string;
+    servicesDescription?: string;
+    contactContent?: string;
+    footerContent?: string;
     // Business address for NAP (Name, Address, Phone) SEO
     businessAddress?: {
         street: string;
