@@ -200,7 +200,27 @@ export default function RichTextEditor({
                     </button>
                 </div>
 
+                <div className={styles.divider} />
+
+                <div className={styles.toolGroup}>
+                    <button type="button" onClick={() => execCommand('undo')} title="Undo" className={styles.toolBtn}>
+                        ↩
+                    </button>
+                    <button type="button" onClick={() => execCommand('redo')} title="Redo" className={styles.toolBtn}>
+                        ↪
+                    </button>
+                    <button type="button" onClick={() => execCommand('removeFormat')} title="Clear Formatting" className={styles.toolBtn}>
+                        ✗
+                    </button>
+                </div>
+
                 <div className={styles.spacer} />
+
+                <div className={styles.toolGroup}>
+                    <span className={styles.wordCount}>
+                        {value ? value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(w => w).length : 0} words
+                    </span>
+                </div>
 
                 <div className={styles.toolGroup}>
                     <button
