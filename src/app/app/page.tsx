@@ -161,6 +161,15 @@ function AppDashboardContent() {
 
                 {/* Quick Links */}
                 <div className={styles.quickLinks}>
+                    <Link href="/app/blog-writer" className={styles.quickLink}>
+                        ✍️ AI Blog Writer
+                    </Link>
+                    <Link href="/app/blog-manager" className={styles.quickLink}>
+                        📝 Blog Manager
+                    </Link>
+                    <Link href="/app/billing" className={styles.quickLink}>
+                        💳 Billing
+                    </Link>
                     <Link href="/app/settings" className={styles.quickLink}>
                         ⚙️ API Settings
                     </Link>
