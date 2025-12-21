@@ -29,6 +29,7 @@ export default function EditorPage() {
     const [sectionContent, setSectionContent] = useState<Record<string, unknown>>({});
     const [editTab, setEditTab] = useState<EditTab>('website');
     const [showImageUploader, setShowImageUploader] = useState(false);
+    const [showLogoUploader, setShowLogoUploader] = useState(false);
     const [showVideoEditor, setShowVideoEditor] = useState(false);
     const [editingVideoUrl, setEditingVideoUrl] = useState('');
     const [editingVideoElementId, setEditingVideoElementId] = useState('');
@@ -1261,11 +1262,49 @@ export default function EditorPage() {
                                 {/* Branding Tab */}
                                 {editTab === 'branding' && website && (
                                     <>
-                                        {/* Logo & Favicon */}
+                                        {/* Global Branding Notice */}
                                         <div className={styles.editorSection}>
-                                            <h3>🖼️ Logo & Favicon</h3>
+                                            <div className={styles.hint} style={{ padding: '0.75rem', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-md)', marginBottom: 0 }}>
+                                                🌐 <strong>Global Branding</strong> - Changes here apply to your entire website across all pages.
+                                            </div>
+                                        </div>
+
+                                        {/* Logo Upload */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🖼️ Logo</h3>
                                             <div className={styles.field}>
-                                                <label>Logo URL</label>
+                                                {website.logoUrl ? (
+                                                    <div className={styles.logoPreview}>
+                                                        <img src={website.logoUrl} alt="Logo preview" />
+                                                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                                            <button
+                                                                className={styles.cancelBtn}
+                                                                onClick={() => setShowLogoUploader(true)}
+                                                                style={{ flex: 1 }}
+                                                            >
+                                                                📷 Change Logo
+                                                            </button>
+                                                            <button
+                                                                className={styles.deleteBtn}
+                                                                onClick={() => updateWebsiteField('logoUrl', '')}
+                                                                style={{ padding: '8px 12px' }}
+                                                            >
+                                                                🗑️
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        className={styles.saveBtn}
+                                                        onClick={() => setShowLogoUploader(true)}
+                                                        style={{ width: '100%' }}
+                                                    >
+                                                        📤 Upload Logo
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <div className={styles.field} style={{ marginTop: '1rem' }}>
+                                                <label>Or enter URL directly</label>
                                                 <input
                                                     type="text"
                                                     value={website.logoUrl || ''}
@@ -1273,12 +1312,12 @@ export default function EditorPage() {
                                                     className={styles.input}
                                                     placeholder="https://example.com/logo.png"
                                                 />
-                                                {website.logoUrl && (
-                                                    <div className={styles.logoPreview}>
-                                                        <img src={website.logoUrl} alt="Logo preview" />
-                                                    </div>
-                                                )}
                                             </div>
+                                        </div>
+
+                                        {/* Favicon */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🔖 Favicon</h3>
                                             <div className={styles.field}>
                                                 <label>Favicon URL (optional)</label>
                                                 <input
@@ -1457,6 +1496,18 @@ export default function EditorPage() {
                     onImageSelect={handleImageUpload}
                     onClose={() => setShowImageUploader(false)}
                     currentImage={selectedElement?.elementType === 'image' ? selectedElement.content : undefined}
+                />
+            )}
+
+            {/* Logo Uploader Modal */}
+            {showLogoUploader && website && (
+                <ImageUploader
+                    onImageSelect={(imageUrl) => {
+                        updateWebsiteField('logoUrl', imageUrl);
+                        setShowLogoUploader(false);
+                    }}
+                    onClose={() => setShowLogoUploader(false)}
+                    currentImage={website.logoUrl}
                 />
             )}
 
