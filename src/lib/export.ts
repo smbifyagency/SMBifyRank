@@ -1012,6 +1012,17 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
             if (el) {
                 if (property === 'text') {
                     el.textContent = value;
+                } else if (property === 'innerHTML') {
+                    el.innerHTML = value;
+                    // Trigger content-updated to persist
+                    window.parent.postMessage({
+                        type: 'content-updated',
+                        data: {
+                            elementId: elementId,
+                            elementType: el.getAttribute('data-element-type') || 'text',
+                            newContent: value
+                        }
+                    }, '*');
                 } else if (property === 'src') {
                     el.setAttribute('src', value);
                 } else if (property === 'href') {

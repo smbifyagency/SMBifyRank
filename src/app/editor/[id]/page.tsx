@@ -1002,11 +1002,84 @@ export default function EditorPage() {
                                 {/* Content Tab - Rich Text Editing for all page content */}
                                 {editTab === 'edit' && website && (
                                     <>
-                                        <div className={styles.editorSection}>
-                                            <div className={styles.hint} style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
-                                                ✏️ <strong>Rich Text Editor</strong> - Format text, add links, change colors using the toolbar above each field.
+                                        {/* Selected Element Editor - Shows when user clicks on text in preview */}
+                                        {selectedElement && (
+                                            <div className={styles.editorSection} style={{
+                                                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1))',
+                                                border: '2px solid rgba(99, 102, 241, 0.3)',
+                                                borderRadius: 'var(--radius-md)',
+                                                marginBottom: '1rem'
+                                            }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                                                    <h3 style={{ margin: 0 }}>✏️ Editing: {selectedElement.tagName || selectedElement.elementType}</h3>
+                                                    <button
+                                                        onClick={() => setSelectedElement(null)}
+                                                        style={{
+                                                            background: 'rgba(239, 68, 68, 0.2)',
+                                                            border: 'none',
+                                                            borderRadius: '4px',
+                                                            padding: '4px 12px',
+                                                            cursor: 'pointer',
+                                                            color: '#ef4444',
+                                                            fontSize: '12px'
+                                                        }}
+                                                    >
+                                                        ✕ Close
+                                                    </button>
+                                                </div>
+                                                <div className={styles.field}>
+                                                    <label style={{ color: '#6366f1', fontWeight: 600 }}>
+                                                        {selectedElement.elementType === 'heading' ? 'Heading Text' :
+                                                            selectedElement.elementType === 'text' ? 'Paragraph Text' :
+                                                                selectedElement.elementType === 'image' ? 'Image' : 'Content'}
+                                                    </label>
+                                                    {(selectedElement.elementType === 'heading' || selectedElement.elementType === 'text') && (
+                                                        <RichTextEditor
+                                                            value={selectedElement.content || ''}
+                                                            onChange={(val) => {
+                                                                // Send update to iframe
+                                                                if (iframeRef.current?.contentWindow) {
+                                                                    iframeRef.current.contentWindow.postMessage({
+                                                                        type: 'update-element',
+                                                                        data: {
+                                                                            elementId: selectedElement.elementId,
+                                                                            property: 'innerHTML',
+                                                                            value: val
+                                                                        }
+                                                                    }, '*');
+                                                                }
+                                                                // Update selected element state
+                                                                setSelectedElement({
+                                                                    ...selectedElement,
+                                                                    content: val
+                                                                });
+                                                            }}
+                                                            placeholder="Edit this content..."
+                                                        />
+                                                    )}
+                                                    {selectedElement.elementType === 'image' && (
+                                                        <div>
+                                                            <p className={styles.hint}>Click "🖼️ Change" button above the image in preview to upload a new image.</p>
+                                                            {selectedElement.src && (
+                                                                <img src={selectedElement.src} alt="Selected" style={{ maxWidth: '100%', borderRadius: '8px', marginTop: '8px' }} />
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className={styles.hint} style={{ marginTop: '0.5rem', fontSize: '11px' }}>
+                                                    💡 Click on any text or heading in the preview to edit it here
+                                                </p>
                                             </div>
-                                        </div>
+                                        )}
+
+                                        {/* Instructions when nothing selected */}
+                                        {!selectedElement && (
+                                            <div className={styles.editorSection}>
+                                                <div className={styles.hint} style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
+                                                    👆 <strong>Click on any text in the preview</strong> to edit it here. Or use the sections below to edit specific content areas.
+                                                </div>
+                                            </div>
+                                        )}
 
                                         {/* Hero Content */}
                                         <div className={styles.editorSection}>
@@ -1244,7 +1317,7 @@ export default function EditorPage() {
                                 )}
 
                                 {/* @ts-expect-error Page Tab DISABLED */}
-{/* Page Tab - DISABLED */}
+                                {/* Page Tab - DISABLED */}
                                 {false && currentPage && (
                                     <>
                                         <div className={styles.editorSection}>
