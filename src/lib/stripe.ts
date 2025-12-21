@@ -8,7 +8,8 @@ if (!stripeSecretKey) {
 }
 
 export const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
-    apiVersion: '2025-12-15.clover',
+    // Using the SDK's expected API version
+    apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
     typescript: true,
 }) : null;
 
