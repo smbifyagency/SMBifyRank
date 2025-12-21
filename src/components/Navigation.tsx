@@ -100,11 +100,20 @@ export default function Navigation() {
                     </Link>
 
                     <div className={styles.links}>
-                        <a href="#features" className={styles.link}>
+                        <a href="/#features" className={styles.link}>
                             Features
                         </a>
-                        <Link href="/pricing" className={styles.link}>
+                        <Link href="/how-it-works" className={`${styles.link} ${pathname === '/how-it-works' ? styles.active : ''}`}>
+                            How It Works
+                        </Link>
+                        <Link href="/about" className={`${styles.link} ${pathname === '/about' ? styles.active : ''}`}>
+                            About
+                        </Link>
+                        <Link href="/pricing" className={`${styles.link} ${pathname === '/pricing' ? styles.active : ''}`}>
                             Pricing
+                        </Link>
+                        <Link href="/contact" className={`${styles.link} ${pathname === '/contact' ? styles.active : ''}`}>
+                            Contact
                         </Link>
                         <ThemeToggle />
                         {isAuthenticated ? (
