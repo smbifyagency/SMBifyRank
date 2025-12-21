@@ -1,0 +1,82 @@
+.page {
+    min-height: 100vh;
+    padding: 6rem 1rem 4rem;
+    background: var(--bg-primary);
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.container h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.lastUpdated {
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+}
+
+.section {
+    margin-bottom: 2.5rem;
+}
+
+.section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    color: var(--text-primary);
+}
+
+.section p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.section ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.section li {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 0.5rem;
+}
+
+.section a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.section a:hover {
+    text-decoration: underline;
+}
+
+.section strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .container h1 {
+        font-size: 2rem;
+    }
+
+    .section h2 {
+        font-size: 1.25rem;
+    }
+}

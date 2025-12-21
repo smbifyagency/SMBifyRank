@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import AuthProvider from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/Toast";
@@ -40,6 +41,7 @@ export default function RootLayout({
               <main className="page-enter">
                 {children}
               </main>
+              <Footer />
             </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
