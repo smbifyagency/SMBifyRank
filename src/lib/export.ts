@@ -436,39 +436,48 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
     #wysiwyg-toolbar {
         position: fixed;
         display: none;
-        background: #1a1a2e;
-        border-radius: 8px;
-        padding: 6px 8px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 10px 14px;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4), 0 0 0 1px rgba(255,255,255,0.1);
         z-index: 99999;
-        gap: 2px;
+        gap: 6px;
         flex-wrap: wrap;
-        max-width: 360px;
+        max-width: 400px;
+        animation: toolbar-pop 0.2s ease-out;
+    }
+    
+    @keyframes toolbar-pop {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
     }
     
     #wysiwyg-toolbar.visible {
         display: flex;
+        align-items: center;
     }
     
     #wysiwyg-toolbar button {
-        background: transparent;
+        background: rgba(255,255,255,0.15);
         border: none;
-        color: #e0e0e0;
-        padding: 6px 8px;
-        border-radius: 4px;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
-        transition: background 0.15s;
-        min-width: 28px;
+        font-weight: 600;
+        transition: all 0.15s;
+        min-width: 36px;
     }
     
     #wysiwyg-toolbar button:hover {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.3);
+        transform: scale(1.05);
     }
     
     #wysiwyg-toolbar button.active {
-        background: #6366f1;
-        color: white;
+        background: #fff;
+        color: #667eea;
     }
     
     #wysiwyg-toolbar .divider {
