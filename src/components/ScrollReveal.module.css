@@ -1,0 +1,78 @@
+.wrapper {
+    opacity: 0;
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wrapper.visible {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}
+
+/* Direction: Up */
+.up {
+    transform: translateY(40px);
+}
+
+/* Direction: Down */
+.down {
+    transform: translateY(-40px);
+}
+
+/* Direction: Left */
+.left {
+    transform: translateX(-40px);
+}
+
+/* Direction: Right */
+.right {
+    transform: translateX(40px);
+}
+
+/* Direction: Scale */
+.scale {
+    transform: scale(0.9);
+}
+
+/* Staggered children animation helper */
+.staggerChildren>* {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.staggerChildren.visible>*:nth-child(1) {
+    transition-delay: 0ms;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.staggerChildren.visible>*:nth-child(2) {
+    transition-delay: 100ms;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.staggerChildren.visible>*:nth-child(3) {
+    transition-delay: 200ms;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.staggerChildren.visible>*:nth-child(4) {
+    transition-delay: 300ms;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.staggerChildren.visible>*:nth-child(5) {
+    transition-delay: 400ms;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.staggerChildren.visible>*:nth-child(6) {
+    transition-delay: 500ms;
+    opacity: 1;
+    transform: translateY(0);
+}

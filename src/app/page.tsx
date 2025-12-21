@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import ScrollReveal from '@/components/ScrollReveal';
 import styles from './page.module.css';
 
 export default function HomePage() {
