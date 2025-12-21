@@ -4,9 +4,10 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { saveAs } from 'file-saver';
-import { Website, Page, PageSection, Service, Location } from '@/lib/types';
+import { Website, Page, PageSection, Service, Location, BrandColors } from '@/lib/types';
 import { getWebsite, saveWebsite, generateId } from '@/lib/storage';
 import { getEditablePagePreviewHtml } from '@/lib/export';
+import { INDUSTRY_TEMPLATES, templateToBrandColors } from '@/lib/templates';
 import ImageUploader from '@/components/ImageUploader';
 import styles from './editor.module.css';
 
@@ -1334,6 +1335,36 @@ export default function EditorPage() {
                                         {/* Color Theme */}
                                         <div className={styles.editorSection}>
                                             <h3>🎨 Color Theme</h3>
+
+                                            {/* Color Palettes */}
+                                            <label style={{ marginBottom: '0.5rem', display: 'block' }}>Quick Palettes (Click to Apply)</label>
+                                            <div className={styles.paletteGrid}>
+                                                {INDUSTRY_TEMPLATES.map((template) => {
+                                                    const colors = template.light;
+                                                    return (
+                                                        <button
+                                                            key={template.id}
+                                                            type="button"
+                                                            className={styles.paletteCard}
+                                                            onClick={() => {
+                                                                const brandColors = templateToBrandColors(template, 'light') as BrandColors;
+                                                                setWebsite({ ...website, colors: brandColors });
+                                                                saveWebsite({ ...website, colors: brandColors });
+                                                            }}
+                                                            title={template.name}
+                                                        >
+                                                            <div className={styles.paletteSwatches}>
+                                                                <span style={{ background: colors.primary }}></span>
+                                                                <span style={{ background: colors.secondary }}></span>
+                                                                <span style={{ background: colors.accent }}></span>
+                                                            </div>
+                                                            <span className={styles.paletteName}>{template.name}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            <label style={{ marginTop: '1.5rem', marginBottom: '0.5rem', display: 'block' }}>Custom Colors</label>
                                             <div className={styles.colorGrid}>
                                                 <div className={styles.colorField}>
                                                     <label>Primary</label>
