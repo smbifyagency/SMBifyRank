@@ -559,22 +559,20 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
     function createToolbar() {
         const toolbar = document.createElement('div');
         toolbar.id = 'wysiwyg-toolbar';
-        toolbar.innerHTML = \`
-            <button onclick="formatDoc('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-            <button onclick="formatDoc('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-            <button onclick="formatDoc('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
-            <button onclick="formatDoc('strikeThrough')" title="Strikethrough"><s>S</s></button>
-            <span class="divider"></span>
-            <button onclick="showLinkModal()" title="Insert Link (Ctrl+K)">🔗</button>
-            <button onclick="formatDoc('removeFormat')" title="Clear Formatting">✕</button>
-            <span class="divider"></span>
-            <button onclick="formatDoc('insertUnorderedList')" title="Bullet List">•</button>
-            <button onclick="formatDoc('insertOrderedList')" title="Numbered List">1.</button>
-            <span class="divider"></span>
-            <button onclick="setHeading('h2')" title="Heading 2">H2</button>
-            <button onclick="setHeading('h3')" title="Heading 3">H3</button>
-            <button onclick="setHeading('p')" title="Paragraph">P</button>
-        \`;
+        toolbar.innerHTML = '<button onclick="formatDoc(\\'bold\\')" title="Bold"><b>B</b></button>' +
+            '<button onclick="formatDoc(\\'italic\\')" title="Italic"><i>I</i></button>' +
+            '<button onclick="formatDoc(\\'underline\\')" title="Underline"><u>U</u></button>' +
+            '<button onclick="formatDoc(\\'strikeThrough\\')" title="Strikethrough"><s>S</s></button>' +
+            '<span class="divider"></span>' +
+            '<button onclick="showLinkModal()" title="Insert Link">🔗</button>' +
+            '<button onclick="formatDoc(\\'removeFormat\\')" title="Clear">✕</button>' +
+            '<span class="divider"></span>' +
+            '<button onclick="formatDoc(\\'insertUnorderedList\\')" title="Bullets">•</button>' +
+            '<button onclick="formatDoc(\\'insertOrderedList\\')" title="Numbers">1.</button>' +
+            '<span class="divider"></span>' +
+            '<button onclick="setHeading(\\'h2\\')" title="H2">H2</button>' +
+            '<button onclick="setHeading(\\'h3\\')" title="H3">H3</button>' +
+            '<button onclick="setHeading(\\'p\\')" title="P">P</button>';
         document.body.appendChild(toolbar);
         return toolbar;
     }
@@ -583,17 +581,14 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
     function createLinkModal() {
         const overlay = document.createElement('div');
         overlay.id = 'link-modal-overlay';
-        overlay.innerHTML = \`
-            <div id="link-modal">
-                <h4>🔗 Insert Link</h4>
-                <input type="text" id="link-url" placeholder="https://example.com" />
-                <input type="text" id="link-text" placeholder="Link text (optional)" />
-                <div class="modal-buttons">
-                    <button class="cancel-btn" onclick="closeLinkModal()">Cancel</button>
-                    <button class="insert-btn" onclick="insertLink()">Insert</button>
-                </div>
-            </div>
-        \`;
+        overlay.innerHTML = '<div id="link-modal">' +
+            '<h4>🔗 Insert Link</h4>' +
+            '<input type="text" id="link-url" placeholder="https://example.com" />' +
+            '<input type="text" id="link-text" placeholder="Link text (optional)" />' +
+            '<div class="modal-buttons">' +
+            '<button class="cancel-btn" onclick="closeLinkModal()">Cancel</button>' +
+            '<button class="insert-btn" onclick="insertLink()">Insert</button>' +
+            '</div></div>';
         document.body.appendChild(overlay);
         return overlay;
     }
