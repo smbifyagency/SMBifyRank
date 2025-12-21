@@ -6,6 +6,7 @@ import { IntakeFormData, INDUSTRIES, WEBSITE_GOALS, DEFAULT_COLORS, ServiceInput
 import { generateWebsiteWithAI } from '@/lib/generator';
 import { saveWebsite } from '@/lib/storage';
 import { getApiConfig, saveApiConfig } from '@/lib/ai';
+import { INDUSTRY_TEMPLATES, getTemplateByIndustry, templateToBrandColors } from '@/lib/templates';
 import styles from './create.module.css';
 
 const STEPS = ['Business Info', 'Services', 'Locations', 'Brand Colors', 'AI Settings', 'Final Details'];
@@ -19,6 +20,7 @@ export default function CreateWebsitePage() {
     // AI Settings state
     const [openaiApiKey, setOpenaiApiKey] = useState('');
     const [useAiContent, setUseAiContent] = useState(true);
+    const [colorMode, setColorMode] = useState<'light' | 'dark'>('light');
 
     // Load saved API key on mount
     useEffect(() => {
@@ -385,37 +387,63 @@ export default function CreateWebsitePage() {
                                         )}
                                     </div>
 
-                                    {/* Preset Color Palettes */}
+                                    {/* Light/Dark Mode Toggle */}
                                     <div className={styles.formGroup}>
-                                        <label>Quick Palettes (Click to Apply)</label>
-                                        <div className={styles.palettes}>
-                                            {[
-                                                { name: 'Ocean Blue', primary: '#0077B6', secondary: '#00B4D8', accent: '#90E0EF' },
-                                                { name: 'Forest Green', primary: '#2D6A4F', secondary: '#40916C', accent: '#52B788' },
-                                                { name: 'Royal Purple', primary: '#5A189A', secondary: '#7B2CBF', accent: '#9D4EDD' },
-                                                { name: 'Sunset Orange', primary: '#F94144', secondary: '#F8961E', accent: '#F9C74F' },
-                                                { name: 'Modern Dark', primary: '#1A1A2E', secondary: '#16213E', accent: '#E94560' },
-                                                { name: 'Clean Blue', primary: '#003049', secondary: '#023E7D', accent: '#0077B6' },
-                                                { name: 'Warm Brown', primary: '#6F4E37', secondary: '#A67B5B', accent: '#D4A574' },
-                                                { name: 'Tech Cyan', primary: '#0D1B2A', secondary: '#1B263B', accent: '#00D4FF' },
-                                            ].map((palette) => (
-                                                <button
-                                                    key={palette.name}
-                                                    type="button"
-                                                    className={styles.paletteBtn}
-                                                    onClick={() => {
-                                                        updateColor('primary', palette.primary);
-                                                        updateColor('secondary', palette.secondary);
-                                                        updateColor('accent', palette.accent);
-                                                    }}
-                                                    style={{
-                                                        background: `linear-gradient(135deg, ${palette.primary} 0%, ${palette.secondary} 50%, ${palette.accent} 100%)`,
-                                                    }}
-                                                    title={palette.name}
-                                                >
-                                                    {palette.name}
-                                                </button>
-                                            ))}
+                                        <label>Color Mode</label>
+                                        <div className={styles.modeToggle}>
+                                            <button
+                                                type="button"
+                                                className={`${styles.modeBtn} ${colorMode === 'light' ? styles.active : ''}`}
+                                                onClick={() => setColorMode('light')}
+                                            >
+                                                ☀️ Light Mode
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`${styles.modeBtn} ${colorMode === 'dark' ? styles.active : ''}`}
+                                                onClick={() => setColorMode('dark')}
+                                            >
+                                                🌙 Dark Mode
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Industry Templates */}
+                                    <div className={styles.formGroup}>
+                                        <label>Industry Templates (Click to Apply)</label>
+                                        <div className={styles.templateGrid}>
+                                            {INDUSTRY_TEMPLATES.map((template) => {
+                                                const colors = colorMode === 'dark' ? template.dark : template.light;
+                                                return (
+                                                    <button
+                                                        key={template.id}
+                                                        type="button"
+                                                        className={styles.templateCard}
+                                                        onClick={() => {
+                                                            const brandColors = templateToBrandColors(template, colorMode);
+                                                            updateFormData({
+                                                                colors: brandColors as BrandColors
+                                                            });
+                                                        }}
+                                                        style={{
+                                                            background: colors.background,
+                                                            borderColor: colors.primary,
+                                                        }}
+                                                    >
+                                                        <div className={styles.templatePreview}>
+                                                            <span style={{ background: colors.primary }}></span>
+                                                            <span style={{ background: colors.secondary }}></span>
+                                                            <span style={{ background: colors.accent }}></span>
+                                                        </div>
+                                                        <span className={styles.templateName} style={{ color: colors.text }}>
+                                                            {template.name}
+                                                        </span>
+                                                        <span className={styles.templateDesc} style={{ color: colors.text, opacity: 0.7 }}>
+                                                            {template.description}
+                                                        </span>
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
