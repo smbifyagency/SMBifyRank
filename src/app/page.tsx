@@ -174,9 +174,11 @@ export default function HomePage() {
       {/* Pricing Section */}
       <section id="pricing" className={styles.pricing}>
         <div className={styles.container}>
-          <span className={styles.sectionBadge}>Simple Pricing</span>
-          <h2>Choose Your Plan</h2>
-          <p className={styles.pricingSubtext}>Start free, upgrade when you need more</p>
+          <ScrollReveal>
+            <span className={styles.sectionBadge}>Simple Pricing</span>
+            <h2>Choose Your Plan</h2>
+            <p className={styles.pricingSubtext}>Start free, upgrade when you need more</p>
+          </ScrollReveal>
 
           <div className={styles.pricingGrid}>
             {/* Free Trial */}
