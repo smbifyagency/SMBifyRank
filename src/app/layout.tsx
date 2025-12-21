@@ -9,15 +9,55 @@ import "@/styles/animations.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SMBify Rank | AI-Powered Website Builder for Local Businesses",
-  description: "Generate SEO-optimized websites for local businesses in minutes. AI-powered content, location pages, and one-click deployment.",
-  keywords: "website builder, SEO, local business, AI, website generator",
-  authors: [{ name: "SMBify", url: "https://smbify.agency" }],
+  title: {
+    default: "SMBify Rank | AI-Powered Website Builder for Local Businesses",
+    template: "%s | SMBify Rank",
+  },
+  description: "Generate SEO-optimized websites for local businesses in minutes. AI-powered content, location pages, and one-click deployment. Start free today!",
+  keywords: ["website builder", "SEO", "local business", "AI website generator", "small business website", "static website builder", "Netlify deployment"],
+  authors: [{ name: "SMBify Agency", url: "https://smbify.agency" }],
+  creator: "SMBify Agency",
+  publisher: "SMBify Agency",
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "https://smbifyrank.com"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "SMBify Rank | AI-Powered Website Builder",
-    description: "Generate SEO-optimized websites for local businesses in minutes.",
-    type: "website",
+    description: "Generate SEO-optimized websites for local businesses in minutes. No coding required.",
+    url: process.env.NEXTAUTH_URL || "https://smbifyrank.com",
     siteName: "SMBify Rank",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SMBify Rank - AI Website Builder",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SMBify Rank | AI-Powered Website Builder",
+    description: "Generate SEO-optimized websites for local businesses in minutes. No coding required.",
+    images: ["/og-image.png"],
+    creator: "@smbify",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-code",
   },
 };
 
