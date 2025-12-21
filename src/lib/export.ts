@@ -431,12 +431,265 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
     .edit-overlay:hover::after {
         opacity: 1;
     }
+    
+    /* Floating WYSIWYG Toolbar */
+    #wysiwyg-toolbar {
+        position: fixed;
+        display: none;
+        background: #1a1a2e;
+        border-radius: 8px;
+        padding: 6px 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        z-index: 99999;
+        gap: 2px;
+        flex-wrap: wrap;
+        max-width: 360px;
+    }
+    
+    #wysiwyg-toolbar.visible {
+        display: flex;
+    }
+    
+    #wysiwyg-toolbar button {
+        background: transparent;
+        border: none;
+        color: #e0e0e0;
+        padding: 6px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.15s;
+        min-width: 28px;
+    }
+    
+    #wysiwyg-toolbar button:hover {
+        background: rgba(255,255,255,0.15);
+    }
+    
+    #wysiwyg-toolbar button.active {
+        background: #6366f1;
+        color: white;
+    }
+    
+    #wysiwyg-toolbar .divider {
+        width: 1px;
+        height: 24px;
+        background: rgba(255,255,255,0.2);
+        margin: 0 4px;
+    }
+    
+    /* Link Modal */
+    #link-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 100000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #link-modal-overlay.visible {
+        display: flex;
+    }
+    
+    #link-modal {
+        background: #1a1a2e;
+        border-radius: 12px;
+        padding: 20px;
+        width: 320px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+    
+    #link-modal h4 {
+        color: #fff;
+        margin: 0 0 16px 0;
+        font-size: 16px;
+    }
+    
+    #link-modal input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #333;
+        border-radius: 6px;
+        background: #0d0d1a;
+        color: #fff;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    
+    #link-modal input:focus {
+        outline: none;
+        border-color: #6366f1;
+    }
+    
+    #link-modal .modal-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+    
+    #link-modal button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    #link-modal .cancel-btn {
+        background: #333;
+        color: #fff;
+    }
+    
+    #link-modal .insert-btn {
+        background: #6366f1;
+        color: #fff;
+    }
 </style>
 `;
 
     const editorScript = `
 <script>
 (function() {
+    // Create floating toolbar
+    function createToolbar() {
+        const toolbar = document.createElement('div');
+        toolbar.id = 'wysiwyg-toolbar';
+        toolbar.innerHTML = \`
+            <button onclick="formatDoc('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button onclick="formatDoc('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button onclick="formatDoc('underline')" title="Underline (Ctrl+U)"><u>U</u></button>
+            <button onclick="formatDoc('strikeThrough')" title="Strikethrough"><s>S</s></button>
+            <span class="divider"></span>
+            <button onclick="showLinkModal()" title="Insert Link (Ctrl+K)">🔗</button>
+            <button onclick="formatDoc('removeFormat')" title="Clear Formatting">✕</button>
+            <span class="divider"></span>
+            <button onclick="formatDoc('insertUnorderedList')" title="Bullet List">•</button>
+            <button onclick="formatDoc('insertOrderedList')" title="Numbered List">1.</button>
+            <span class="divider"></span>
+            <button onclick="setHeading('h2')" title="Heading 2">H2</button>
+            <button onclick="setHeading('h3')" title="Heading 3">H3</button>
+            <button onclick="setHeading('p')" title="Paragraph">P</button>
+        \`;
+        document.body.appendChild(toolbar);
+        return toolbar;
+    }
+    
+    // Create link modal
+    function createLinkModal() {
+        const overlay = document.createElement('div');
+        overlay.id = 'link-modal-overlay';
+        overlay.innerHTML = \`
+            <div id="link-modal">
+                <h4>🔗 Insert Link</h4>
+                <input type="text" id="link-url" placeholder="https://example.com" />
+                <input type="text" id="link-text" placeholder="Link text (optional)" />
+                <div class="modal-buttons">
+                    <button class="cancel-btn" onclick="closeLinkModal()">Cancel</button>
+                    <button class="insert-btn" onclick="insertLink()">Insert</button>
+                </div>
+            </div>
+        \`;
+        document.body.appendChild(overlay);
+        return overlay;
+    }
+    
+    const toolbar = createToolbar();
+    const linkModal = createLinkModal();
+    let currentEditableElement = null;
+    let savedSelection = null;
+    
+    // Format document command
+    window.formatDoc = function(cmd, value) {
+        document.execCommand(cmd, false, value || null);
+        currentEditableElement?.focus();
+    };
+    
+    // Set heading level
+    window.setHeading = function(tag) {
+        document.execCommand('formatBlock', false, tag);
+        currentEditableElement?.focus();
+    };
+    
+    // Save current selection for link insertion
+    function saveSelection() {
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            savedSelection = sel.getRangeAt(0).cloneRange();
+        }
+    }
+    
+    // Restore saved selection
+    function restoreSelection() {
+        if (savedSelection) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(savedSelection);
+        }
+    }
+    
+    // Show link modal
+    window.showLinkModal = function() {
+        saveSelection();
+        const sel = window.getSelection();
+        document.getElementById('link-text').value = sel.toString() || '';
+        document.getElementById('link-url').value = '';
+        linkModal.classList.add('visible');
+        document.getElementById('link-url').focus();
+    };
+    
+    // Close link modal
+    window.closeLinkModal = function() {
+        linkModal.classList.remove('visible');
+        currentEditableElement?.focus();
+    };
+    
+    // Insert link
+    window.insertLink = function() {
+        const url = document.getElementById('link-url').value.trim();
+        const text = document.getElementById('link-text').value.trim();
+        
+        if (!url) return;
+        
+        restoreSelection();
+        
+        if (text && window.getSelection().toString() !== text) {
+            document.execCommand('insertHTML', false, '<a href="' + url + '" target="_blank">' + text + '</a>');
+        } else {
+            document.execCommand('createLink', false, url);
+            // Add target blank
+            const sel = window.getSelection();
+            if (sel.anchorNode.parentElement.tagName === 'A') {
+                sel.anchorNode.parentElement.setAttribute('target', '_blank');
+            }
+        }
+        
+        closeLinkModal();
+    };
+    
+    // Position toolbar near element
+    function positionToolbar(element) {
+        const rect = element.getBoundingClientRect();
+        toolbar.style.left = Math.max(10, rect.left) + 'px';
+        toolbar.style.top = Math.max(10, rect.top - 50) + 'px';
+    }
+    
+    // Show toolbar
+    function showToolbar(element) {
+        currentEditableElement = element;
+        positionToolbar(element);
+        toolbar.classList.add('visible');
+    }
+    
+    // Hide toolbar
+    function hideToolbar() {
+        toolbar.classList.remove('visible');
+    }
+    
     // Add data-editable attributes to editable elements
     function initEditableElements() {
         // Headings
@@ -575,6 +828,9 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
             const sel = window.getSelection();
             sel.removeAllRanges();
             sel.addRange(range);
+            
+            // Show WYSIWYG toolbar
+            showToolbar(target);
         }
         
         // Handle video double-click - notify parent to show URL editor
@@ -598,16 +854,19 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         if (target) {
             target.removeAttribute('contenteditable');
             
+            // Hide toolbar
+            hideToolbar();
+            
             const editId = target.getAttribute('data-edit-id');
             const editType = target.getAttribute('data-edit-type');
             
-            // Send updated content to parent
+            // Send updated content to parent (use innerHTML to preserve formatting)
             window.parent.postMessage({
                 type: 'content-updated',
                 data: {
                     elementId: editId,
                     elementType: editType,
-                    newContent: target.textContent
+                    newContent: target.innerHTML
                 }
             }, '*');
         }
