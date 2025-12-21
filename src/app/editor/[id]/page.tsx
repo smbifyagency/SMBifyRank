@@ -13,7 +13,7 @@ import RichTextEditor from '@/components/RichTextEditor';
 import { DeployModal } from '@/components/DeployModal';
 import styles from './editor.module.css';
 
-type EditTab = 'content' | 'website' | 'page' | 'sections' | 'branding' | 'blog';
+type EditTab = 'edit' | 'settings';
 
 export default function EditorPage() {
     const params = useParams();
@@ -30,7 +30,7 @@ export default function EditorPage() {
     const [showEditor, setShowEditor] = useState(true);
     const [editingSection, setEditingSection] = useState<PageSection | null>(null);
     const [sectionContent, setSectionContent] = useState<Record<string, unknown>>({});
-    const [editTab, setEditTab] = useState<EditTab>('content');
+    const [editTab, setEditTab] = useState<EditTab>('edit');
     const [showImageUploader, setShowImageUploader] = useState(false);
     const [showLogoUploader, setShowLogoUploader] = useState(false);
     const [showVideoEditor, setShowVideoEditor] = useState(false);
@@ -983,42 +983,24 @@ export default function EditorPage() {
                             </div>
                         ) : (
                             <>
-                                {/* Tab Navigation */}
+                                {/* Simplified Tab Navigation - Just 2 tabs */}
                                 <div className={styles.tabNav}>
                                     <button
-                                        className={`${styles.tabBtn} ${editTab === 'content' ? styles.activeTab : ''}`}
-                                        onClick={() => setEditTab('content')}
+                                        className={`${styles.tabBtn} ${editTab === 'edit' ? styles.activeTab : ''}`}
+                                        onClick={() => setEditTab('edit')}
                                     >
-                                        ✏️ Content
+                                        📝 Edit Content
                                     </button>
                                     <button
-                                        className={`${styles.tabBtn} ${editTab === 'website' ? styles.activeTab : ''}`}
-                                        onClick={() => setEditTab('website')}
+                                        className={`${styles.tabBtn} ${editTab === 'settings' ? styles.activeTab : ''}`}
+                                        onClick={() => setEditTab('settings')}
                                     >
-                                        🏢 Website
-                                    </button>
-                                    <button
-                                        className={`${styles.tabBtn} ${editTab === 'sections' ? styles.activeTab : ''}`}
-                                        onClick={() => setEditTab('sections')}
-                                    >
-                                        🧩 Sections
-                                    </button>
-                                    <button
-                                        className={`${styles.tabBtn} ${editTab === 'branding' ? styles.activeTab : ''}`}
-                                        onClick={() => setEditTab('branding')}
-                                    >
-                                        🎨 Branding
-                                    </button>
-                                    <button
-                                        className={`${styles.tabBtn} ${editTab === 'blog' ? styles.activeTab : ''}`}
-                                        onClick={() => setEditTab('blog')}
-                                    >
-                                        ✍️ Blog
+                                        ⚙️ Settings
                                     </button>
                                 </div>
 
                                 {/* Content Tab - Rich Text Editing for all page content */}
-                                {editTab === 'content' && website && (
+                                {editTab === 'edit' && website && (
                                     <>
                                         <div className={styles.editorSection}>
                                             <div className={styles.hint} style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
@@ -1102,7 +1084,7 @@ export default function EditorPage() {
                                 )}
 
                                 {/* Website Settings Tab */}
-                                {editTab === 'website' && website && (
+                                {editTab === 'settings' && website && (
                                     <>
                                         {/* Business Info */}
                                         <div className={styles.editorSection}>
@@ -1261,8 +1243,9 @@ export default function EditorPage() {
                                     </>
                                 )}
 
-                                {/* Page Tab */}
-                                {editTab === 'page' && (
+                                {/* @ts-expect-error Page Tab DISABLED */}
+{/* Page Tab - DISABLED */}
+                                {false && currentPage && (
                                     <>
                                         <div className={styles.editorSection}>
                                             <h3>📄 Page Settings</h3>
@@ -1320,8 +1303,8 @@ export default function EditorPage() {
                                     </>
                                 )}
 
-                                {/* Sections Tab */}
-                                {editTab === 'sections' && (
+                                {/* Sections Tab - DISABLED */}
+                                {false && (
                                     <>
                                         {/* Sections List */}
                                         <div className={styles.editorSection}>
@@ -1399,8 +1382,8 @@ export default function EditorPage() {
                                     </>
                                 )}
 
-                                {/* Branding Tab */}
-                                {editTab === 'branding' && website && (
+                                {/* Branding Tab - DISABLED */}
+                                {false && website && (
                                     <>
                                         {/* Global Branding Notice */}
                                         <div className={styles.editorSection}>
@@ -1606,8 +1589,8 @@ export default function EditorPage() {
                                     </>
                                 )}
 
-                                {/* Blog Tab */}
-                                {editTab === 'blog' && website && (
+                                {/* Blog Tab - DISABLED */}
+                                {false && website && (
                                     <>
                                         {/* Create New Post */}
                                         <div className={styles.editorSection}>
