@@ -1057,6 +1057,336 @@ export function generateCSS(colors: BrandColors): string {
       color: var(--text);
     }
     
+    /* ===== PREMIUM ANIMATIONS ===== */
+    
+    /* Keyframe Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes fadeInRight {
+      from {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.5); }
+      50% { box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8), 0 0 30px rgba(var(--primary-rgb), 0.4); }
+    }
+    
+    /* Animate on scroll - elements start hidden */
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Staggered animations for grids */
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    .stagger-6 { transition-delay: 0.6s; }
+    
+    /* Hero section entrance */
+    .hero {
+      animation: fadeInUp 1s ease-out;
+    }
+    
+    .hero h1 {
+      animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+    
+    .hero p {
+      animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+    
+    .hero .btn {
+      animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+    
+    /* Premium button effects */
+    .btn {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-primary);
+    }
+    
+    .btn:active {
+      transform: translateY(-1px);
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Card hover effects */
+    .service-card,
+    .feature-card,
+    .blog-card,
+    .location-link,
+    .area-card-pro,
+    .benefit-card,
+    .faq-item-pro,
+    .edu-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .service-card:hover,
+    .feature-card:hover,
+    .blog-card:hover,
+    .area-card-pro:hover,
+    .benefit-card:hover,
+    .edu-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Card shine effect */
+    .service-card::after,
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: skewX(-25deg);
+      transition: left 0.6s;
+      pointer-events: none;
+    }
+    
+    .service-card:hover::after,
+    .feature-card:hover::after {
+      left: 125%;
+    }
+    
+    /* Image hover effects */
+    .service-card img,
+    .blog-card img,
+    .about-image img,
+    .hero-main-image {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .service-card:hover img,
+    .blog-card:hover img {
+      transform: scale(1.08);
+    }
+    
+    /* Section headings */
+    section h2,
+    .section-title h2 {
+      position: relative;
+    }
+    
+    section h2::after,
+    .section-title h2::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      margin-top: 15px;
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    
+    section:hover h2::after,
+    .section-title:hover h2::after {
+      width: 100px;
+    }
+    
+    /* Glassmorphism cards (optional class) */
+    .glass {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Floating animation for icons */
+    .service-icon,
+    .benefit-icon,
+    .step-icon {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .service-icon { animation-delay: 0s; }
+    .service-card:nth-child(2) .service-icon { animation-delay: 0.2s; }
+    .service-card:nth-child(3) .service-icon { animation-delay: 0.4s; }
+    .service-card:nth-child(4) .service-icon { animation-delay: 0.6s; }
+    
+    /* Call-to-action buttons glow */
+    .hero-cta .btn-primary,
+    .mega-phone-cta,
+    .giant-phone-cta,
+    .big-call-button {
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    /* Smooth header transitions */
+    .header {
+      transition: all 0.3s ease;
+    }
+    
+    .header.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Navigation link underline */
+    .nav-link {
+      position: relative;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    /* Form inputs focus effects */
+    input, textarea, select {
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+      outline: none;
+    }
+    
+    /* Process step hover */
+    .process-step {
+      transition: all 0.4s ease;
+    }
+    
+    .process-step:hover {
+      transform: scale(1.05);
+    }
+    
+    .process-step:hover .step-number {
+      background: var(--accent);
+      transform: rotate(10deg);
+    }
+    
+    /* Footer link hover */
+    .footer a {
+      transition: all 0.3s ease;
+    }
+    
+    .footer a:hover {
+      color: var(--accent);
+      transform: translateX(5px);
+    }
+    
+    /* Smooth page load */
+    body {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    
+    /* ===== END PREMIUM ANIMATIONS ===== */
+    
     /* Responsive */
     @media (max-width: 768px) {
       .nav {
@@ -1712,6 +2042,162 @@ export function generateJS(): string {
         }
       });
     }
+    
+    // ===== PREMIUM ANIMATION SCRIPTS =====
+    
+    // Header scroll effect
+    const header = document.querySelector('.header');
+    if (header) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+    }
+    
+    // Intersection Observer for scroll animations
+    const animateOnScroll = () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            // Add staggered delay for grid items
+            const delay = entry.target.dataset.delay || 0;
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+            }, delay);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      });
+      
+      // Observe all animatable elements
+      document.querySelectorAll('section, .service-card, .feature-card, .benefit-card, .process-step, .faq-item-pro, .area-card-pro, .edu-card').forEach((el, index) => {
+        el.classList.add('animate-on-scroll');
+        el.dataset.delay = index * 100;
+        observer.observe(el);
+      });
+    };
+    
+    // Initialize scroll animations after page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', animateOnScroll);
+    } else {
+      animateOnScroll();
+    }
+    
+    // Parallax effect for hero section
+    const heroSection = document.querySelector('.hero, .hero-emergency');
+    if (heroSection) {
+      window.addEventListener('scroll', function() {
+        const scrolled = window.scrollY;
+        if (scrolled < 600) {
+          heroSection.style.transform = 'translateY(' + (scrolled * 0.3) + 'px)';
+          heroSection.style.opacity = 1 - (scrolled / 600);
+        }
+      });
+    }
+    
+    // Counter animation for numbers
+    const animateCounters = () => {
+      document.querySelectorAll('[data-count]').forEach(counter => {
+        const target = parseInt(counter.dataset.count);
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+          current += step;
+          if (current < target) {
+            counter.textContent = Math.floor(current);
+            requestAnimationFrame(updateCounter);
+          } else {
+            counter.textContent = target;
+          }
+        };
+        
+        updateCounter();
+      });
+    };
+    
+    // Typing effect for headlines (optional)
+    const typeWriter = (element, text, speed = 50) => {
+      let i = 0;
+      element.textContent = '';
+      const type = () => {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        }
+      };
+      type();
+    };
+    
+    // Mouse follower for premium feel (subtle)
+    const createMouseFollower = () => {
+      const follower = document.createElement('div');
+      follower.className = 'mouse-follower';
+      follower.style.cssText = 'position: fixed; width: 20px; height: 20px; background: rgba(var(--primary-rgb, 59, 130, 246), 0.3); border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.15s ease-out, opacity 0.3s; opacity: 0;';
+      document.body.appendChild(follower);
+      
+      let mouseX = 0, mouseY = 0;
+      let followerX = 0, followerY = 0;
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        follower.style.opacity = '1';
+      });
+      
+      document.addEventListener('mouseleave', () => {
+        follower.style.opacity = '0';
+      });
+      
+      const animate = () => {
+        followerX += (mouseX - followerX) * 0.1;
+        followerY += (mouseY - followerY) * 0.1;
+        follower.style.transform = 'translate(' + (followerX - 10) + 'px, ' + (followerY - 10) + 'px)';
+        requestAnimationFrame(animate);
+      };
+      animate();
+      
+      // Enlarge on hovering interactive elements
+      document.querySelectorAll('a, button, .btn').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          follower.style.transform = 'translate(' + (followerX - 10) + 'px, ' + (followerY - 10) + 'px) scale(2)';
+          follower.style.background = 'rgba(var(--primary-rgb, 59, 130, 246), 0.15)';
+        });
+        el.addEventListener('mouseleave', () => {
+          follower.style.transform = 'translate(' + (followerX - 10) + 'px, ' + (followerY - 10) + 'px) scale(1)';
+          follower.style.background = 'rgba(var(--primary-rgb, 59, 130, 246), 0.3)';
+        });
+      });
+    };
+    
+    // Only enable mouse follower on desktop
+    if (window.innerWidth > 1024) {
+      createMouseFollower();
+    }
+    
+    // Smooth reveal for images
+    document.querySelectorAll('img').forEach(img => {
+      img.style.opacity = '0';
+      img.style.transition = 'opacity 0.5s ease';
+      
+      if (img.complete) {
+        img.style.opacity = '1';
+      } else {
+        img.addEventListener('load', () => {
+          img.style.opacity = '1';
+        });
+      }
+    });
+    
+    // ===== END PREMIUM ANIMATION SCRIPTS =====
   `;
 }
 
