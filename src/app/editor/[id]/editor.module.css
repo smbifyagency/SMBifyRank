@@ -818,3 +818,18 @@
 .videoPreview iframe {
     display: block;
 }
+
+/* Logo Preview in Branding Tab */
+.logoPreview {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.logoPreview img {
+    max-width: 200px;
+    max-height: 80px;
+    object-fit: contain;
+}

@@ -22,6 +22,7 @@ export interface Website {
     contactPhone?: string;
     contactEmail?: string;
     logoUrl?: string;
+    faviconUrl?: string;
     // Business address for NAP (Name, Address, Phone) SEO
     businessAddress?: {
         street: string;

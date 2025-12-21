@@ -10,7 +10,7 @@ import { getEditablePagePreviewHtml } from '@/lib/export';
 import ImageUploader from '@/components/ImageUploader';
 import styles from './editor.module.css';
 
-type EditTab = 'website' | 'page' | 'sections';
+type EditTab = 'website' | 'page' | 'sections' | 'branding';
 
 export default function EditorPage() {
     const params = useParams();
@@ -950,6 +950,12 @@ export default function EditorPage() {
                                     >
                                         🧩 Sections
                                     </button>
+                                    <button
+                                        className={`${styles.tabBtn} ${editTab === 'branding' ? styles.activeTab : ''}`}
+                                        onClick={() => setEditTab('branding')}
+                                    >
+                                        🎨 Branding
+                                    </button>
                                 </div>
 
                                 {/* Website Settings Tab */}
@@ -1248,6 +1254,145 @@ export default function EditorPage() {
                                                     🔧 HTML
                                                 </button>
                                             </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Branding Tab */}
+                                {editTab === 'branding' && website && (
+                                    <>
+                                        {/* Logo & Favicon */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🖼️ Logo & Favicon</h3>
+                                            <div className={styles.field}>
+                                                <label>Logo URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={website.logoUrl || ''}
+                                                    onChange={(e) => updateWebsiteField('logoUrl', e.target.value)}
+                                                    className={styles.input}
+                                                    placeholder="https://example.com/logo.png"
+                                                />
+                                                {website.logoUrl && (
+                                                    <div className={styles.logoPreview}>
+                                                        <img src={website.logoUrl} alt="Logo preview" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className={styles.field}>
+                                                <label>Favicon URL (optional)</label>
+                                                <input
+                                                    type="text"
+                                                    value={website.faviconUrl || ''}
+                                                    onChange={(e) => updateWebsiteField('faviconUrl', e.target.value)}
+                                                    className={styles.input}
+                                                    placeholder="https://example.com/favicon.ico"
+                                                />
+                                                <span className={styles.hint}>Leave blank to use logo as favicon</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Color Theme */}
+                                        <div className={styles.editorSection}>
+                                            <h3>🎨 Color Theme</h3>
+                                            <div className={styles.colorGrid}>
+                                                <div className={styles.colorField}>
+                                                    <label>Primary</label>
+                                                    <div className={styles.colorInput}>
+                                                        <input
+                                                            type="color"
+                                                            value={website.colors.primary}
+                                                            onChange={(e) => {
+                                                                const newColors = { ...website.colors, primary: e.target.value };
+                                                                setWebsite({ ...website, colors: newColors });
+                                                                saveWebsite({ ...website, colors: newColors });
+                                                            }}
+                                                        />
+                                                        <span>{website.colors.primary}</span>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.colorField}>
+                                                    <label>Secondary</label>
+                                                    <div className={styles.colorInput}>
+                                                        <input
+                                                            type="color"
+                                                            value={website.colors.secondary}
+                                                            onChange={(e) => {
+                                                                const newColors = { ...website.colors, secondary: e.target.value };
+                                                                setWebsite({ ...website, colors: newColors });
+                                                                saveWebsite({ ...website, colors: newColors });
+                                                            }}
+                                                        />
+                                                        <span>{website.colors.secondary}</span>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.colorField}>
+                                                    <label>Accent</label>
+                                                    <div className={styles.colorInput}>
+                                                        <input
+                                                            type="color"
+                                                            value={website.colors.accent}
+                                                            onChange={(e) => {
+                                                                const newColors = { ...website.colors, accent: e.target.value };
+                                                                setWebsite({ ...website, colors: newColors });
+                                                                saveWebsite({ ...website, colors: newColors });
+                                                            }}
+                                                        />
+                                                        <span>{website.colors.accent}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.colorGrid} style={{ marginTop: '1rem' }}>
+                                                <div className={styles.colorField}>
+                                                    <label>Background</label>
+                                                    <div className={styles.colorInput}>
+                                                        <input
+                                                            type="color"
+                                                            value={website.colors.background}
+                                                            onChange={(e) => {
+                                                                const newColors = { ...website.colors, background: e.target.value };
+                                                                setWebsite({ ...website, colors: newColors });
+                                                                saveWebsite({ ...website, colors: newColors });
+                                                            }}
+                                                        />
+                                                        <span>{website.colors.background}</span>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.colorField}>
+                                                    <label>Text</label>
+                                                    <div className={styles.colorInput}>
+                                                        <input
+                                                            type="color"
+                                                            value={website.colors.text}
+                                                            onChange={(e) => {
+                                                                const newColors = { ...website.colors, text: e.target.value };
+                                                                setWebsite({ ...website, colors: newColors });
+                                                                saveWebsite({ ...website, colors: newColors });
+                                                            }}
+                                                        />
+                                                        <span>{website.colors.text}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Quick Actions */}
+                                        <div className={styles.editorSection}>
+                                            <h3>⚡ Quick Actions</h3>
+                                            <div className={styles.field}>
+                                                <button
+                                                    className={styles.saveBtn}
+                                                    onClick={() => {
+                                                        saveWebsite(website);
+                                                        alert('✅ Branding changes saved! Click Deploy to update your live site.');
+                                                    }}
+                                                >
+                                                    💾 Save Branding Changes
+                                                </button>
+                                            </div>
+                                            <p className={styles.hint}>
+                                                Changes are saved locally. Click &quot;Deploy&quot; in the toolbar to update your live website.
+                                            </p>
                                         </div>
                                     </>
                                 )}
