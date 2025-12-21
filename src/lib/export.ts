@@ -478,6 +478,45 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         margin: 0 4px;
     }
     
+    /* Color Picker Dropdown */
+    .color-picker-wrap {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .color-picker-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #1a1a2e;
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        display: none;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
+        width: 180px;
+        z-index: 100000;
+    }
+    
+    .color-picker-dropdown.visible {
+        display: grid;
+    }
+    
+    .color-swatch {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.1s, border-color 0.1s;
+    }
+    
+    .color-swatch:hover {
+        transform: scale(1.15);
+        border-color: #fff;
+    }
+    
     /* Link Modal */
     #link-modal-overlay {
         position: fixed;
@@ -568,17 +607,27 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         toolbar.innerHTML = '<button data-cmd="bold" title="Bold"><b>B</b></button>' +
             '<button data-cmd="italic" title="Italic"><i>I</i></button>' +
             '<button data-cmd="underline" title="Underline"><u>U</u></button>' +
-            '<button data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>' +
             '<span class="divider"></span>' +
-            '<button data-action="link" title="Insert Link">🔗</button>' +
-            '<button data-cmd="removeFormat" title="Clear">✕</button>' +
+            '<button data-action="link" title="Insert/Edit Link">🔗 Link</button>' +
             '<span class="divider"></span>' +
-            '<button data-cmd="insertUnorderedList" title="Bullets">•</button>' +
-            '<button data-cmd="insertOrderedList" title="Numbers">1.</button>' +
+            '<div class="color-picker-wrap">' +
+            '<button data-action="color" title="Text Color">🎨</button>' +
+            '<div class="color-picker-dropdown" id="color-dropdown">' +
+            '<div class="color-swatch" style="background:#000" data-color="#000000"></div>' +
+            '<div class="color-swatch" style="background:#333" data-color="#333333"></div>' +
+            '<div class="color-swatch" style="background:#666" data-color="#666666"></div>' +
+            '<div class="color-swatch" style="background:#999" data-color="#999999"></div>' +
+            '<div class="color-swatch" style="background:#fff" data-color="#ffffff"></div>' +
+            '<div class="color-swatch" style="background:#e74c3c" data-color="#e74c3c"></div>' +
+            '<div class="color-swatch" style="background:#e67e22" data-color="#e67e22"></div>' +
+            '<div class="color-swatch" style="background:#f1c40f" data-color="#f1c40f"></div>' +
+            '<div class="color-swatch" style="background:#2ecc71" data-color="#2ecc71"></div>' +
+            '<div class="color-swatch" style="background:#1abc9c" data-color="#1abc9c"></div>' +
+            '<div class="color-swatch" style="background:#3498db" data-color="#3498db"></div>' +
+            '<div class="color-swatch" style="background:#9b59b6" data-color="#9b59b6"></div>' +
+            '</div></div>' +
             '<span class="divider"></span>' +
-            '<button data-heading="h2" title="H2">H2</button>' +
-            '<button data-heading="h3" title="H3">H3</button>' +
-            '<button data-heading="p" title="P">P</button>';
+            '<button data-cmd="removeFormat" title="Clear Formatting">✕</button>';
         document.body.appendChild(toolbar);
         
         // Prevent mousedown from stealing focus from editable element
@@ -589,6 +638,19 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         // Handle toolbar button clicks
         toolbar.addEventListener('click', function(e) {
             const btn = e.target.closest('button');
+            const swatch = e.target.closest('.color-swatch');
+            
+            // Handle color swatch click
+            if (swatch) {
+                e.preventDefault();
+                e.stopPropagation();
+                const color = swatch.getAttribute('data-color');
+                document.execCommand('foreColor', false, color);
+                document.getElementById('color-dropdown').classList.remove('visible');
+                currentEditableElement?.focus();
+                return;
+            }
+            
             if (!btn) return;
             e.preventDefault();
             e.stopPropagation();
@@ -599,6 +661,10 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
                 setHeading(btn.dataset.heading);
             } else if (btn.dataset.action === 'link') {
                 showLinkModal();
+            } else if (btn.dataset.action === 'color') {
+                // Toggle color picker
+                const dropdown = document.getElementById('color-dropdown');
+                dropdown.classList.toggle('visible');
             }
         });
         
