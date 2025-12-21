@@ -87,83 +87,51 @@ export default function EditorPage() {
                 setShowVideoEditor(true);
             } else if (event.data.type === 'content-updated') {
                 // Handle content update from inline editing - persist changes
-                const { elementId, elementType, newContent } = event.data.data;
-                console.log('Content updated:', { elementId, elementType, newContent });
+                const { elementId, elementType, sectionId, property, newContent } = event.data.data;
+                console.log('Content updated:', { elementId, elementType, sectionId, property, newContent });
 
                 if (website && currentPage) {
-                    // Parse element ID to find matching section
-                    // Element IDs are like 'heading-0', 'text-1', etc.
-                    const [type, indexStr] = elementId.split('-');
-                    const elementIndex = parseInt(indexStr, 10);
-
-                    // Track which element we're updating (heading-0 is 1st heading, heading-1 is 2nd, etc.)
-                    let headingCounter = 0;
-                    let textCounter = 0;
                     let sectionUpdated = false;
 
-                    // Update the appropriate section based on element index
+                    // Use sectionId + property for precise updates (new method)
                     const updatedSections = currentPage.content.map((section) => {
-                        if (sectionUpdated) return section;
-
-                        const content = section.content as Record<string, unknown>;
-
-                        // For headings
-                        if (elementType === 'heading') {
-                            // Check section properties that could be headings
-                            if (typeof content.headline === 'string') {
-                                if (headingCounter === elementIndex) {
-                                    sectionUpdated = true;
-                                    console.log('Updating headline in section:', section.type);
-                                    return { ...section, content: { ...content, headline: newContent } };
-                                }
-                                headingCounter++;
-                            }
-                            if (typeof content.title === 'string') {
-                                if (headingCounter === elementIndex) {
-                                    sectionUpdated = true;
-                                    console.log('Updating title in section:', section.type);
-                                    return { ...section, content: { ...content, title: newContent } };
-                                }
-                                headingCounter++;
+                        // Direct match using sectionId and property
+                        if (sectionId && property && section.id === sectionId) {
+                            const content = section.content as Record<string, unknown>;
+                            if (property in content) {
+                                sectionUpdated = true;
+                                console.log(`Updating ${property} in section ${section.id} (${section.type})`);
+                                return { ...section, content: { ...content, [property]: newContent } };
                             }
                         }
 
-                        // For text/paragraphs
-                        if (elementType === 'text') {
-                            if (typeof content.subheadline === 'string') {
-                                if (textCounter === elementIndex) {
-                                    sectionUpdated = true;
-                                    console.log('Updating subheadline in section:', section.type);
-                                    return { ...section, content: { ...content, subheadline: newContent } };
+                        // Fallback: For older elements without data-section-id, use index-based matching
+                        if (!sectionId && !sectionUpdated) {
+                            const content = section.content as Record<string, unknown>;
+                            const [, indexStr] = (elementId || '').split('-');
+                            const elementIndex = parseInt(indexStr, 10);
+
+                            if (elementType === 'heading') {
+                                const headingProps = ['headline', 'title'];
+                                for (const prop of headingProps) {
+                                    if (typeof content[prop] === 'string') {
+                                        sectionUpdated = true;
+                                        console.log(`Fallback: Updating ${prop} in section ${section.type}`);
+                                        return { ...section, content: { ...content, [prop]: newContent } };
+                                    }
                                 }
-                                textCounter++;
                             }
-                            if (typeof content.subtitle === 'string') {
-                                if (textCounter === elementIndex) {
-                                    sectionUpdated = true;
-                                    console.log('Updating subtitle in section:', section.type);
-                                    return { ...section, content: { ...content, subtitle: newContent } };
+                            if (elementType === 'text') {
+                                const textProps = ['subheadline', 'subtitle', 'content', 'description'];
+                                for (const prop of textProps) {
+                                    if (typeof content[prop] === 'string') {
+                                        sectionUpdated = true;
+                                        console.log(`Fallback: Updating ${prop} in section ${section.type}`);
+                                        return { ...section, content: { ...content, [prop]: newContent } };
+                                    }
                                 }
-                                textCounter++;
-                            }
-                            if (typeof content.content === 'string') {
-                                if (textCounter === elementIndex) {
-                                    sectionUpdated = true;
-                                    console.log('Updating content in section:', section.type);
-                                    return { ...section, content: { ...content, content: newContent } };
-                                }
-                                textCounter++;
-                            }
-                            if (typeof content.description === 'string') {
-                                if (textCounter === elementIndex) {
-                                    sectionUpdated = true;
-                                    console.log('Updating description in section:', section.type);
-                                    return { ...section, content: { ...content, description: newContent } };
-                                }
-                                textCounter++;
                             }
                         }
-
                         return section;
                     });
 
@@ -180,7 +148,7 @@ export default function EditorPage() {
                         handleSave(updatedWebsite);
                         console.log('Website saved successfully');
                     } else {
-                        console.log('No matching section found for elementId:', elementId);
+                        console.log('No matching section found for:', { sectionId, property, elementId });
                     }
                 }
             }

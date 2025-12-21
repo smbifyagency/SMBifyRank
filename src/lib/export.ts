@@ -990,6 +990,8 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
             
             const editId = target.getAttribute('data-edit-id');
             const editType = target.getAttribute('data-edit-type');
+            const sectionId = target.getAttribute('data-section-id') || '';
+            const property = target.getAttribute('data-property') || '';
             
             // Send updated content to parent (use innerHTML to preserve formatting)
             window.parent.postMessage({
@@ -997,6 +999,8 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
                 data: {
                     elementId: editId,
                     elementType: editType,
+                    sectionId: sectionId,
+                    property: property,
                     newContent: target.innerHTML
                 }
             }, '*');

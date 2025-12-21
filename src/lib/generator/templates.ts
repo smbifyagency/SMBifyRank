@@ -1319,18 +1319,19 @@ export function renderFooter(website: Website): string {
 // Render section based on type
 function renderSection(section: PageSection, website: Website): string {
   const content = section.content as Record<string, unknown>;
+  const sectionId = section.id;
 
   switch (section.type) {
     case 'hero':
-      return renderHeroSection(content);
+      return renderHeroSection(content, sectionId);
     case 'services-grid':
-      return renderServicesGridSection(content);
+      return renderServicesGridSection(content, sectionId);
     case 'about-intro':
-      return renderAboutSection(content);
+      return renderAboutSection(content, sectionId);
     case 'locations-list':
       return renderLocationsSection(content);
     case 'cta':
-      return renderCtaSection(content);
+      return renderCtaSection(content, sectionId);
     case 'contact-form':
       return renderContactSection(content);
     case 'trust-badges':
@@ -1338,32 +1339,33 @@ function renderSection(section: PageSection, website: Website): string {
     case 'blog-list':
       return renderBlogList(content, website.blogPosts);
     case 'custom-content':
-      return renderCustomContent(content);
+      return renderCustomContent(content, sectionId);
     case 'image':
-      return renderImageSection(content);
+      return renderImageSection(content, sectionId);
     case 'video':
-      return renderVideoSection(content);
+      return renderVideoSection(content, sectionId);
     case 'text-block':
-      return renderTextBlockSection(content);
+      return renderTextBlockSection(content, sectionId);
     case 'features':
-      return renderFeaturesSection(content);
+      return renderFeaturesSection(content, sectionId);
     default:
       return '';
   }
 }
 
-function renderHeroSection(content: Record<string, unknown>): string {
+function renderHeroSection(content: Record<string, unknown>, sectionId?: string): string {
   const showCta = content.showCta !== false;
+  const sid = sectionId || '';
 
   return `
-    <section class="hero">
+    <section class="hero" data-section-id="${sid}">
       <div class="container">
-        <h1>${content.headline || 'Welcome'}</h1>
-        <p>${content.subheadline || ''}</p>
+        <h1 data-section-id="${sid}" data-property="headline">${content.headline || 'Welcome'}</h1>
+        <p data-section-id="${sid}" data-property="subheadline">${content.subheadline || ''}</p>
         ${showCta ? `
           <div class="hero-cta">
-            <a href="${content.ctaLink || '/contact'}" class="btn btn-primary">${content.ctaText || 'Get Started'}</a>
-            ${content.secondaryCtaText ? `<a href="${content.secondaryCtaLink}" class="btn btn-secondary">${content.secondaryCtaText}</a>` : ''}
+            <a href="${content.ctaLink || '/contact'}" class="btn btn-primary" data-section-id="${sid}" data-property="ctaText">${content.ctaText || 'Get Started'}</a>
+            ${content.secondaryCtaText ? `<a href="${content.secondaryCtaLink}" class="btn btn-secondary" data-section-id="${sid}" data-property="secondaryCtaText">${content.secondaryCtaText}</a>` : ''}
           </div>
         ` : ''}
         ${content.phone ? `<div class="phone-number"><a href="tel:${content.phone}">${content.phone}</a></div>` : ''}
@@ -1372,15 +1374,16 @@ function renderHeroSection(content: Record<string, unknown>): string {
   `;
 }
 
-function renderServicesGridSection(content: Record<string, unknown>): string {
+function renderServicesGridSection(content: Record<string, unknown>, sectionId?: string): string {
   const services = (content.services || []) as Array<{ id: string; name: string; description: string; icon: string; link: string }>;
+  const sid = sectionId || '';
 
   return `
-    <section>
+    <section data-section-id="${sid}">
       <div class="container">
         <div class="section-title">
-          <h2>${content.title || 'Our Services'}</h2>
-          ${content.subtitle ? `<p>${content.subtitle}</p>` : ''}
+          <h2 data-section-id="${sid}" data-property="title">${content.title || 'Our Services'}</h2>
+          ${content.subtitle ? `<p data-section-id="${sid}" data-property="subtitle">${content.subtitle}</p>` : ''}
         </div>
         <div class="services-grid">
           ${services.map(s => `
@@ -1397,16 +1400,17 @@ function renderServicesGridSection(content: Record<string, unknown>): string {
   `;
 }
 
-function renderAboutSection(content: Record<string, unknown>): string {
+function renderAboutSection(content: Record<string, unknown>, sectionId?: string): string {
   const features = (content.features || []) as Array<{ icon: string; text: string }>;
+  const sid = sectionId || '';
 
   return `
-    <section class="about-section">
+    <section class="about-section" data-section-id="${sid}">
       <div class="container">
         <div class="about-content">
           <div class="about-text">
-            <h2>${content.title || 'About Us'}</h2>
-            <p>${content.description || ''}</p>
+            <h2 data-section-id="${sid}" data-property="title">${content.title || 'About Us'}</h2>
+            <p data-section-id="${sid}" data-property="description">${content.description || ''}</p>
             <ul class="features-list">
               ${features.map(f => `
                 <li><span class="icon">${f.icon}</span> ${f.text}</li>
@@ -1442,15 +1446,16 @@ function renderLocationsSection(content: Record<string, unknown>): string {
   `;
 }
 
-function renderCtaSection(content: Record<string, unknown>): string {
+function renderCtaSection(content: Record<string, unknown>, sectionId?: string): string {
+  const sid = sectionId || '';
   return `
-    <section class="cta-section">
+    <section class="cta-section" data-section-id="${sid}">
       <div class="container">
-        <h2>${content.title || 'Ready to Get Started?'}</h2>
-        <p>${content.subtitle || ''}</p>
+        <h2 data-section-id="${sid}" data-property="title">${content.title || 'Ready to Get Started?'}</h2>
+        <p data-section-id="${sid}" data-property="subtitle">${content.subtitle || ''}</p>
         <div class="cta-buttons">
-          <a href="${content.ctaLink || '/contact'}" class="btn btn-primary">${content.ctaText || 'Get Started'}</a>
-          ${content.secondaryCtaText ? `<a href="${content.secondaryCtaLink}" class="btn btn-secondary">${content.secondaryCtaText}</a>` : ''}
+          <a href="${content.ctaLink || '/contact'}" class="btn btn-primary" data-section-id="${sid}" data-property="ctaText">${content.ctaText || 'Get Started'}</a>
+          ${content.secondaryCtaText ? `<a href="${content.secondaryCtaLink}" class="btn btn-secondary" data-section-id="${sid}" data-property="secondaryCtaText">${content.secondaryCtaText}</a>` : ''}
         </div>
       </div>
     </section>
@@ -1553,11 +1558,12 @@ function renderBlogList(content: Record<string, unknown>, posts: BlogPost[]): st
   `;
 }
 
-function renderCustomContent(content: Record<string, unknown>): string {
+function renderCustomContent(content: Record<string, unknown>, sectionId?: string): string {
+  const sid = sectionId || '';
   return `
-    <section>
+    <section data-section-id="${sid}">
       <div class="container">
-        <div class="custom-content">
+        <div class="custom-content" data-section-id="${sid}" data-property="html">
           ${content.html || ''}
         </div>
       </div>
@@ -1565,28 +1571,30 @@ function renderCustomContent(content: Record<string, unknown>): string {
   `;
 }
 
-function renderImageSection(content: Record<string, unknown>): string {
+function renderImageSection(content: Record<string, unknown>, sectionId?: string): string {
   const imgUrl = content.imageUrl as string || 'https://picsum.photos/800/400';
   const altText = content.altText as string || 'Image';
   const caption = content.caption as string || '';
   const linkUrl = content.linkUrl as string || '';
+  const sid = sectionId || '';
 
-  const imageHtml = `<img src="${imgUrl}" alt="${altText}" style="width: 100%; max-width: 1000px; height: auto; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" loading="lazy" />`;
+  const imageHtml = `<img src="${imgUrl}" alt="${altText}" data-section-id="${sid}" data-property="imageUrl" style="width: 100%; max-width: 1000px; height: auto; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" loading="lazy" />`;
 
   return `
-    <section style="padding: 60px 0;">
+    <section style="padding: 60px 0;" data-section-id="${sid}">
       <div class="container" style="text-align: center;">
         ${linkUrl ? `<a href="${linkUrl}">${imageHtml}</a>` : imageHtml}
-        ${caption ? `<p style="margin-top: 15px; color: var(--text-light); font-size: 0.9rem;">${caption}</p>` : ''}
+        ${caption ? `<p style="margin-top: 15px; color: var(--text-light); font-size: 0.9rem;" data-section-id="${sid}" data-property="caption">${caption}</p>` : ''}
       </div>
     </section>
   `;
 }
 
-function renderVideoSection(content: Record<string, unknown>): string {
+function renderVideoSection(content: Record<string, unknown>, sectionId?: string): string {
   const youtubeUrl = content.youtubeUrl as string || '';
   const title = content.title as string || '';
   const description = content.description as string || '';
+  const sid = sectionId || '';
 
   // Extract YouTube video ID from various URL formats
   let videoId = '';
@@ -1600,10 +1608,10 @@ function renderVideoSection(content: Record<string, unknown>): string {
   }
 
   return `
-    <section style="padding: 80px 0; background: #f8fafc;">
+    <section style="padding: 80px 0; background: #f8fafc;" data-section-id="${sid}">
       <div class="container" style="text-align: center;">
-        ${title ? `<h2 style="margin-bottom: 15px;">${title}</h2>` : ''}
-        ${description ? `<p style="margin-bottom: 30px; color: var(--text-light);">${description}</p>` : ''}
+        ${title ? `<h2 style="margin-bottom: 15px;" data-section-id="${sid}" data-property="title">${title}</h2>` : ''}
+        ${description ? `<p style="margin-bottom: 30px; color: var(--text-light);" data-section-id="${sid}" data-property="description">${description}</p>` : ''}
         <div style="position: relative; width: 100%; max-width: 800px; margin: 0 auto; padding-bottom: 45%; height: 0; overflow: hidden; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.15);">
           <iframe 
             src="https://www.youtube.com/embed/${videoId}" 
@@ -1619,16 +1627,17 @@ function renderVideoSection(content: Record<string, unknown>): string {
   `;
 }
 
-function renderTextBlockSection(content: Record<string, unknown>): string {
+function renderTextBlockSection(content: Record<string, unknown>, sectionId?: string): string {
   const title = content.title as string || '';
   const textContent = content.content as string || '';
   const alignment = content.alignment as string || 'left';
+  const sid = sectionId || '';
 
   return `
-    <section style="padding: 60px 0;">
+    <section style="padding: 60px 0;" data-section-id="${sid}">
       <div class="container" style="max-width: 800px; text-align: ${alignment};">
-        ${title ? `<h2 style="margin-bottom: 20px;">${title}</h2>` : ''}
-        <div style="line-height: 1.8; color: var(--text);">
+        ${title ? `<h2 style="margin-bottom: 20px;" data-section-id="${sid}" data-property="title">${title}</h2>` : ''}
+        <div style="line-height: 1.8; color: var(--text);" data-section-id="${sid}" data-property="content">
           ${textContent.split('\n').map(p => p.trim() ? `<p style="margin-bottom: 15px;">${p}</p>` : '').join('')}
         </div>
       </div>
@@ -1636,16 +1645,17 @@ function renderTextBlockSection(content: Record<string, unknown>): string {
   `;
 }
 
-function renderFeaturesSection(content: Record<string, unknown>): string {
+function renderFeaturesSection(content: Record<string, unknown>, sectionId?: string): string {
   const title = content.title as string || 'Our Features';
   const subtitle = content.subtitle as string || '';
   const features = (content.features || []) as Array<{ icon: string; title: string; description: string }>;
+  const sid = sectionId || '';
 
   return `
-    <section style="padding: 80px 0; background: #f8fafc;">
+    <section style="padding: 80px 0; background: #f8fafc;" data-section-id="${sid}">
       <div class="container" style="text-align: center;">
-        <h2 style="margin-bottom: 10px;">${title}</h2>
-        ${subtitle ? `<p style="color: var(--text-light); margin-bottom: 40px;">${subtitle}</p>` : ''}
+        <h2 style="margin-bottom: 10px;" data-section-id="${sid}" data-property="title">${title}</h2>
+        ${subtitle ? `<p style="color: var(--text-light); margin-bottom: 40px;" data-section-id="${sid}" data-property="subtitle">${subtitle}</p>` : ''}
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 30px;">
           ${features.map(f => `
             <div style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
