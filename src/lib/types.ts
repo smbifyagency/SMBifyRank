@@ -38,6 +38,8 @@ export interface Website {
         zip: string;
         country?: string;
     };
+    // Custom content overrides from editing (rich content fields)
+    customContent?: Record<string, string>;
 }
 
 export interface Service {

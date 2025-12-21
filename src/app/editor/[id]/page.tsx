@@ -42,8 +42,10 @@ export default function EditorPage() {
         elementId: string;
         sectionId?: string;
         property?: string;
+        field?: string; // For rich content field identification
         tagName: string;
         content: string;
+        innerHTML?: string; // HTML content for rich text editing
         src?: string;
         rect: { top: number; left: number; width: number; height: number };
     } | null>(null);
@@ -81,6 +83,9 @@ export default function EditorPage() {
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             if (event.data.type === 'element-selected') {
+                console.log('🔍 Element selected:', JSON.stringify(event.data.data, null, 2));
+                console.log('   -> sectionId:', event.data.data.sectionId);
+                console.log('   -> property:', event.data.data.property);
                 setSelectedElement(event.data.data);
             } else if (event.data.type === 'edit-video') {
                 // Handle double-click on video to edit URL
@@ -1069,14 +1074,41 @@ export default function EditorPage() {
                                                                     content: val
                                                                 });
 
-                                                                // PERSIST to website data using sectionId + property
-                                                                if (website && currentPage && selectedElement.sectionId && selectedElement.property) {
+                                                                // PERSIST changes - check for field (rich content) or sectionId+property (sections)
+                                                                console.log('📝 Checking save conditions:', {
+                                                                    hasWebsite: !!website,
+                                                                    hasCurrentPage: !!currentPage,
+                                                                    sectionId: selectedElement.sectionId,
+                                                                    property: selectedElement.property,
+                                                                    field: selectedElement.field
+                                                                });
+
+                                                                // Option 1: Save to website customContent using field attribute
+                                                                if (website && selectedElement.field) {
+                                                                    const fieldName = selectedElement.field;
+                                                                    console.log(`💾 Saving field '${fieldName}' to website.customContent`);
+
+                                                                    // Store in customContent object on website
+                                                                    const customContent = website.customContent || {};
+                                                                    const updatedCustomContent = { ...customContent, [fieldName]: val };
+
+                                                                    const updatedWebsite = {
+                                                                        ...website,
+                                                                        customContent: updatedCustomContent
+                                                                    };
+                                                                    handleSave(updatedWebsite);
+                                                                    console.log('💾 handleSave called for field');
+                                                                }
+                                                                // Option 2: Save to section content using sectionId + property
+                                                                else if (website && currentPage && selectedElement.sectionId && selectedElement.property) {
                                                                     const propName = selectedElement.property as string;
+                                                                    console.log('✅ Saving via section:', selectedElement.sectionId, propName);
+
                                                                     const updatedSections = currentPage.content.map((section) => {
                                                                         if (section.id === selectedElement.sectionId) {
                                                                             const content = section.content as Record<string, unknown>;
                                                                             if (propName in content) {
-                                                                                console.log(`Saving ${propName} in section ${section.id}`);
+                                                                                console.log(`💾 Saving ${propName} in section ${section.id}`);
                                                                                 return { ...section, content: { ...content, [propName]: val } };
                                                                             }
                                                                         }
@@ -1091,6 +1123,9 @@ export default function EditorPage() {
                                                                         ),
                                                                     };
                                                                     handleSave(updatedWebsite);
+                                                                    console.log('💾 handleSave called for section');
+                                                                } else {
+                                                                    console.log('ℹ️ No persistence path - edit is visual only');
                                                                 }
                                                             }}
                                                             placeholder="Edit this content..."

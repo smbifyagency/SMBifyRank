@@ -23,11 +23,11 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
                 <div class="hero-main">
                     <div class="emergency-badge">
                         <span class="pulse"></span>
-                        24/7 Emergency Service - Call Now!
+                        <span data-field="emergencyBadge">24/7 Emergency Service - Call Now!</span>
                     </div>
-                    <h1>${capitalizeFirst(industry)} Services in ${city}</h1>
-                    <h2>${name} - Fast Response When You Need It Most</h2>
-                    <p class="hero-description">
+                    <h1 data-field="heroHeadline">${capitalizeFirst(industry)} Services in ${city}</h1>
+                    <h2 data-field="heroSubheadline">${name} - Fast Response When You Need It Most</h2>
+                    <p class="hero-description" data-field="heroDescription">
                         Dealing with ${industryKeywords.commonIssue}? Don't wait - every minute counts! ${name} provides 
                         immediate ${industry.toLowerCase()} services throughout ${city} and surrounding areas. Our team is 
                         standing by right now to help you with ${industryKeywords.heroService}. Call us now for a free 
@@ -78,8 +78,8 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
         <div class="container">
             <div class="section-intro">
                 <span class="section-label">${industryKeywords.sectionBadge}</span>
-                <h2>${capitalizeFirst(industry)} Services in ${city}</h2>
-                <p class="intro-text">
+                <h2 data-field="servicesTitle">${capitalizeFirst(industry)} Services in ${city}</h2>
+                <p class="intro-text" data-field="servicesDescription">
                     ${name} offers a full range of ${industry.toLowerCase()} services to meet your needs. Whether you're 
                     dealing with ${industryKeywords.commonIssue} or need ${industryKeywords.commonService}, we're here to help. 
                     Call us now to discuss your situation with one of our experts.

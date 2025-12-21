@@ -920,6 +920,7 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
                 : target.getAttribute('src') || '';
             const sectionId = target.getAttribute('data-section-id') || '';
             const property = target.getAttribute('data-property') || '';
+            const field = target.getAttribute('data-field') || ''; // For rich content editing
             
             // Send message to parent
             window.parent.postMessage({
@@ -929,8 +930,10 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
                     elementId: editId,
                     sectionId: sectionId,
                     property: property,
+                    field: field, // New: identifies field in website object
                     tagName: target.tagName,
                     content: target.textContent || srcValue || '',
+                    innerHTML: target.innerHTML || '', // Include HTML content
                     href: target.getAttribute('href') || '',
                     src: srcValue,
                     alt: target.getAttribute('alt') || '',
