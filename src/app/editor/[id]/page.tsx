@@ -1390,7 +1390,6 @@ export default function EditorPage() {
                                     </>
                                 )}
 
-                                {/* @ts-expect-error Page Tab DISABLED */}
                                 {/* Page Tab - DISABLED */}
                                 {false && currentPage && (
                                     <>
