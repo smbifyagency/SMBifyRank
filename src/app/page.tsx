@@ -275,41 +275,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className={styles.container}>
-          <div className={styles.footerContent}>
-            <div className={styles.footerBrand}>
-              <Image
-                src="/logo-brand.png"
-                alt="SMBify Rank"
-                width={160}
-                height={40}
-                className={styles.footerLogo}
-              />
-              <p>AI-powered website builder for local businesses. Build SEO-optimized websites in minutes.</p>
-            </div>
-            <div className={styles.footerLinks}>
-              <div className={styles.footerColumn}>
-                <h4>Product</h4>
-                <Link href="#features">Features</Link>
-                <Link href="/pricing">Pricing</Link>
-                <Link href="#how-it-works">How It Works</Link>
-              </div>
-              <div className={styles.footerColumn}>
-                <h4>Company</h4>
-                <a href="https://smbify.agency" target="_blank" rel="noopener noreferrer">SMBify Agency</a>
-                <Link href="/login">Sign In</Link>
-              </div>
-            </div>
-          </div>
-          <div className={styles.footerBottom}>
-            <p>© 2025 SMBify Rank. All rights reserved.</p>
-            <p>Powered by <a href="https://smbify.agency" target="_blank" rel="noopener noreferrer">smbify.agency</a></p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -26,7 +26,7 @@ export default function Footer() {
                     <div className={styles.brand}>
                         <Link href="/" className={styles.logo}>
                             <Image
-                                src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+                                src="/logo-dark.png"
                                 alt="SMBify Rank"
                                 width={140}
                                 height={32}
