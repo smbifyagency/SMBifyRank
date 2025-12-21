@@ -502,6 +502,9 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         padding: 20px;
         width: 320px;
         box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        pointer-events: auto;
+        position: relative;
+        z-index: 100001;
     }
     
     #link-modal h4 {
@@ -538,6 +541,9 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         border: none;
         cursor: pointer;
         font-size: 14px;
+        pointer-events: auto;
+        position: relative;
+        z-index: 100002;
     }
     
     #link-modal .cancel-btn {
@@ -559,21 +565,43 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
     function createToolbar() {
         const toolbar = document.createElement('div');
         toolbar.id = 'wysiwyg-toolbar';
-        toolbar.innerHTML = '<button onclick="formatDoc(\\'bold\\')" title="Bold"><b>B</b></button>' +
-            '<button onclick="formatDoc(\\'italic\\')" title="Italic"><i>I</i></button>' +
-            '<button onclick="formatDoc(\\'underline\\')" title="Underline"><u>U</u></button>' +
-            '<button onclick="formatDoc(\\'strikeThrough\\')" title="Strikethrough"><s>S</s></button>' +
+        toolbar.innerHTML = '<button data-cmd="bold" title="Bold"><b>B</b></button>' +
+            '<button data-cmd="italic" title="Italic"><i>I</i></button>' +
+            '<button data-cmd="underline" title="Underline"><u>U</u></button>' +
+            '<button data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>' +
             '<span class="divider"></span>' +
-            '<button onclick="showLinkModal()" title="Insert Link">🔗</button>' +
-            '<button onclick="formatDoc(\\'removeFormat\\')" title="Clear">✕</button>' +
+            '<button data-action="link" title="Insert Link">🔗</button>' +
+            '<button data-cmd="removeFormat" title="Clear">✕</button>' +
             '<span class="divider"></span>' +
-            '<button onclick="formatDoc(\\'insertUnorderedList\\')" title="Bullets">•</button>' +
-            '<button onclick="formatDoc(\\'insertOrderedList\\')" title="Numbers">1.</button>' +
+            '<button data-cmd="insertUnorderedList" title="Bullets">•</button>' +
+            '<button data-cmd="insertOrderedList" title="Numbers">1.</button>' +
             '<span class="divider"></span>' +
-            '<button onclick="setHeading(\\'h2\\')" title="H2">H2</button>' +
-            '<button onclick="setHeading(\\'h3\\')" title="H3">H3</button>' +
-            '<button onclick="setHeading(\\'p\\')" title="P">P</button>';
+            '<button data-heading="h2" title="H2">H2</button>' +
+            '<button data-heading="h3" title="H3">H3</button>' +
+            '<button data-heading="p" title="P">P</button>';
         document.body.appendChild(toolbar);
+        
+        // Prevent mousedown from stealing focus from editable element
+        toolbar.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
+        
+        // Handle toolbar button clicks
+        toolbar.addEventListener('click', function(e) {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (btn.dataset.cmd) {
+                formatDoc(btn.dataset.cmd);
+            } else if (btn.dataset.heading) {
+                setHeading(btn.dataset.heading);
+            } else if (btn.dataset.action === 'link') {
+                showLinkModal();
+            }
+        });
+        
         return toolbar;
     }
     
@@ -586,10 +614,43 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
             '<input type="text" id="link-url" placeholder="https://example.com" />' +
             '<input type="text" id="link-text" placeholder="Link text (optional)" />' +
             '<div class="modal-buttons">' +
-            '<button class="cancel-btn" onclick="closeLinkModal()">Cancel</button>' +
-            '<button class="insert-btn" onclick="insertLink()">Insert</button>' +
+            '<button type="button" class="cancel-btn" id="cancel-link-btn">Cancel</button>' +
+            '<button type="button" class="insert-btn" id="insert-link-btn">Insert</button>' +
             '</div></div>';
         document.body.appendChild(overlay);
+        
+        // Use setTimeout to ensure DOM is fully ready before attaching events
+        setTimeout(function() {
+            // Prevent closing issues by handling clicks properly
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeLinkModal();
+                }
+            });
+            
+            // Handle cancel button
+            var cancelBtn = document.getElementById('cancel-link-btn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('mousedown', function(e) { e.preventDefault(); });
+                cancelBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeLinkModal();
+                });
+            }
+            
+            // Handle insert button
+            var insertBtn = document.getElementById('insert-link-btn');
+            if (insertBtn) {
+                insertBtn.addEventListener('mousedown', function(e) { e.preventDefault(); });
+                insertBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    insertLink();
+                });
+            }
+        }, 0);
+        
         return overlay;
     }
     
