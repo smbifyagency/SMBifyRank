@@ -142,10 +142,39 @@ export default function ProfilePage() {
                 </div>
 
                 <div className={styles.card}>
-                    <h2>Account</h2>
+                    <h2>Account Details</h2>
+                    <div className={styles.accountInfo}>
+                        <div className={styles.field}>
+                            <label>Account ID</label>
+                            <p className={styles.value + ' ' + styles.mono}>{user.id.slice(0, 8)}...{user.id.slice(-4)}</p>
+                        </div>
+                        <div className={styles.field}>
+                            <label>Member Since</label>
+                            <p className={styles.value}>
+                                {user.created_at
+                                    ? new Date(user.created_at).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    })
+                                    : 'Unknown'
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.card}>
+                    <h2>Quick Links</h2>
                     <div className={styles.accountActions}>
+                        <a href="/app" className={styles.link}>
+                            🏠 Dashboard
+                        </a>
                         <a href="/app/billing" className={styles.link}>
-                            💳 Manage Billing & Subscription
+                            💳 Billing & Subscription
+                        </a>
+                        <a href="/app/settings" className={styles.link}>
+                            ⚙️ API Settings
                         </a>
                         <button onClick={handleSignOut} className={styles.signOutBtn}>
                             🚪 Sign Out

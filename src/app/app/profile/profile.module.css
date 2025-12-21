@@ -88,6 +88,17 @@
     color: var(--text-primary);
 }
 
+.mono {
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.accountInfo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+}
+
 .input {
     padding: var(--space-md);
     background: var(--bg-tertiary);
