@@ -50,8 +50,14 @@ function AppDashboardContent() {
     }, [searchParams, toast]);
 
     useEffect(() => {
-        // Clear any old guest mode data
-        localStorage.removeItem('guest-mode');
+        // TEMPORARY: Enable test mode for development
+        const testMode = localStorage.getItem('test-mode');
+        if (testMode === 'true') {
+            setWebsites(getAllWebsites());
+            setIsLoading(false);
+            setIsPaidUser(true); // Grant full access in test mode
+            return;
+        }
 
         // Require authentication - no guest mode
         if (!authLoading && !isAuthenticated) {
