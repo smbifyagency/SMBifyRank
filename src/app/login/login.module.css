@@ -72,6 +72,15 @@
     color: var(--text-muted);
 }
 
+.legalLink {
+    color: var(--accent-primary);
+    text-decoration: underline;
+}
+
+.legalLink:hover {
+    color: var(--accent-secondary);
+}
+
 .userInfo {
     margin-bottom: var(--space-xl);
 }
