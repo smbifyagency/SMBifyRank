@@ -88,55 +88,100 @@ export default function EditorPage() {
             } else if (event.data.type === 'content-updated') {
                 // Handle content update from inline editing - persist changes
                 const { elementId, elementType, newContent } = event.data.data;
+                console.log('Content updated:', { elementId, elementType, newContent });
 
                 if (website && currentPage) {
                     // Parse element ID to find matching section
                     // Element IDs are like 'heading-0', 'text-1', etc.
                     const [type, indexStr] = elementId.split('-');
+                    const elementIndex = parseInt(indexStr, 10);
 
-                    // Update the appropriate section based on element type
-                    const updatedSections = currentPage.content.map((section, sectionIndex) => {
+                    // Track which element we're updating (heading-0 is 1st heading, heading-1 is 2nd, etc.)
+                    let headingCounter = 0;
+                    let textCounter = 0;
+                    let sectionUpdated = false;
+
+                    // Update the appropriate section based on element index
+                    const updatedSections = currentPage.content.map((section) => {
+                        if (sectionUpdated) return section;
+
                         const content = section.content as Record<string, unknown>;
 
-                        // Match by section type and update appropriate field
-                        if (section.type === 'hero') {
-                            if (elementType === 'heading' && typeof content.headline === 'string') {
-                                return { ...section, content: { ...content, headline: newContent.replace(/<[^>]*>/g, '') } };
+                        // For headings
+                        if (elementType === 'heading') {
+                            // Check section properties that could be headings
+                            if (typeof content.headline === 'string') {
+                                if (headingCounter === elementIndex) {
+                                    sectionUpdated = true;
+                                    console.log('Updating headline in section:', section.type);
+                                    return { ...section, content: { ...content, headline: newContent } };
+                                }
+                                headingCounter++;
                             }
-                            if (elementType === 'text' && typeof content.subheadline === 'string') {
-                                return { ...section, content: { ...content, subheadline: newContent } };
+                            if (typeof content.title === 'string') {
+                                if (headingCounter === elementIndex) {
+                                    sectionUpdated = true;
+                                    console.log('Updating title in section:', section.type);
+                                    return { ...section, content: { ...content, title: newContent } };
+                                }
+                                headingCounter++;
                             }
                         }
-                        if (section.type === 'cta' || section.type === 'text-block' || section.type === 'features') {
-                            if (elementType === 'heading' && typeof content.title === 'string') {
-                                return { ...section, content: { ...content, title: newContent.replace(/<[^>]*>/g, '') } };
+
+                        // For text/paragraphs
+                        if (elementType === 'text') {
+                            if (typeof content.subheadline === 'string') {
+                                if (textCounter === elementIndex) {
+                                    sectionUpdated = true;
+                                    console.log('Updating subheadline in section:', section.type);
+                                    return { ...section, content: { ...content, subheadline: newContent } };
+                                }
+                                textCounter++;
                             }
-                            if (elementType === 'text' && typeof content.subtitle === 'string') {
-                                return { ...section, content: { ...content, subtitle: newContent } };
+                            if (typeof content.subtitle === 'string') {
+                                if (textCounter === elementIndex) {
+                                    sectionUpdated = true;
+                                    console.log('Updating subtitle in section:', section.type);
+                                    return { ...section, content: { ...content, subtitle: newContent } };
+                                }
+                                textCounter++;
                             }
-                            if (elementType === 'text' && typeof content.content === 'string') {
-                                return { ...section, content: { ...content, content: newContent } };
+                            if (typeof content.content === 'string') {
+                                if (textCounter === elementIndex) {
+                                    sectionUpdated = true;
+                                    console.log('Updating content in section:', section.type);
+                                    return { ...section, content: { ...content, content: newContent } };
+                                }
+                                textCounter++;
                             }
-                        }
-                        if (section.type === 'about-intro') {
-                            if (elementType === 'text' && typeof content.description === 'string') {
-                                return { ...section, content: { ...content, description: newContent } };
+                            if (typeof content.description === 'string') {
+                                if (textCounter === elementIndex) {
+                                    sectionUpdated = true;
+                                    console.log('Updating description in section:', section.type);
+                                    return { ...section, content: { ...content, description: newContent } };
+                                }
+                                textCounter++;
                             }
                         }
 
                         return section;
                     });
 
-                    // Save the updated website
-                    const updatedPage = { ...currentPage, content: updatedSections };
-                    const updatedWebsite = {
-                        ...website,
-                        pages: website.pages.map(p =>
-                            p.id === currentPage.id ? updatedPage : p
-                        ),
-                    };
+                    if (sectionUpdated) {
+                        // Save the updated website
+                        const updatedPage = { ...currentPage, content: updatedSections };
+                        const updatedWebsite = {
+                            ...website,
+                            pages: website.pages.map(p =>
+                                p.id === currentPage.id ? updatedPage : p
+                            ),
+                        };
 
-                    handleSave(updatedWebsite);
+                        handleSave(updatedWebsite);
+                        console.log('Website saved successfully');
+                    } else {
+                        console.log('No matching section found for elementId:', elementId);
+                    }
                 }
             }
         };
