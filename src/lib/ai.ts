@@ -1,9 +1,8 @@
 // AI Content Generation for Website Pages
-// Uses OpenAI or OpenRouter to generate SEO-optimized content
+// Uses OpenAI to generate SEO-optimized content
 
 interface ApiConfig {
     openaiApiKey?: string;
-    openrouterApiKey?: string;
 }
 
 interface ContentGenerationParams {
@@ -41,7 +40,7 @@ export function saveApiConfig(config: ApiConfig): void {
 // Check if AI is available
 export function isAiAvailable(): boolean {
     const config = getApiConfig();
-    return !!(config.openaiApiKey || config.openrouterApiKey);
+    return !!config.openaiApiKey;
 }
 
 // Generate content using AI
@@ -51,11 +50,9 @@ export async function generateAiContent(params: ContentGenerationParams): Promis
 
     const prompt = buildPrompt(params, targetWords);
 
-    // Try OpenAI first, then OpenRouter
+    // Use OpenAI if available
     if (config.openaiApiKey) {
         return await callOpenAI(config.openaiApiKey, prompt);
-    } else if (config.openrouterApiKey) {
-        return await callOpenRouter(config.openrouterApiKey, prompt);
     }
 
     // Fallback to template content if no API key
@@ -244,44 +241,6 @@ async function callOpenAI(apiKey: string, prompt: string): Promise<string> {
         return data.choices[0].message.content;
     } catch (error) {
         console.error('OpenAI API error:', error);
-        throw error;
-    }
-}
-
-async function callOpenRouter(apiKey: string, prompt: string): Promise<string> {
-    try {
-        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-                'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : '',
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o-mini',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are an expert SEO copywriter specializing in local business websites. You write compelling, keyword-rich content that converts visitors into leads.'
-                    },
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                max_tokens: 2000,
-                temperature: 0.7,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`OpenRouter API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error('OpenRouter API error:', error);
         throw error;
     }
 }

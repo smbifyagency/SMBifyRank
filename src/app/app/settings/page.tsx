@@ -7,30 +7,22 @@ import styles from './settings.module.css';
 interface ApiConfig {
     netlifyToken: string;
     openaiApiKey: string;
-    openrouterApiKey: string;
-    agentrouterApiKey: string;
 }
 
 interface TestResults {
     netlify: 'idle' | 'testing' | 'success' | 'error';
     openai: 'idle' | 'testing' | 'success' | 'error';
-    openrouter: 'idle' | 'testing' | 'success' | 'error';
-    agentrouter: 'idle' | 'testing' | 'success' | 'error';
 }
 
 export default function SettingsPage() {
     const [config, setConfig] = useState<ApiConfig>({
         netlifyToken: '',
         openaiApiKey: '',
-        openrouterApiKey: '',
-        agentrouterApiKey: '',
     });
 
     const [testResults, setTestResults] = useState<TestResults>({
         netlify: 'idle',
         openai: 'idle',
-        openrouter: 'idle',
-        agentrouter: 'idle',
     });
 
     const [saved, setSaved] = useState(false);
@@ -72,33 +64,6 @@ export default function SettingsPage() {
             setTestResults(prev => ({ ...prev, openai: res.ok ? 'success' : 'error' }));
         } catch {
             setTestResults(prev => ({ ...prev, openai: 'error' }));
-        }
-    };
-
-    const testOpenRouter = async () => {
-        if (!config.openrouterApiKey) return;
-        setTestResults(prev => ({ ...prev, openrouter: 'testing' }));
-        try {
-            const res = await fetch('https://openrouter.ai/api/v1/models', {
-                headers: { Authorization: `Bearer ${config.openrouterApiKey}` },
-            });
-            setTestResults(prev => ({ ...prev, openrouter: res.ok ? 'success' : 'error' }));
-        } catch {
-            setTestResults(prev => ({ ...prev, openrouter: 'error' }));
-        }
-    };
-
-    const testAgentRouter = async () => {
-        if (!config.agentrouterApiKey) return;
-        setTestResults(prev => ({ ...prev, agentrouter: 'testing' }));
-        // AgentRouter test - since we don't have a specific endpoint, we'll simulate
-        try {
-            // Placeholder test - adjust when actual AgentRouter API is known
-            setTimeout(() => {
-                setTestResults(prev => ({ ...prev, agentrouter: config.agentrouterApiKey.length > 10 ? 'success' : 'error' }));
-            }, 500);
-        } catch {
-            setTestResults(prev => ({ ...prev, agentrouter: 'error' }));
         }
     };
 
@@ -189,65 +154,6 @@ export default function SettingsPage() {
                             <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className={styles.helpLink}>
                                 Get your API key →
                             </a>
-                        </div>
-                    </div>
-
-                    {/* OpenRouter */}
-                    <div className={styles.card}>
-                        <div className={styles.cardHeader}>
-                            <div className={styles.cardIcon}>🔄</div>
-                            <div>
-                                <h3>OpenRouter</h3>
-                                <p>Access multiple AI models</p>
-                            </div>
-                            <span className={`${styles.status} ${getStatusClass(testResults.openrouter)}`}>
-                                {getStatusIcon(testResults.openrouter)}
-                            </span>
-                        </div>
-                        <div className={styles.cardBody}>
-                            <label>API Key</label>
-                            <div className={styles.inputRow}>
-                                <input
-                                    type="password"
-                                    placeholder="sk-or-xxxxxxxxxxxxxxxx"
-                                    value={config.openrouterApiKey}
-                                    onChange={(e) => setConfig(prev => ({ ...prev, openrouterApiKey: e.target.value }))}
-                                />
-                                <button onClick={testOpenRouter} disabled={!config.openrouterApiKey}>
-                                    Test
-                                </button>
-                            </div>
-                            <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className={styles.helpLink}>
-                                Get your API key →
-                            </a>
-                        </div>
-                    </div>
-
-                    {/* AgentRouter */}
-                    <div className={styles.card}>
-                        <div className={styles.cardHeader}>
-                            <div className={styles.cardIcon}>🤝</div>
-                            <div>
-                                <h3>AgentRouter</h3>
-                                <p>AI agent orchestration</p>
-                            </div>
-                            <span className={`${styles.status} ${getStatusClass(testResults.agentrouter)}`}>
-                                {getStatusIcon(testResults.agentrouter)}
-                            </span>
-                        </div>
-                        <div className={styles.cardBody}>
-                            <label>API Key</label>
-                            <div className={styles.inputRow}>
-                                <input
-                                    type="password"
-                                    placeholder="ar-xxxxxxxxxxxxxxxx"
-                                    value={config.agentrouterApiKey}
-                                    onChange={(e) => setConfig(prev => ({ ...prev, agentrouterApiKey: e.target.value }))}
-                                />
-                                <button onClick={testAgentRouter} disabled={!config.agentrouterApiKey}>
-                                    Test
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,7 @@ import { getEditablePagePreviewHtml } from '@/lib/export';
 import { INDUSTRY_TEMPLATES, templateToBrandColors } from '@/lib/templates';
 import ImageUploader from '@/components/ImageUploader';
 import RichTextEditor from '@/components/RichTextEditor';
+import { DeployModal } from '@/components/DeployModal';
 import styles from './editor.module.css';
 
 type EditTab = 'website' | 'page' | 'sections' | 'branding' | 'blog';
@@ -35,6 +36,7 @@ export default function EditorPage() {
     const [showVideoEditor, setShowVideoEditor] = useState(false);
     const [editingVideoUrl, setEditingVideoUrl] = useState('');
     const [editingVideoElementId, setEditingVideoElementId] = useState('');
+    const [showDeployModal, setShowDeployModal] = useState(false);
     const [selectedElement, setSelectedElement] = useState<{
         elementType: string;
         elementId: string;
@@ -556,13 +558,13 @@ export default function EditorPage() {
                     >
                         💾 Save
                     </button>
-                    <Link
-                        href={`/dashboard/${website.id}?deploy=true`}
+                    <button
                         className={styles.deployBtn}
                         title="Deploy changes to Netlify"
+                        onClick={() => setShowDeployModal(true)}
                     >
                         🚀 Deploy
-                    </Link>
+                    </button>
                     <button
                         className={styles.exportBtn}
                         onClick={handleExport}
@@ -1706,6 +1708,24 @@ export default function EditorPage() {
                     </div>
                 </div>
             )}
+
+            {/* Deploy Modal */}
+            <DeployModal
+                isOpen={showDeployModal}
+                onClose={() => setShowDeployModal(false)}
+                siteName={website.businessName}
+                siteId={website.id}
+                existingUrl={website.netlifyUrl}
+                onDeploySuccess={(url) => {
+                    const updatedWebsite = {
+                        ...website,
+                        status: 'published' as const,
+                        netlifyUrl: url,
+                    };
+                    handleSave(updatedWebsite);
+                    setShowDeployModal(false);
+                }}
+            />
         </div>
     );
 }
