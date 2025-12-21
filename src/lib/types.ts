@@ -158,6 +158,7 @@ export interface IntakeFormData {
     contactPhone: string;
     additionalPages: string[];
     logoUrl?: string;
+    isParasiteSite?: boolean; // Toggle for parasite site mode
     mainWebsiteUrl?: string; // For parasite sites - add backlinks to main site
     // Business address for NAP (Name, Address, Phone) SEO
     businessAddress?: {

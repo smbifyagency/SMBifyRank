@@ -585,6 +585,46 @@ export default function CreateWebsitePage() {
                                         />
                                     </div>
 
+                                    {/* Parasite Site Option */}
+                                    <div className={styles.aiSettingsCard} style={{ marginTop: '1.5rem' }}>
+                                        <div className={styles.toggleGroup} style={{ margin: 0, padding: '1rem' }}>
+                                            <label className={styles.toggleLabel}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.isParasiteSite || false}
+                                                    onChange={(e) => updateFormData({ isParasiteSite: e.target.checked })}
+                                                />
+                                                <span className={styles.toggleSlider}></span>
+                                                <span>🔗 Parasite Site (for Backlinks)</span>
+                                            </label>
+                                        </div>
+
+                                        {formData.isParasiteSite && (
+                                            <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
+                                                <label>Main Website URL (to link back to)</label>
+                                                <input
+                                                    type="url"
+                                                    className={styles.input}
+                                                    placeholder="https://yourmainwebsite.com"
+                                                    value={formData.mainWebsiteUrl || ''}
+                                                    onChange={(e) => updateFormData({ mainWebsiteUrl: e.target.value })}
+                                                />
+                                                <span className={styles.hint}>
+                                                    This site will include backlinks to your main website for SEO purposes.
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className={styles.aiInfoBox} style={{ marginTop: '1rem' }}>
+                                            <h4>What is a Parasite Site?</h4>
+                                            <ul style={{ display: 'block' }}>
+                                                <li>A separate website that links back to your main site</li>
+                                                <li>Helps build domain authority and backlinks</li>
+                                                <li>Great for local SEO and niche targeting</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
                                     <div className={styles.summary}>
                                         <h4>Summary</h4>
                                         <ul>
