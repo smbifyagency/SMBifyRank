@@ -19,7 +19,11 @@ export default function RichTextEditor({
 }: RichTextEditorProps) {
     const [mode, setMode] = useState<'visual' | 'html'>('visual');
     const [htmlSource, setHtmlSource] = useState(value);
+    const [showLinkModal, setShowLinkModal] = useState(false);
+    const [linkUrl, setLinkUrl] = useState('');
+    const [linkText, setLinkText] = useState('');
     const editorRef = useRef<HTMLDivElement>(null);
+    const savedSelectionRef = useRef<Range | null>(null);
 
     // Sync editor content with value prop
     useEffect(() => {
@@ -89,12 +93,51 @@ export default function RichTextEditor({
         handleInput();
     };
 
-    // Insert link
-    const insertLink = () => {
-        const url = prompt('Enter URL:');
-        if (url) {
-            execCommand('createLink', url);
+    // Insert link with modal
+    const openLinkModal = () => {
+        // Save current selection
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+            // Get selected text for link text
+            const selectedText = selection.toString();
+            setLinkText(selectedText);
         }
+        setLinkUrl('');
+        setShowLinkModal(true);
+    };
+
+    const insertLinkFromModal = () => {
+        if (!linkUrl.trim()) return;
+
+        // Restore selection
+        if (savedSelectionRef.current) {
+            const selection = window.getSelection();
+            selection?.removeAllRanges();
+            selection?.addRange(savedSelectionRef.current);
+        }
+
+        const text = linkText.trim() || linkUrl;
+        const url = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
+
+        // If there's selected text, wrap it in a link
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            if (range.toString()) {
+                // Wrap selected text
+                execCommand('createLink', url);
+            } else {
+                // Insert new link with text
+                const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+                execCommand('insertHTML', link);
+            }
+        }
+
+        setShowLinkModal(false);
+        setLinkUrl('');
+        setLinkText('');
+        editorRef.current?.focus();
     };
 
     // Insert image
@@ -178,7 +221,7 @@ export default function RichTextEditor({
                 <div className={styles.divider} />
 
                 <div className={styles.toolGroup}>
-                    <button type="button" onClick={insertLink} title="Insert Link" className={styles.toolBtn}>
+                    <button type="button" onClick={openLinkModal} title="Insert Link" className={styles.toolBtn}>
                         🔗
                     </button>
                     <button type="button" onClick={insertImage} title="Insert Image" className={styles.toolBtn}>
@@ -251,6 +294,42 @@ export default function RichTextEditor({
                     onChange={handleHtmlChange}
                     placeholder="Enter HTML code..."
                 />
+            )}
+
+            {/* Link Modal */}
+            {showLinkModal && (
+                <div className={styles.linkModalOverlay} onClick={() => setShowLinkModal(false)}>
+                    <div className={styles.linkModal} onClick={e => e.stopPropagation()}>
+                        <h3>Insert Link</h3>
+                        <div className={styles.linkField}>
+                            <label>URL</label>
+                            <input
+                                type="url"
+                                value={linkUrl}
+                                onChange={e => setLinkUrl(e.target.value)}
+                                placeholder="https://example.com"
+                                autoFocus
+                            />
+                        </div>
+                        <div className={styles.linkField}>
+                            <label>Link Text (optional)</label>
+                            <input
+                                type="text"
+                                value={linkText}
+                                onChange={e => setLinkText(e.target.value)}
+                                placeholder="Click here"
+                            />
+                        </div>
+                        <div className={styles.linkActions}>
+                            <button type="button" onClick={() => setShowLinkModal(false)} className={styles.cancelBtn}>
+                                Cancel
+                            </button>
+                            <button type="button" onClick={insertLinkFromModal} className={styles.insertBtn}>
+                                Insert Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

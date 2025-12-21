@@ -653,6 +653,76 @@ export default function CreateWebsitePage() {
                                         </div>
                                     </div>
 
+                                    {/* Legal Pages */}
+                                    <div className={styles.aiSettingsCard} style={{ marginTop: '1.5rem' }}>
+                                        <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>📜 Legal Pages (Auto-Generated)</h4>
+                                        <p className={styles.hint} style={{ marginBottom: '1rem' }}>
+                                            Select which legal pages to include with your website. Content will be auto-generated with your business details.
+                                        </p>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                            <label className={styles.toggleLabel}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.additionalPages?.includes('privacy-policy') || false}
+                                                    onChange={(e) => {
+                                                        const pages = formData.additionalPages || [];
+                                                        if (e.target.checked) {
+                                                            updateFormData({ additionalPages: [...pages, 'privacy-policy'] });
+                                                        } else {
+                                                            updateFormData({ additionalPages: pages.filter(p => p !== 'privacy-policy') });
+                                                        }
+                                                    }}
+                                                />
+                                                <span>Privacy Policy</span>
+                                            </label>
+                                            <label className={styles.toggleLabel}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.additionalPages?.includes('terms') || false}
+                                                    onChange={(e) => {
+                                                        const pages = formData.additionalPages || [];
+                                                        if (e.target.checked) {
+                                                            updateFormData({ additionalPages: [...pages, 'terms'] });
+                                                        } else {
+                                                            updateFormData({ additionalPages: pages.filter(p => p !== 'terms') });
+                                                        }
+                                                    }}
+                                                />
+                                                <span>Terms and Conditions</span>
+                                            </label>
+                                            <label className={styles.toggleLabel}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.additionalPages?.includes('refund-policy') || false}
+                                                    onChange={(e) => {
+                                                        const pages = formData.additionalPages || [];
+                                                        if (e.target.checked) {
+                                                            updateFormData({ additionalPages: [...pages, 'refund-policy'] });
+                                                        } else {
+                                                            updateFormData({ additionalPages: pages.filter(p => p !== 'refund-policy') });
+                                                        }
+                                                    }}
+                                                />
+                                                <span>Refund Policy</span>
+                                            </label>
+                                            <label className={styles.toggleLabel}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.additionalPages?.includes('cookies') || false}
+                                                    onChange={(e) => {
+                                                        const pages = formData.additionalPages || [];
+                                                        if (e.target.checked) {
+                                                            updateFormData({ additionalPages: [...pages, 'cookies'] });
+                                                        } else {
+                                                            updateFormData({ additionalPages: pages.filter(p => p !== 'cookies') });
+                                                        }
+                                                    }}
+                                                />
+                                                <span>Cookie Policy</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div className={styles.summary}>
                                         <h4>Summary</h4>
                                         <ul>
