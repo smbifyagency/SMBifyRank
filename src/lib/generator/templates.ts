@@ -53,15 +53,8 @@ export function renderPage(website: Website, page: Page): string {
   // Generate content based on page type (with home page fallback by slug)
   let mainContent: string;
 
-  // If the page has custom sections, always use section-based rendering
-  // This ensures data-section-id and data-property attributes are preserved for editing
-  if (page.content && page.content.length > 0) {
-    mainContent = page.content
-      .sort((a, b) => a.order - b.order)
-      .map(section => renderSection(section, website))
-      .join('\n');
-  } else if (isHomePage) {
-    // Fallback to rich content generators only if no sections exist
+  // Home page - detect by type OR by empty slug
+  if (isHomePage) {
     mainContent = generateRichHomepageContent(businessInfo);
   } else {
     switch (page.type) {
@@ -86,7 +79,11 @@ export function renderPage(website: Website, page: Page): string {
         })));
         break;
       default:
-        mainContent = '';
+        // Fall back to section-based rendering for custom pages
+        mainContent = page.content
+          .sort((a, b) => a.order - b.order)
+          .map(section => renderSection(section, website))
+          .join('\n');
     }
   }
 
