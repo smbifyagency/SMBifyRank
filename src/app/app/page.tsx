@@ -27,6 +27,7 @@ function AppDashboardContent() {
     const [showUpgrade, setShowUpgrade] = useState(false);
     const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
     const [upgradedPlan, setUpgradedPlan] = useState<string | null>(null);
+    const [isPaidUser, setIsPaidUser] = useState(false);
 
     // Combined auth check - must be authenticated with either NextAuth or Supabase
     const isAuthenticated = session?.user || supabaseUser;
@@ -61,6 +62,16 @@ function AppDashboardContent() {
         if (isAuthenticated) {
             setWebsites(getAllWebsites());
             setIsLoading(false);
+
+            // Fetch subscription status
+            fetch('/api/subscription')
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (data && (data.plan_type === 'monthly' || data.plan_type === 'lifetime')) {
+                        setIsPaidUser(true);
+                    }
+                })
+                .catch(() => { });
         }
     }, [authLoading, isAuthenticated, router]);
 
@@ -96,10 +107,7 @@ function AppDashboardContent() {
 
     // Plan limit check - Free users get 1 website max
     const handleCreateNew = () => {
-        // TODO: Check from Supabase subscription
-        // For now, check localStorage websites count
         const currentCount = websites.length;
-        const isPaidUser = false; // TODO: Check from subscription
 
         if (!isPaidUser && currentCount >= 1) {
             setShowUpgrade(true);
@@ -111,7 +119,6 @@ function AppDashboardContent() {
     // Demo also counts toward limit
     const handleLoadDemo = () => {
         const currentCount = websites.length;
-        const isPaidUser = false; // TODO: Check from subscription
 
         if (!isPaidUser && currentCount >= 1) {
             setShowUpgrade(true);
