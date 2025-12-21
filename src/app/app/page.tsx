@@ -28,9 +28,10 @@ function AppDashboardContent() {
     const [showUpgradeBanner, setShowUpgradeBanner] = useState(false);
     const [upgradedPlan, setUpgradedPlan] = useState<string | null>(null);
     const [isPaidUser, setIsPaidUser] = useState(false);
+    const [isTestMode, setIsTestMode] = useState(false);
 
-    // Combined auth check - must be authenticated with either NextAuth or Supabase
-    const isAuthenticated = session?.user || supabaseUser;
+    // Combined auth check - must be authenticated with either NextAuth or Supabase (or test mode)
+    const isAuthenticated = session?.user || supabaseUser || isTestMode;
     const authLoading = status === 'loading' || supabaseLoading;
 
     // Check for upgrade success from Stripe checkout
@@ -53,6 +54,7 @@ function AppDashboardContent() {
         // TEMPORARY: Enable test mode for development
         const testMode = localStorage.getItem('test-mode');
         if (testMode === 'true') {
+            setIsTestMode(true);
             setWebsites(getAllWebsites());
             setIsLoading(false);
             setIsPaidUser(true); // Grant full access in test mode
