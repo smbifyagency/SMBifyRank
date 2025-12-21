@@ -9,9 +9,10 @@ import { getWebsite, saveWebsite, generateId } from '@/lib/storage';
 import { getEditablePagePreviewHtml } from '@/lib/export';
 import { INDUSTRY_TEMPLATES, templateToBrandColors } from '@/lib/templates';
 import ImageUploader from '@/components/ImageUploader';
+import RichTextEditor from '@/components/RichTextEditor';
 import styles from './editor.module.css';
 
-type EditTab = 'website' | 'page' | 'sections' | 'branding';
+type EditTab = 'website' | 'page' | 'sections' | 'branding' | 'blog';
 
 export default function EditorPage() {
     const params = useParams();
@@ -42,6 +43,10 @@ export default function EditorPage() {
         src?: string;
         rect: { top: number; left: number; width: number; height: number };
     } | null>(null);
+
+    // Blog post state
+    const [blogPostTitle, setBlogPostTitle] = useState('');
+    const [blogPostContent, setBlogPostContent] = useState('');
 
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -958,6 +963,12 @@ export default function EditorPage() {
                                     >
                                         🎨 Branding
                                     </button>
+                                    <button
+                                        className={`${styles.tabBtn} ${editTab === 'blog' ? styles.activeTab : ''}`}
+                                        onClick={() => setEditTab('blog')}
+                                    >
+                                        ✍️ Blog
+                                    </button>
                                 </div>
 
                                 {/* Website Settings Tab */}
@@ -1463,6 +1474,122 @@ export default function EditorPage() {
                                             <p className={styles.hint}>
                                                 Changes are saved locally. Click &quot;Deploy&quot; in the toolbar to update your live website.
                                             </p>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Blog Tab */}
+                                {editTab === 'blog' && website && (
+                                    <>
+                                        {/* Create New Post */}
+                                        <div className={styles.editorSection}>
+                                            <h3>✍️ Blog Posts</h3>
+                                            <div className={styles.hint} style={{ padding: '0.75rem', background: 'rgba(99, 102, 241, 0.1)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
+                                                Create blog posts for <strong>{website.businessName}</strong>. Posts will be added to your website.
+                                            </div>
+                                        </div>
+
+                                        <div className={styles.editorSection}>
+                                            <h4>Create New Post</h4>
+                                            <div className={styles.field}>
+                                                <label>Post Title</label>
+                                                <input
+                                                    type="text"
+                                                    className={styles.input}
+                                                    placeholder="Enter blog post title..."
+                                                    value={blogPostTitle}
+                                                    onChange={(e) => setBlogPostTitle(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className={styles.field} style={{ marginTop: '1rem' }}>
+                                                <label>Content</label>
+                                                <RichTextEditor
+                                                    value={blogPostContent}
+                                                    onChange={setBlogPostContent}
+                                                    placeholder="Write your blog post content here... (paste from WordPress, Google Docs, etc.)"
+                                                />
+                                            </div>
+                                            <div className={styles.field} style={{ marginTop: '1rem' }}>
+                                                <button
+                                                    className={styles.saveBtn}
+                                                    onClick={() => {
+                                                        if (!blogPostTitle.trim()) {
+                                                            alert('Please enter a post title');
+                                                            return;
+                                                        }
+                                                        if (!blogPostContent.trim()) {
+                                                            alert('Please enter post content');
+                                                            return;
+                                                        }
+                                                        // Add blog post to website pages
+                                                        const slug = blogPostTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                                                        const newPage: Page = {
+                                                            id: generateId(),
+                                                            title: blogPostTitle,
+                                                            slug: `blog/${slug}`,
+                                                            type: 'blog-post',
+                                                            content: [{
+                                                                id: generateId(),
+                                                                type: 'custom-content',
+                                                                content: {
+                                                                    html: `<article class="blog-post"><h1>${blogPostTitle}</h1>${blogPostContent}</article>`
+                                                                },
+                                                                order: 0
+                                                            }],
+                                                            seo: {
+                                                                title: blogPostTitle,
+                                                                description: blogPostContent.replace(/<[^>]*>/g, '').substring(0, 160),
+                                                                keywords: []
+                                                            },
+                                                            order: website.pages.length,
+                                                            isPublished: true
+                                                        };
+                                                        const updatedWebsite = {
+                                                            ...website,
+                                                            pages: [...website.pages, newPage]
+                                                        };
+                                                        setWebsite(updatedWebsite);
+                                                        saveWebsite(updatedWebsite);
+                                                        setBlogPostTitle('');
+                                                        setBlogPostContent('');
+                                                        alert('✅ Blog post added! Click Deploy to publish.');
+                                                    }}
+                                                    style={{ width: '100%' }}
+                                                >
+                                                    ➕ Add Blog Post
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Existing Blog Posts */}
+                                        <div className={styles.editorSection}>
+                                            <h4>Existing Blog Posts</h4>
+                                            {website.pages.filter(p => p.type === 'blog' || p.slug?.startsWith('blog/')).length === 0 ? (
+                                                <p className={styles.hint}>No blog posts yet. Create your first post above!</p>
+                                            ) : (
+                                                <div className={styles.pagesList}>
+                                                    {website.pages.filter(p => p.type === 'blog' || p.slug?.startsWith('blog/')).map(post => (
+                                                        <div key={post.id} className={styles.pageItem}>
+                                                            <span>📝 {post.title}</span>
+                                                            <button
+                                                                className={styles.deleteBtn}
+                                                                onClick={() => {
+                                                                    if (confirm(`Delete "${post.title}"?`)) {
+                                                                        const updatedWebsite = {
+                                                                            ...website,
+                                                                            pages: website.pages.filter(p => p.id !== post.id)
+                                                                        };
+                                                                        setWebsite(updatedWebsite);
+                                                                        saveWebsite(updatedWebsite);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                🗑️
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </>
                                 )}
