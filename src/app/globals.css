@@ -145,14 +145,32 @@ a {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
-  transition: all var(--transition-base);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+  transition: left 0.5s;
+  pointer-events: none;
 }
 
 .card:hover {
   background: var(--bg-card-hover);
   border-color: var(--border-color-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card:hover::before {
+  left: 100%;
 }
 
 /* Button Styles */
@@ -167,7 +185,24 @@ a {
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.4s;
+}
+
+.btn:hover::before {
+  left: 100%;
 }
 
 .btn-primary {
@@ -177,8 +212,12 @@ a {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow), 0 10px 30px -10px rgba(180, 245, 0, 0.5);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -189,7 +228,8 @@ a {
 
 .btn-secondary:hover {
   background: var(--bg-card-hover);
-  border-color: var(--border-color-hover);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
 }
 
 .btn-ghost {
@@ -200,6 +240,7 @@ a {
 .btn-ghost:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 .btn-danger {
@@ -209,6 +250,8 @@ a {
 
 .btn-danger:hover {
   background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(239, 68, 68, 0.5);
 }
 
 .btn-success {
@@ -218,6 +261,25 @@ a {
 
 .btn-success:hover {
   background: #16a34a;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(34, 197, 94, 0.5);
+}
+
+/* Button loading state */
+.btn.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.btn.loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 8px;
 }
 
 /* Input Styles */
@@ -241,17 +303,27 @@ a {
   border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: 1rem;
-  transition: all var(--transition-fast);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input:hover {
+  border-color: var(--border-color-hover);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 4px rgba(180, 245, 0, 0.15);
+  background: var(--bg-tertiary);
 }
 
 .input::placeholder {
   color: var(--text-muted);
+  transition: opacity 0.2s;
+}
+
+.input:focus::placeholder {
+  opacity: 0.5;
 }
 
 .textarea {
