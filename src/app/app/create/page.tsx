@@ -38,11 +38,7 @@ export default function CreateWebsitePage() {
         setFormData(prev => ({ ...prev, ...updates }));
     };
 
-    // Load sample data into the form
-    const loadSampleData = (sample: SampleBusiness) => {
-        setFormData(sample.data);
-        setShowSampleSelector(false);
-    };
+
 
     const addService = () => {
         setFormData(prev => ({
@@ -218,17 +214,7 @@ export default function CreateWebsitePage() {
                                         Let&apos;s start with the basics. This information will be used throughout your website.
                                     </p>
 
-                                    {/* Sample Data Button */}
-                                    <div className={styles.sampleBanner}>
-                                        <span>🚀 Want to test quickly?</span>
-                                        <button
-                                            type="button"
-                                            className={styles.sampleBtn}
-                                            onClick={() => setShowSampleSelector(true)}
-                                        >
-                                            Load Sample Data
-                                        </button>
-                                    </div>
+
 
                                     <div className={styles.formGroup}>
                                         <label>Business Name *</label>
@@ -706,43 +692,7 @@ export default function CreateWebsitePage() {
                 </div>
             </main>
 
-            {/* Sample Data Selector Modal */}
-            {showSampleSelector && (
-                <div className={styles.modalOverlay} onClick={() => setShowSampleSelector(false)}>
-                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h3>📋 Choose a Sample Business</h3>
-                            <button
-                                className={styles.modalClose}
-                                onClick={() => setShowSampleSelector(false)}
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <p className={styles.modalDescription}>
-                            Select a sample to pre-fill the form and test the website builder:
-                        </p>
-                        <div className={styles.sampleGrid}>
-                            {SAMPLE_BUSINESSES.map((sample) => (
-                                <button
-                                    key={sample.id}
-                                    className={styles.sampleCard}
-                                    onClick={() => loadSampleData(sample)}
-                                >
-                                    <span className={styles.sampleIcon}>{sample.icon}</span>
-                                    <div className={styles.sampleInfo}>
-                                        <strong>{sample.name}</strong>
-                                        <span>{sample.description}</span>
-                                        <span className={styles.sampleMeta}>
-                                            {sample.data.services.length} services • {sample.data.locations.length} locations
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 }

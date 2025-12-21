@@ -178,18 +178,6 @@ export default function LoginPage() {
 
 
 
-                {/* TEMPORARY: Test Mode for Development */}
-                <button
-                    onClick={() => {
-                        localStorage.setItem('test-mode', 'true');
-                        router.push('/app');
-                    }}
-                    className={styles.toggleBtn}
-                    style={{ marginTop: '1rem', background: '#22c55e', color: '#fff', padding: '0.75rem 1.5rem', borderRadius: '0.5rem' }}
-                >
-                    🧪 Enter Test Mode (Dev Only)
-                </button>
-
                 <p className={styles.terms}>
                     By signing in, you agree to our{' '}
                     <a href="/terms" className={styles.legalLink}>Terms of Service</a>

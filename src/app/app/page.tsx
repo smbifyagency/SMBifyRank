@@ -7,7 +7,6 @@ import { useSession } from 'next-auth/react';
 import { useAuth } from '@/lib/useAuth';
 import { Website } from '@/lib/types';
 import { getAllWebsites, deleteWebsite, saveWebsite } from '@/lib/storage';
-import { generateDemoWebsite } from '@/lib/demoData';
 import { DeployModal } from '@/components/DeployModal';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { useToast } from '@/components/Toast';
@@ -30,8 +29,8 @@ function AppDashboardContent() {
     const [isPaidUser, setIsPaidUser] = useState(false);
     const [isTestMode, setIsTestMode] = useState(false);
 
-    // Combined auth check - must be authenticated with either NextAuth or Supabase (or test mode)
-    const isAuthenticated = session?.user || supabaseUser || isTestMode;
+    // Combined auth check - must be authenticated with either NextAuth or Supabase
+    const isAuthenticated = session?.user || supabaseUser;
     const authLoading = status === 'loading' || supabaseLoading;
 
     // Check for upgrade success from Stripe checkout
@@ -51,16 +50,6 @@ function AppDashboardContent() {
     }, [searchParams, toast]);
 
     useEffect(() => {
-        // TEMPORARY: Enable test mode for development
-        const testMode = localStorage.getItem('test-mode');
-        if (testMode === 'true') {
-            setIsTestMode(true);
-            setWebsites(getAllWebsites());
-            setIsLoading(false);
-            setIsPaidUser(true); // Grant full access in test mode
-            return;
-        }
-
         // Require authentication - no guest mode
         if (!authLoading && !isAuthenticated) {
             router.push('/login');
@@ -124,19 +113,7 @@ function AppDashboardContent() {
         router.push('/create');
     };
 
-    // Demo also counts toward limit
-    const handleLoadDemo = () => {
-        const currentCount = websites.length;
 
-        if (!isPaidUser && currentCount >= 1) {
-            setShowUpgrade(true);
-            return;
-        }
-        const demoWebsite = generateDemoWebsite();
-        saveWebsite(demoWebsite);
-        setWebsites(getAllWebsites());
-        toast.success('Demo website loaded!');
-    };
 
     return (
         <div className={styles.page}>
@@ -165,9 +142,6 @@ function AppDashboardContent() {
                         <p>Manage your AI-generated websites</p>
                     </div>
                     <div className={styles.headerActions}>
-                        <button onClick={handleLoadDemo} className={styles.demoBtn}>
-                            📦 Load Demo
-                        </button>
                         <button onClick={handleCreateNew} className={styles.createBtn}>
                             + New Website
                         </button>
@@ -248,9 +222,7 @@ function AppDashboardContent() {
                             <Link href="/app/create" className={styles.createBtn}>
                                 Create Website
                             </Link>
-                            <button onClick={handleLoadDemo} className={styles.demoBtn}>
-                                Load Demo Data
-                            </button>
+
                         </div>
                     </div>
                 )}
