@@ -621,10 +621,10 @@ export default function EditorPage() {
                                             </div>
                                             <div className={styles.field}>
                                                 <label>Subheadline</label>
-                                                <textarea
+                                                <RichTextEditor
                                                     value={(sectionContent.subheadline as string) || ''}
-                                                    onChange={(e) => setSectionContent({ ...sectionContent, subheadline: e.target.value })}
-                                                    className={styles.textarea}
+                                                    onChange={(val) => setSectionContent({ ...sectionContent, subheadline: val })}
+                                                    placeholder="Enter subheadline..."
                                                 />
                                             </div>
                                             <div className={styles.field}>
@@ -737,11 +737,10 @@ export default function EditorPage() {
                                             </div>
                                             <div className={styles.field}>
                                                 <label>Description</label>
-                                                <textarea
+                                                <RichTextEditor
                                                     value={(sectionContent.description as string) || ''}
-                                                    onChange={(e) => setSectionContent({ ...sectionContent, description: e.target.value })}
-                                                    className={styles.textarea}
-                                                    rows={5}
+                                                    onChange={(val) => setSectionContent({ ...sectionContent, description: val })}
+                                                    placeholder="Enter description..."
                                                 />
                                             </div>
                                         </>
@@ -839,11 +838,10 @@ export default function EditorPage() {
                                             </div>
                                             <div className={styles.field}>
                                                 <label>Description</label>
-                                                <textarea
+                                                <RichTextEditor
                                                     value={(sectionContent.description as string) || ''}
-                                                    onChange={(e) => setSectionContent({ ...sectionContent, description: e.target.value })}
-                                                    className={styles.textarea}
-                                                    rows={3}
+                                                    onChange={(val) => setSectionContent({ ...sectionContent, description: val })}
+                                                    placeholder="Enter description..."
                                                 />
                                             </div>
                                         </>
@@ -862,11 +860,9 @@ export default function EditorPage() {
                                             </div>
                                             <div className={styles.field}>
                                                 <label>Content</label>
-                                                <textarea
+                                                <RichTextEditor
                                                     value={(sectionContent.content as string) || ''}
-                                                    onChange={(e) => setSectionContent({ ...sectionContent, content: e.target.value })}
-                                                    className={styles.textarea}
-                                                    rows={8}
+                                                    onChange={(val) => setSectionContent({ ...sectionContent, content: val })}
                                                     placeholder="Enter your text content here..."
                                                 />
                                             </div>
@@ -1074,11 +1070,9 @@ export default function EditorPage() {
                                                                 className={styles.input}
                                                                 placeholder="Service name"
                                                             />
-                                                            <textarea
+                                                            <RichTextEditor
                                                                 value={service.description}
-                                                                onChange={(e) => updateService(service.id, { description: e.target.value })}
-                                                                className={styles.textarea}
-                                                                rows={2}
+                                                                onChange={(val) => updateService(service.id, { description: val })}
                                                                 placeholder="Description"
                                                             />
                                                         </div>
