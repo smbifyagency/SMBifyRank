@@ -918,6 +918,8 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
             const srcValue = editType === 'video' 
                 ? target.getAttribute('data-video-src') || ''
                 : target.getAttribute('src') || '';
+            const sectionId = target.getAttribute('data-section-id') || '';
+            const property = target.getAttribute('data-property') || '';
             
             // Send message to parent
             window.parent.postMessage({
@@ -925,6 +927,8 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
                 data: {
                     elementType: editType,
                     elementId: editId,
+                    sectionId: sectionId,
+                    property: property,
                     tagName: target.tagName,
                     content: target.textContent || srcValue || '',
                     href: target.getAttribute('href') || '',

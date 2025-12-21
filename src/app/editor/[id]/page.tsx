@@ -40,6 +40,8 @@ export default function EditorPage() {
     const [selectedElement, setSelectedElement] = useState<{
         elementType: string;
         elementId: string;
+        sectionId?: string;
+        property?: string;
         tagName: string;
         content: string;
         src?: string;
@@ -1050,7 +1052,7 @@ export default function EditorPage() {
                                                         <RichTextEditor
                                                             value={selectedElement.content || ''}
                                                             onChange={(val) => {
-                                                                // Send update to iframe
+                                                                // Send update to iframe (visual update)
                                                                 if (iframeRef.current?.contentWindow) {
                                                                     iframeRef.current.contentWindow.postMessage({
                                                                         type: 'update-element',
@@ -1066,6 +1068,30 @@ export default function EditorPage() {
                                                                     ...selectedElement,
                                                                     content: val
                                                                 });
+
+                                                                // PERSIST to website data using sectionId + property
+                                                                if (website && currentPage && selectedElement.sectionId && selectedElement.property) {
+                                                                    const propName = selectedElement.property as string;
+                                                                    const updatedSections = currentPage.content.map((section) => {
+                                                                        if (section.id === selectedElement.sectionId) {
+                                                                            const content = section.content as Record<string, unknown>;
+                                                                            if (propName in content) {
+                                                                                console.log(`Saving ${propName} in section ${section.id}`);
+                                                                                return { ...section, content: { ...content, [propName]: val } };
+                                                                            }
+                                                                        }
+                                                                        return section;
+                                                                    });
+
+                                                                    const updatedPage = { ...currentPage, content: updatedSections };
+                                                                    const updatedWebsite = {
+                                                                        ...website,
+                                                                        pages: website.pages.map(p =>
+                                                                            p.id === currentPage.id ? updatedPage : p
+                                                                        ),
+                                                                    };
+                                                                    handleSave(updatedWebsite);
+                                                                }
                                                             }}
                                                             placeholder="Edit this content..."
                                                         />
