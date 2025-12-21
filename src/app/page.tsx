@@ -88,33 +88,43 @@ export default function HomePage() {
       {/* How It Works Section */}
       <section id="how-it-works" className={styles.howItWorks}>
         <div className={styles.container}>
-          <span className={styles.sectionBadge}>Simple Process</span>
-          <h2>Build Your Website in 4 Easy Steps</h2>
+          <ScrollReveal>
+            <span className={styles.sectionBadge}>Simple Process</span>
+            <h2>Build Your Website in 4 Easy Steps</h2>
+          </ScrollReveal>
           <div className={styles.stepsGrid}>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>1</div>
-              <div className={styles.stepIcon}>📋</div>
-              <h3>Enter Business Info</h3>
-              <p>Tell us about your business, industry, services, and locations. We&apos;ll use this to generate your site.</p>
-            </div>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>2</div>
-              <div className={styles.stepIcon}>🎨</div>
-              <h3>Choose Your Brand</h3>
-              <p>Upload your logo and pick your brand colors. We&apos;ll apply them across your entire website.</p>
-            </div>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>3</div>
-              <div className={styles.stepIcon}>🤖</div>
-              <h3>AI Generates Content</h3>
-              <p>Our AI creates SEO-optimized content for every page - home, about, services, and location pages.</p>
-            </div>
-            <div className={styles.step}>
-              <div className={styles.stepNumber}>4</div>
-              <div className={styles.stepIcon}>🚀</div>
-              <h3>Export & Deploy</h3>
-              <p>Download your complete website as a ZIP or deploy directly to Netlify with one click.</p>
-            </div>
+            <ScrollReveal delay={100}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepIcon}>📋</div>
+                <h3>Enter Business Info</h3>
+                <p>Tell us about your business, industry, services, and locations. We&apos;ll use this to generate your site.</p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepIcon}>🎨</div>
+                <h3>Choose Your Brand</h3>
+                <p>Upload your logo and pick your brand colors. We&apos;ll apply them across your entire website.</p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={300}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepIcon}>🤖</div>
+                <h3>AI Generates Content</h3>
+                <p>Our AI creates SEO-optimized content for every page - home, about, services, and location pages.</p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={400}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <div className={styles.stepIcon}>🚀</div>
+                <h3>Export & Deploy</h3>
+                <p>Download your complete website as a ZIP or deploy directly to Netlify with one click.</p>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
@@ -122,8 +132,10 @@ export default function HomePage() {
       {/* Features Section */}
       <section id="features" className={styles.features}>
         <div className={styles.container}>
-          <span className={styles.sectionBadge}>Powerful Features</span>
-          <h2>Everything You Need to Rank</h2>
+          <ScrollReveal>
+            <span className={styles.sectionBadge}>Powerful Features</span>
+            <h2>Everything You Need to Rank</h2>
+          </ScrollReveal>
           <div className={styles.featureGrid}>
             <div className={styles.featureCard}>
               <div className={styles.featureIcon}>🤖</div>
