@@ -56,6 +56,10 @@ export default function EditorPage() {
 
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
+    // Refs to track latest state values for event handlers (fixes stale closure bug)
+    const websiteRef = useRef<Website | null>(null);
+    const currentPageRef = useRef<Page | null>(null);
+
     useEffect(() => {
         const ws = getWebsite(websiteId);
         if (ws) {
@@ -72,6 +76,15 @@ export default function EditorPage() {
         setIsLoading(false);
     }, [websiteId, initialPageId, router]);
 
+    // Keep refs in sync with state (for event handler access)
+    useEffect(() => {
+        websiteRef.current = website;
+    }, [website]);
+
+    useEffect(() => {
+        currentPageRef.current = currentPage;
+    }, [currentPage]);
+
     useEffect(() => {
         if (website && currentPage) {
             const html = getEditablePagePreviewHtml(website, currentPage);
@@ -80,6 +93,7 @@ export default function EditorPage() {
     }, [website, currentPage]);
 
     // Listen for messages from iframe (inline editing)
+    // Uses refs to access latest state, avoiding stale closure issues
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             if (event.data.type === 'element-selected') {
@@ -97,11 +111,15 @@ export default function EditorPage() {
                 const { elementId, elementType, sectionId, property, newContent } = event.data.data;
                 console.log('Content updated:', { elementId, elementType, sectionId, property, newContent });
 
-                if (website && currentPage) {
+                // Use refs to get latest state values (fixes stale closure bug)
+                const currentWebsite = websiteRef.current;
+                const currentPageState = currentPageRef.current;
+
+                if (currentWebsite && currentPageState) {
                     let sectionUpdated = false;
 
                     // Use sectionId + property for precise updates (new method)
-                    const updatedSections = currentPage.content.map((section) => {
+                    const updatedSections = currentPageState.content.map((section) => {
                         // Direct match using sectionId and property
                         if (sectionId && property && section.id === sectionId) {
                             const content = section.content as Record<string, unknown>;
@@ -144,15 +162,18 @@ export default function EditorPage() {
 
                     if (sectionUpdated) {
                         // Save the updated website
-                        const updatedPage = { ...currentPage, content: updatedSections };
+                        const updatedPage = { ...currentPageState, content: updatedSections };
                         const updatedWebsite = {
-                            ...website,
-                            pages: website.pages.map(p =>
-                                p.id === currentPage.id ? updatedPage : p
+                            ...currentWebsite,
+                            pages: currentWebsite.pages.map(p =>
+                                p.id === currentPageState.id ? updatedPage : p
                             ),
                         };
 
-                        handleSave(updatedWebsite);
+                        // Use saveWebsite directly and update state
+                        saveWebsite(updatedWebsite);
+                        setWebsite(updatedWebsite);
+                        setCurrentPage(updatedPage);
                         console.log('Website saved successfully');
                     } else {
                         console.log('No matching section found for:', { sectionId, property, elementId });
@@ -163,7 +184,7 @@ export default function EditorPage() {
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [website, currentPage]);
+    }, []); // Empty deps - listener set up once, uses refs for current state values
 
     // Handle image upload for selected element
     const handleImageUpload = useCallback((imageUrl: string, altText: string) => {
