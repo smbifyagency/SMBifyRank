@@ -5,12 +5,14 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { saveAs } from 'file-saver';
 import { Website, Page, PageSection, Service, Location, BrandColors } from '@/lib/types';
-import { getWebsite, saveWebsite, generateId } from '@/lib/storage';
+import { getWebsite, saveWebsite as saveWebsiteLocal, generateId } from '@/lib/storage';
+import { fetchWebsite, saveWebsiteWithStatus } from '@/lib/supabase-storage';
 import { getEditablePagePreviewHtml } from '@/lib/export';
 import { INDUSTRY_TEMPLATES, templateToBrandColors } from '@/lib/templates';
 import ImageUploader from '@/components/ImageUploader';
 import RichTextEditor from '@/components/RichTextEditor';
 import { DeployModal } from '@/components/DeployModal';
+import { SyncStatusIndicator } from '@/components/SyncStatusIndicator';
 import styles from './editor.module.css';
 
 type EditTab = 'edit' | 'settings';
@@ -53,6 +55,8 @@ export default function EditorPage() {
     // Blog post state
     const [blogPostTitle, setBlogPostTitle] = useState('');
     const [blogPostContent, setBlogPostContent] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -60,20 +64,65 @@ export default function EditorPage() {
     const websiteRef = useRef<Website | null>(null);
     const currentPageRef = useRef<Page | null>(null);
 
+    // Auto-save debounce ref
+    const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Load website from Supabase (primary) or localStorage (fallback)
     useEffect(() => {
-        const ws = getWebsite(websiteId);
-        if (ws) {
-            setWebsite(ws);
-            const page = initialPageId
-                ? ws.pages.find(p => p.id === initialPageId || p.slug === initialPageId)
-                : ws.pages[0];
-            if (page) {
-                setCurrentPage(page);
+        async function loadWebsite() {
+            setIsLoading(true);
+
+            try {
+                // Try Supabase first
+                const supabaseWebsite = await fetchWebsite(websiteId);
+
+                if (supabaseWebsite) {
+                    setWebsite(supabaseWebsite);
+                    setIsAuthenticated(true);
+                    const page = initialPageId
+                        ? supabaseWebsite.pages.find(p => p.id === initialPageId || p.slug === initialPageId)
+                        : supabaseWebsite.pages[0];
+                    if (page) {
+                        setCurrentPage(page);
+                    }
+                } else {
+                    // Fallback to localStorage for unauthenticated users
+                    const localWebsite = getWebsite(websiteId);
+                    if (localWebsite) {
+                        setWebsite(localWebsite);
+                        setIsAuthenticated(false);
+                        const page = initialPageId
+                            ? localWebsite.pages.find(p => p.id === initialPageId || p.slug === initialPageId)
+                            : localWebsite.pages[0];
+                        if (page) {
+                            setCurrentPage(page);
+                        }
+                    } else {
+                        router.push('/');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading website:', error);
+                // Fallback to localStorage on error
+                const localWebsite = getWebsite(websiteId);
+                if (localWebsite) {
+                    setWebsite(localWebsite);
+                    setIsAuthenticated(false);
+                    const page = initialPageId
+                        ? localWebsite.pages.find(p => p.id === initialPageId || p.slug === initialPageId)
+                        : localWebsite.pages[0];
+                    if (page) {
+                        setCurrentPage(page);
+                    }
+                } else {
+                    router.push('/');
+                }
+            } finally {
+                setIsLoading(false);
             }
-        } else {
-            router.push('/');
         }
-        setIsLoading(false);
+
+        loadWebsite();
     }, [websiteId, initialPageId, router]);
 
     // Keep refs in sync with state (for event handler access)
@@ -170,11 +219,19 @@ export default function EditorPage() {
                             ),
                         };
 
-                        // Use saveWebsite directly and update state
-                        saveWebsite(updatedWebsite);
+                        // Always save to localStorage immediately (for consistency)
+                        saveWebsiteLocal(updatedWebsite);
                         setWebsite(updatedWebsite);
                         setCurrentPage(updatedPage);
-                        console.log('Website saved successfully via section update');
+
+                        // Also save to Supabase asynchronously (if authenticated)
+                        saveWebsiteWithStatus(updatedWebsite).then(result => {
+                            if (result.success) {
+                                console.log('✅ Website saved to Supabase via section update');
+                            } else {
+                                console.error('Failed to save to Supabase:', result.error);
+                            }
+                        }).catch(err => console.error('Supabase save error:', err));
                     } else {
                         // Fallback: Save to customContent using elementId as key
                         // This handles dynamically generated content that doesn't map to sections
@@ -182,9 +239,19 @@ export default function EditorPage() {
                         const customContent = ((currentWebsite as unknown) as Record<string, unknown>).customContent as Record<string, string> || {};
                         const updatedCustomContent = { ...customContent, [elementId]: newContent };
                         const updatedWebsite = { ...currentWebsite, customContent: updatedCustomContent } as Website;
-                        saveWebsite(updatedWebsite);
+
+                        // Save to localStorage immediately
+                        saveWebsiteLocal(updatedWebsite);
                         setWebsite(updatedWebsite);
-                        console.log('💾 Saved to customContent:', elementId);
+
+                        // Also save to Supabase asynchronously
+                        saveWebsiteWithStatus(updatedWebsite).then(result => {
+                            if (result.success) {
+                                console.log('💾 Saved to Supabase customContent:', elementId);
+                            } else {
+                                console.error('Failed to save customContent to Supabase:', result.error);
+                            }
+                        }).catch(err => console.error('Supabase save error:', err));
                     }
                 }
             }
@@ -226,9 +293,19 @@ export default function EditorPage() {
                     [selectedElement.elementId]: { src: imageUrl, alt: altText }
                 };
                 const updatedWebsite = { ...currentWebsite, customImages: updatedCustomImages } as Website;
-                saveWebsite(updatedWebsite);
+
+                // Save to localStorage immediately
+                saveWebsiteLocal(updatedWebsite);
                 setWebsite(updatedWebsite);
-                console.log('💾 Image saved:', selectedElement.elementId, imageUrl);
+
+                // Also save to Supabase asynchronously
+                saveWebsiteWithStatus(updatedWebsite).then(result => {
+                    if (result.success) {
+                        console.log('💾 Image saved to Supabase:', selectedElement.elementId, imageUrl);
+                    } else {
+                        console.error('Failed to save image to Supabase:', result.error);
+                    }
+                }).catch(err => console.error('Supabase save error:', err));
             }
         }
         setShowImageUploader(false);
@@ -275,17 +352,43 @@ export default function EditorPage() {
         }
     };
 
-    const handleSave = (updatedWebsite: Website) => {
-        saveWebsite(updatedWebsite);
-        setWebsite(updatedWebsite);
-        // Update current page reference
-        if (currentPage) {
-            const updatedPage = updatedWebsite.pages.find(p => p.id === currentPage.id);
-            if (updatedPage) {
-                setCurrentPage(updatedPage);
+    // CRITICAL: Save function that persists to Supabase (or localStorage fallback)
+    const handleSave = useCallback(async (updatedWebsite: Website) => {
+        setIsSaving(true);
+
+        try {
+            if (isAuthenticated) {
+                // Save to Supabase (single source of truth)
+                const result = await saveWebsiteWithStatus(updatedWebsite);
+                if (!result.success) {
+                    console.error('Failed to save to Supabase:', result.error);
+                    alert('⚠️ Failed to save changes. Please try again.');
+                    return;
+                }
+                console.log('✅ Saved to Supabase successfully');
+            } else {
+                // Fallback to localStorage for unauthenticated users
+                saveWebsiteLocal(updatedWebsite);
+                console.log('✅ Saved to localStorage');
             }
+
+            // Update local state
+            setWebsite(updatedWebsite);
+
+            // Update current page reference
+            if (currentPage) {
+                const updatedPage = updatedWebsite.pages.find(p => p.id === currentPage.id);
+                if (updatedPage) {
+                    setCurrentPage(updatedPage);
+                }
+            }
+        } catch (error) {
+            console.error('Error saving:', error);
+            alert('⚠️ Failed to save changes. Please try again.');
+        } finally {
+            setIsSaving(false);
         }
-    };
+    }, [isAuthenticated, currentPage]);
 
     const handleEditSection = (section: PageSection) => {
         setEditingSection(section);
@@ -658,17 +761,19 @@ export default function EditorPage() {
                 </div>
 
                 <div className={styles.toolbarRight}>
+                    <SyncStatusIndicator />
                     <button
                         className={styles.saveAllBtn}
-                        onClick={() => {
+                        onClick={async () => {
                             if (website) {
-                                saveWebsite(website);
+                                await handleSave(website);
                                 alert('✅ All changes saved!');
                             }
                         }}
+                        disabled={isSaving}
                         title="Save all changes"
                     >
-                        💾 Save
+                        {isSaving ? '⏳ Saving...' : '💾 Save'}
                     </button>
                     <button
                         className={styles.deployBtn}
