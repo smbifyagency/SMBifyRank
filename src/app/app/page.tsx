@@ -6,11 +6,61 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useAuth } from '@/lib/useAuth';
 import { Website } from '@/lib/types';
-import { getAllWebsites, deleteWebsite, saveWebsite } from '@/lib/storage';
+import { getAllWebsites, deleteWebsite, saveWebsite, generateId } from '@/lib/storage';
 import { DeployModal } from '@/components/DeployModal';
 import { UpgradeModal } from '@/components/UpgradeModal';
 import { useToast } from '@/components/Toast';
 import styles from './app.module.css';
+
+// Demo website data for testing
+const createDemoWebsite = (): Website => ({
+    id: generateId(),
+    name: 'Demo Roofing Company',
+    businessName: 'Elite Roofing Pro',
+    industry: 'Roofing',
+    services: [
+        { id: generateId(), name: 'Roof Repair', description: 'Professional roof repair services', slug: 'roof-repair', icon: '🔧' },
+        { id: generateId(), name: 'Roof Replacement', description: 'Complete roof replacement', slug: 'roof-replacement', icon: '🏠' },
+    ],
+    locations: [
+        { id: generateId(), city: 'Raleigh', state: 'NC', slug: 'raleigh' },
+    ],
+    colors: { primary: '#1a365d', secondary: '#2d3748', accent: '#ed8936', background: '#ffffff', text: '#1a202c' },
+    goal: 'leads',
+    keywords: ['roofing', 'roof repair', 'raleigh'],
+    pages: [
+        {
+            id: generateId(),
+            title: 'Home',
+            slug: '',
+            type: 'home',
+            content: [
+                {
+                    id: generateId(),
+                    type: 'hero',
+                    content: {
+                        headline: 'Elite Roofing Pro',
+                        subheadline: 'Your trusted roofing experts in Raleigh, NC',
+                        showCta: true,
+                        ctaText: 'Get Free Quote',
+                        ctaLink: '/contact',
+                    },
+                    order: 0,
+                },
+            ],
+            seo: { title: 'Elite Roofing Pro | Raleigh NC', description: 'Professional roofing services', keywords: ['roofing'] },
+            order: 0,
+            isPublished: true,
+        },
+    ],
+    blogPosts: [],
+    seoSettings: { siteName: 'Elite Roofing Pro', siteDescription: 'Professional roofing', socialLinks: {} },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: 'draft',
+    contactPhone: '(555) 123-4567',
+    contactEmail: 'info@eliteroofingpro.com',
+});
 
 // Wrapper component to handle Suspense for useSearchParams
 function AppDashboardContent() {
@@ -50,6 +100,24 @@ function AppDashboardContent() {
     }, [searchParams, toast]);
 
     useEffect(() => {
+        // Check for test mode (development only)
+        const testMode = searchParams.get('test') === 'true';
+        const isDevelopment = process.env.NODE_ENV === 'development';
+
+        if (testMode && isDevelopment) {
+            setIsTestMode(true);
+            // Load or create demo data in test mode
+            let existingWebsites = getAllWebsites();
+            if (existingWebsites.length === 0) {
+                const demoWebsite = createDemoWebsite();
+                saveWebsite(demoWebsite);
+                existingWebsites = [demoWebsite];
+            }
+            setWebsites(existingWebsites);
+            setIsLoading(false);
+            return;
+        }
+
         // Require authentication - no guest mode
         if (!authLoading && !isAuthenticated) {
             router.push('/login');
@@ -70,7 +138,7 @@ function AppDashboardContent() {
                 })
                 .catch(() => { });
         }
-    }, [authLoading, isAuthenticated, router]);
+    }, [authLoading, isAuthenticated, router, searchParams]);
 
     const handleDeleteClick = (id: string, name: string) => {
         setDeleteConfirm({ id, name });
@@ -97,8 +165,8 @@ function AppDashboardContent() {
         );
     }
 
-    // Must be authenticated - redirect handled above
-    if (!isAuthenticated) {
+    // Must be authenticated (or in test mode) - redirect handled above
+    if (!isAuthenticated && !isTestMode) {
         return null;
     }
 

@@ -110,34 +110,52 @@ export default function RichTextEditor({
     const insertLinkFromModal = () => {
         if (!linkUrl.trim()) return;
 
-        // Restore selection
+        const text = linkText.trim() || linkUrl;
+        const url = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
+
+        // Focus the editor first to allow execCommand to work
+        if (editorRef.current) {
+            editorRef.current.focus();
+        }
+
+        // Restore the saved selection
         if (savedSelectionRef.current) {
             const selection = window.getSelection();
             selection?.removeAllRanges();
             selection?.addRange(savedSelectionRef.current);
         }
 
-        const text = linkText.trim() || linkUrl;
-        const url = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
-
-        // If there's selected text, wrap it in a link
+        // Check if there's selected text to wrap
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
             if (range.toString()) {
-                // Wrap selected text
-                execCommand('createLink', url);
+                // Wrap selected text with link
+                document.execCommand('createLink', false, url);
+                // Find the newly created link and add target="_blank"
+                const links = editorRef.current?.querySelectorAll('a');
+                links?.forEach(link => {
+                    if (link.getAttribute('href') === url && !link.hasAttribute('target')) {
+                        link.setAttribute('target', '_blank');
+                        link.setAttribute('rel', 'noopener noreferrer');
+                    }
+                });
             } else {
-                // Insert new link with text
+                // Insert new link with text at cursor position
                 const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-                execCommand('insertHTML', link);
+                document.execCommand('insertHTML', false, link);
             }
+        }
+
+        // Trigger onChange to persist the change
+        if (editorRef.current) {
+            onChange(editorRef.current.innerHTML);
         }
 
         setShowLinkModal(false);
         setLinkUrl('');
         setLinkText('');
-        editorRef.current?.focus();
+        savedSelectionRef.current = null;
     };
 
     // Insert image

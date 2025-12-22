@@ -8,12 +8,25 @@ interface BusinessInfo {
     phone: string;
     services: Array<{ name: string; slug: string; icon: string; description: string }>;
     locations: Array<{ city: string; state?: string; slug: string }>;
+    // Custom fields that may be edited in the builder
+    customFields?: {
+        heroHeadline?: string;
+        heroSubheadline?: string;
+        aboutContent?: string;
+        servicesDescription?: string;
+        contactContent?: string;
+        footerContent?: string;
+    };
 }
 
 export function generateRichHomepageContent(info: BusinessInfo): string {
-    const { name, industry, city, phone, services, locations } = info;
+    const { name, industry, city, phone, services, locations, customFields } = info;
     const industryKeywords = getIndustryKeywords(industry);
     const phoneClean = phone.replace(/[^0-9+]/g, '');
+
+    // Use custom fields if they exist, otherwise use defaults
+    const heroHeadline = customFields?.heroHeadline || `${capitalizeFirst(industry)} Services in ${city}`;
+    const heroSubheadline = customFields?.heroSubheadline || `${name} - Fast Response When You Need It Most`;
 
     return `
     <!-- Emergency Hero Section -->
@@ -25,8 +38,8 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
                         <span class="pulse"></span>
                         <span data-field="emergencyBadge">24/7 Emergency Service - Call Now!</span>
                     </div>
-                    <h1 data-field="heroHeadline">${capitalizeFirst(industry)} Services in ${city}</h1>
-                    <h2 data-field="heroSubheadline">${name} - Fast Response When You Need It Most</h2>
+                    <h1 data-field="heroHeadline">${heroHeadline}</h1>
+                    <h2 data-field="heroSubheadline">${heroSubheadline}</h2>
                     <p class="hero-description" data-field="heroDescription">
                         Dealing with ${industryKeywords.commonIssue}? Don't wait - every minute counts! ${name} provides 
                         immediate ${industry.toLowerCase()} services throughout ${city} and surrounding areas. Our team is 

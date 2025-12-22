@@ -47,7 +47,16 @@ export function renderPage(website: Website, page: Page): string {
       city: l.city,
       state: l.state,
       slug: l.slug
-    }))
+    })),
+    // Pass custom content fields for personalized rendering
+    customFields: {
+      heroHeadline: website.heroHeadline,
+      heroSubheadline: website.heroSubheadline,
+      aboutContent: website.aboutContent,
+      servicesDescription: website.servicesDescription,
+      contactContent: website.contactContent,
+      footerContent: website.footerContent,
+    }
   };
 
   // Generate content based on page type (with home page fallback by slug)

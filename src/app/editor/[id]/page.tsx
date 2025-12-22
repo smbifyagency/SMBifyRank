@@ -174,9 +174,17 @@ export default function EditorPage() {
                         saveWebsite(updatedWebsite);
                         setWebsite(updatedWebsite);
                         setCurrentPage(updatedPage);
-                        console.log('Website saved successfully');
+                        console.log('Website saved successfully via section update');
                     } else {
-                        console.log('No matching section found for:', { sectionId, property, elementId });
+                        // Fallback: Save to customContent using elementId as key
+                        // This handles dynamically generated content that doesn't map to sections
+                        console.log('Saving to customContent for:', elementId);
+                        const customContent = ((currentWebsite as unknown) as Record<string, unknown>).customContent as Record<string, string> || {};
+                        const updatedCustomContent = { ...customContent, [elementId]: newContent };
+                        const updatedWebsite = { ...currentWebsite, customContent: updatedCustomContent } as Website;
+                        saveWebsite(updatedWebsite);
+                        setWebsite(updatedWebsite);
+                        console.log('💾 Saved to customContent:', elementId);
                     }
                 }
             }
@@ -189,6 +197,7 @@ export default function EditorPage() {
     // Handle image upload for selected element
     const handleImageUpload = useCallback((imageUrl: string, altText: string) => {
         if (selectedElement && iframeRef.current?.contentWindow) {
+            // Visual update to iframe
             iframeRef.current.contentWindow.postMessage({
                 type: 'update-element',
                 data: {
@@ -207,6 +216,20 @@ export default function EditorPage() {
                     value: altText
                 }
             }, '*');
+
+            // PERSIST: Save image to website's customImages field
+            const currentWebsite = websiteRef.current;
+            if (currentWebsite) {
+                const customImages = ((currentWebsite as unknown) as Record<string, unknown>).customImages as Record<string, { src: string; alt: string }> || {};
+                const updatedCustomImages = {
+                    ...customImages,
+                    [selectedElement.elementId]: { src: imageUrl, alt: altText }
+                };
+                const updatedWebsite = { ...currentWebsite, customImages: updatedCustomImages } as Website;
+                saveWebsite(updatedWebsite);
+                setWebsite(updatedWebsite);
+                console.log('💾 Image saved:', selectedElement.elementId, imageUrl);
+            }
         }
         setShowImageUploader(false);
         setSelectedElement(null);

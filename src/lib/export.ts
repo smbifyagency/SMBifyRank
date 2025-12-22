@@ -389,6 +389,10 @@ export function getPagePreviewHtml(website: Website, page: Page): string {
 export function getEditablePagePreviewHtml(website: Website, page: Page): string {
     const baseHtml = renderPage(website, page);
 
+    // Get custom content and images for restoration
+    const customContent = ((website as unknown) as Record<string, unknown>).customContent || {};
+    const customImages = ((website as unknown) as Record<string, unknown>).customImages || {};
+
     // Inject editor styles and scripts before closing </body>
     const editorStyles = `
 <style>
@@ -608,6 +612,10 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
 
     const editorScript = `
 <script>
+// Saved custom content and images from localStorage
+var savedCustomContent = ${JSON.stringify(customContent)};
+var savedCustomImages = ${JSON.stringify(customImages)};
+
 (function() {
     // Create floating toolbar
     function createToolbar() {
@@ -821,44 +829,67 @@ export function getEditablePagePreviewHtml(website: Website, page: Page): string
         toolbar.classList.remove('visible');
     }
     
-    // Add data-editable attributes to editable elements
+    // Add data-editable attributes to editable elements and restore saved content
     function initEditableElements() {
         // Headings
         document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((el, i) => {
+            const editId = 'heading-' + i;
             el.setAttribute('data-editable', 'true');
             el.setAttribute('data-edit-type', 'heading');
-            el.setAttribute('data-edit-id', 'heading-' + i);
+            el.setAttribute('data-edit-id', editId);
             el.classList.add('edit-overlay');
             el.setAttribute('data-edit-label', el.tagName);
+            // Restore saved content if available
+            if (savedCustomContent[editId]) {
+                el.innerHTML = savedCustomContent[editId];
+            }
         });
         
         // Paragraphs
         document.querySelectorAll('p').forEach((el, i) => {
             if (el.textContent.trim().length > 0) {
+                const editId = 'text-' + i;
                 el.setAttribute('data-editable', 'true');
                 el.setAttribute('data-edit-type', 'text');
-                el.setAttribute('data-edit-id', 'text-' + i);
+                el.setAttribute('data-edit-id', editId);
                 el.classList.add('edit-overlay');
                 el.setAttribute('data-edit-label', 'Text');
+                // Restore saved content if available
+                if (savedCustomContent[editId]) {
+                    el.innerHTML = savedCustomContent[editId];
+                }
             }
         });
         
         // Images
         document.querySelectorAll('img').forEach((el, i) => {
+            const editId = 'image-' + i;
             el.setAttribute('data-editable', 'true');
             el.setAttribute('data-edit-type', 'image');
-            el.setAttribute('data-edit-id', 'image-' + i);
+            el.setAttribute('data-edit-id', editId);
             el.classList.add('edit-overlay');
             el.setAttribute('data-edit-label', 'Image');
+            // Restore saved image if available
+            if (savedCustomImages[editId]) {
+                el.setAttribute('src', savedCustomImages[editId].src);
+                if (savedCustomImages[editId].alt) {
+                    el.setAttribute('alt', savedCustomImages[editId].alt);
+                }
+            }
         });
         
         // Buttons and links
         document.querySelectorAll('a.btn, button, .hero-cta a').forEach((el, i) => {
+            const editId = 'button-' + i;
             el.setAttribute('data-editable', 'true');
             el.setAttribute('data-edit-type', 'button');
-            el.setAttribute('data-edit-id', 'button-' + i);
+            el.setAttribute('data-edit-id', editId);
             el.classList.add('edit-overlay');
             el.setAttribute('data-edit-label', 'Button');
+            // Restore saved content if available
+            if (savedCustomContent[editId]) {
+                el.innerHTML = savedCustomContent[editId];
+            }
         });
         
         // Video iframes (YouTube, Vimeo, etc)
