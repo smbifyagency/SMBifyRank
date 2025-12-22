@@ -1,6 +1,7 @@
 // Rich Home Page Content Generator - Lead Generation Focus
 // Generates 2000+ words of SEO-optimized content with strong phone CTAs
 
+import { getIndustryImages, getServiceImage } from '../industryImages';
 interface BusinessInfo {
     name: string;
     industry: string;
@@ -23,6 +24,9 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
     const { name, industry, city, phone, services, locations, customFields } = info;
     const industryKeywords = getIndustryKeywords(industry);
     const phoneClean = phone.replace(/[^0-9+]/g, '');
+
+    // Get industry-specific images
+    const industryImages = getIndustryImages(industry);
 
     // Use custom fields if they exist, otherwise use defaults
     const heroHeadline = customFields?.heroHeadline || `${capitalizeFirst(industry)} Services in ${city}`;
@@ -76,12 +80,12 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
         <div class="container">
             <div class="hero-image-wrapper">
                 <img 
-                    src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&h=600&fit=crop" 
+                    src="${industryImages.hero}" 
                     alt="${capitalizeFirst(industry)} services in ${city} - ${name} professional team"
                     class="hero-main-image"
                     loading="eager"
                 />
-                <div class="image-caption">${name} - Professional ${capitalizeFirst(industry)} Services in ${city}</div>
+                <div class="image-caption">${name} - Professional ${capitalizeFirst(industry)} Services in ${city}</div></div>
             </div>
         </div>
     </section>
@@ -104,7 +108,7 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
                 <div class="service-card-pro" data-delay="${i * 100}">
                     <div class="service-card-image">
                         <img 
-                            src="https://picsum.photos/seed/${s.slug}/400/250" 
+                            src="${getServiceImage(industry, i)}" 
                             alt="${s.name} services in ${city}"
                             loading="lazy"
                         />
@@ -357,7 +361,7 @@ export function generateRichHomepageContent(info: BusinessInfo): string {
             <div class="about-grid-with-image">
                 <div class="about-image-col">
                     <img 
-                        src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=400&fit=crop" 
+                        src="${industryImages.about}" 
                         alt="${name} team providing ${industry.toLowerCase()} services in ${city}"
                         class="about-section-image"
                         loading="lazy"
