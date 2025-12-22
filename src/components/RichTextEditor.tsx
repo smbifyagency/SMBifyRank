@@ -113,37 +113,51 @@ export default function RichTextEditor({
         const text = linkText.trim() || linkUrl;
         const url = linkUrl.startsWith('http') ? linkUrl : `https://${linkUrl}`;
 
-        // Focus the editor first to allow execCommand to work
+        // Focus the editor first
         if (editorRef.current) {
             editorRef.current.focus();
         }
 
-        // Restore the saved selection
+        // Use direct DOM manipulation instead of deprecated execCommand
+        const selection = window.getSelection();
+
+        // Restore the saved selection if available
         if (savedSelectionRef.current) {
-            const selection = window.getSelection();
             selection?.removeAllRanges();
             selection?.addRange(savedSelectionRef.current);
         }
 
-        // Check if there's selected text to wrap
-        const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            if (range.toString()) {
-                // Wrap selected text with link
-                document.execCommand('createLink', false, url);
-                // Find the newly created link and add target="_blank"
-                const links = editorRef.current?.querySelectorAll('a');
-                links?.forEach(link => {
-                    if (link.getAttribute('href') === url && !link.hasAttribute('target')) {
-                        link.setAttribute('target', '_blank');
-                        link.setAttribute('rel', 'noopener noreferrer');
-                    }
-                });
+
+            // Create the link element
+            const linkElement = document.createElement('a');
+            linkElement.href = url;
+            linkElement.target = '_blank';
+            linkElement.rel = 'noopener noreferrer';
+
+            if (range.toString().length > 0) {
+                // There's selected text - wrap it with the link
+                try {
+                    range.surroundContents(linkElement);
+                } catch {
+                    // If surroundContents fails (e.g., selection crosses element boundaries),
+                    // fall back to extracting and inserting
+                    const contents = range.extractContents();
+                    linkElement.appendChild(contents);
+                    range.insertNode(linkElement);
+                }
             } else {
-                // Insert new link with text at cursor position
-                const link = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-                document.execCommand('insertHTML', false, link);
+                // No selection - insert new link with text
+                linkElement.textContent = text;
+                range.deleteContents();
+                range.insertNode(linkElement);
+
+                // Move cursor after the link
+                range.setStartAfter(linkElement);
+                range.setEndAfter(linkElement);
+                selection.removeAllRanges();
+                selection.addRange(range);
             }
         }
 

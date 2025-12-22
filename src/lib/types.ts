@@ -40,6 +40,8 @@ export interface Website {
     };
     // Custom content overrides from editing (rich content fields)
     customContent?: Record<string, string>;
+    // Custom image overrides from editing
+    customImages?: Record<string, { src: string; alt: string }>;
 }
 
 export interface Service {
