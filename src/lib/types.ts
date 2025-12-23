@@ -93,12 +93,183 @@ export type PageType =
     | 'locations'
     | 'custom';
 
-export interface PageSection {
-    id: string;
-    type: SectionType;
-    content: Record<string, unknown>;
-    order: number;
+// ==========================================
+// SECTION CONTENT SCHEMAS (JSON-first architecture)
+// Each section type has a defined structure
+// ==========================================
+
+export interface HeroSectionContent {
+    headline: string;
+    subheadline: string;
+    ctaPrimary?: { text: string; link: string };
+    ctaSecondary?: { text: string; link: string };
+    backgroundImage?: string;
+    showPhone?: boolean;
 }
+
+export interface ServicesSectionContent {
+    title: string;
+    subtitle?: string;
+    services: Array<{
+        id: string;
+        name: string;
+        description: string;
+        icon?: string;
+        link?: string;
+    }>;
+}
+
+export interface AboutSectionContent {
+    title: string;
+    body: string; // HTML/Markdown content
+    image?: string;
+    features?: Array<{ icon: string; text: string }>;
+}
+
+export interface ContactSectionContent {
+    title: string;
+    subtitle?: string;
+    phone?: string;
+    email?: string;
+    address?: {
+        street: string;
+        city: string;
+        state: string;
+        zip: string;
+    };
+    showMap?: boolean;
+    formFields?: Array<{
+        name: string;
+        type: 'text' | 'email' | 'phone' | 'textarea' | 'select';
+        label: string;
+        required?: boolean;
+        options?: string[];
+    }>;
+}
+
+export interface CTASectionContent {
+    headline: string;
+    subheadline?: string;
+    buttonText: string;
+    buttonLink: string;
+    variant?: 'primary' | 'secondary' | 'accent';
+}
+
+export interface TestimonialsSectionContent {
+    title: string;
+    subtitle?: string;
+    testimonials: Array<{
+        id: string;
+        name: string;
+        company?: string;
+        quote: string;
+        rating?: number;
+        image?: string;
+    }>;
+}
+
+export interface LocationsSectionContent {
+    title: string;
+    subtitle?: string;
+    locations: Array<{
+        id: string;
+        city: string;
+        state?: string;
+        description?: string;
+        link?: string;
+    }>;
+}
+
+export interface GallerySectionContent {
+    title?: string;
+    columns?: 2 | 3 | 4;
+    images: Array<{
+        id: string;
+        src: string;
+        alt: string;
+        caption?: string;
+    }>;
+}
+
+export interface FAQSectionContent {
+    title: string;
+    subtitle?: string;
+    faqs: Array<{
+        id: string;
+        question: string;
+        answer: string;
+    }>;
+}
+
+export interface FeaturesSectionContent {
+    title: string;
+    subtitle?: string;
+    features: Array<{
+        id: string;
+        icon?: string;
+        title: string;
+        description: string;
+    }>;
+    layout?: 'grid' | 'list';
+}
+
+export interface TrustBadgesSectionContent {
+    title?: string;
+    badges: Array<{
+        id: string;
+        name: string;
+        image?: string;
+        icon?: string;
+    }>;
+}
+
+export interface BlogListSectionContent {
+    title: string;
+    subtitle?: string;
+    postsToShow?: number;
+    showExcerpt?: boolean;
+}
+
+export interface TextBlockSectionContent {
+    content: string; // Rich text/HTML
+    alignment?: 'left' | 'center' | 'right';
+}
+
+export interface ImageSectionContent {
+    src: string;
+    alt: string;
+    caption?: string;
+    fullWidth?: boolean;
+}
+
+export interface VideoSectionContent {
+    url: string; // YouTube, Vimeo, or direct video URL
+    title?: string;
+    autoplay?: boolean;
+}
+
+export interface CustomContentSectionContent {
+    html: string; // Raw HTML for custom sections
+}
+
+// Union type for all section content types
+export type SectionContent =
+    | HeroSectionContent
+    | ServicesSectionContent
+    | AboutSectionContent
+    | ContactSectionContent
+    | CTASectionContent
+    | TestimonialsSectionContent
+    | LocationsSectionContent
+    | GallerySectionContent
+    | FAQSectionContent
+    | FeaturesSectionContent
+    | TrustBadgesSectionContent
+    | BlogListSectionContent
+    | TextBlockSectionContent
+    | ImageSectionContent
+    | VideoSectionContent
+    | CustomContentSectionContent;
 
 export type SectionType =
     | 'hero'
@@ -117,6 +288,18 @@ export type SectionType =
     | 'video'
     | 'text-block'
     | 'features';
+
+// Updated PageSection with typed content and edit tracking
+export interface PageSection {
+    id: string;
+    type: SectionType;
+    content: SectionContent | Record<string, unknown>; // Support both typed and legacy
+    order: number;
+    // Edit tracking - prevents AI from overwriting user changes
+    userEdited?: boolean;
+    lastEditedAt?: string;
+    lastEditedBy?: 'user' | 'ai' | 'system';
+}
 
 export interface PageSEO {
     title: string;
