@@ -245,3 +245,85 @@
     background: var(--bg-tertiary);
     border-color: var(--accent-primary);
 }
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+   ======================================== */
+:global([data-theme="light"]) .nav {
+    background: rgba(255, 255, 255, 0.95);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="light"]) .logo {
+    color: #0f172a;
+}
+
+:global([data-theme="light"]) .link {
+    color: #475569;
+}
+
+:global([data-theme="light"]) .link:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+
+:global([data-theme="light"]) .link.active {
+    color: #16a34a;
+}
+
+:global([data-theme="light"]) .createBtn {
+    color: #ffffff;
+}
+
+:global([data-theme="light"]) .guestAvatar {
+    background: #f1f5f9;
+}
+
+:global([data-theme="light"]) .userDropdownInner {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+}
+
+:global([data-theme="light"]) .userName {
+    color: #0f172a;
+}
+
+:global([data-theme="light"]) .userEmail {
+    color: #64748b;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="light"]) .dropdownLinks {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="light"]) .dropdownLink {
+    color: #475569;
+}
+
+:global([data-theme="light"]) .dropdownLink:hover {
+    background: #f8fafc;
+    color: #16a34a;
+}
+
+:global([data-theme="light"]) .signOutBtn {
+    color: #475569;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:global([data-theme="light"]) .signOutBtn:hover {
+    background: #fef2f2;
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+:global([data-theme="light"]) .loginBtn {
+    color: #0f172a;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:global([data-theme="light"]) .loginBtn:hover {
+    background: #f8fafc;
+    border-color: #16a34a;
+}

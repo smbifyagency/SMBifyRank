@@ -1035,225 +1035,180 @@
 }
 
 /* ========================================
-   LIGHT MODE OVERRIDES
+   LIGHT MODE OVERRIDES (data-theme only)
    ======================================== */
-@media (prefers-color-scheme: light) {
-  .page::before {
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(22, 163, 74, 0.1), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.05), transparent),
-      radial-gradient(ellipse 50% 30% at 0% 100%, rgba(34, 211, 238, 0.05), transparent);
-  }
 
-  .heroContent h1 {
-    background: linear-gradient(135deg, #0f172a 0%, #334155 50%, var(--accent-primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .heroBadge {
-    background: rgba(22, 163, 74, 0.1);
-    border: 1px solid rgba(22, 163, 74, 0.2);
-  }
-
-  .mockupWindow {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-  }
-
-  .mockupHeader {
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .mockupNav,
-  .mockupCards div {
-    background: var(--bg-tertiary);
-    border-color: var(--border-color);
-  }
-
-  .mockupHero {
-    background: linear-gradient(135deg, var(--accent-primary), rgba(22, 163, 74, 0.5));
-  }
-
-  .stat {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-  }
-
-  .statNumber {
-    background: linear-gradient(135deg, var(--accent-primary), #15803d);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .step,
-  .featureCard,
-  .pricingCard {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-  }
-
-  .step:hover,
-  .featureCard:hover {
-    border-color: var(--accent-primary);
-    box-shadow: 0 20px 40px -15px rgba(22, 163, 74, 0.15);
-  }
-
-  .pricingPopular {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 40px -15px rgba(22, 163, 74, 0.3);
-  }
-
-  .priceAmount {
-    background: linear-gradient(135deg, #0f172a, var(--accent-primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .primaryBtn {
-    color: #fff;
-    box-shadow: 0 4px 20px -5px rgba(22, 163, 74, 0.4);
-  }
-
-  .primaryBtn:hover {
-    box-shadow: 0 8px 30px -5px rgba(22, 163, 74, 0.5);
-  }
-
-  .secondaryBtn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-  }
-
-  .secondaryBtn:hover {
-    background: var(--bg-secondary);
-    border-color: var(--accent-primary);
-  }
-
-  .pricingBtn {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-  }
-
-  .pricingBtn:hover {
-    background: var(--bg-tertiary);
-    border-color: var(--accent-primary);
-  }
-
-  .ctaContent {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-  }
-
-  .ctaContent h2 {
-    background: linear-gradient(135deg, #0f172a, var(--accent-primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .howItWorks h2,
-  .features h2,
-  .pricing h2 {
-    background: linear-gradient(135deg, #0f172a, #475569);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .footer {
-    background: #f1f5f9;
-    border-top: 1px solid var(--border-color);
-  }
-
-  .footerBottom {
-    border-top: 1px solid var(--border-color);
-  }
-
-  .sectionBadge {
-    background: rgba(22, 163, 74, 0.1);
-    border: 1px solid rgba(22, 163, 74, 0.2);
-  }
-
-  .stepNumber {
-    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
-  }
-
-  .popularBadge {
-    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
-  }
-
-  .lifetimeBadge {
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-  }
-}
-
-/* Data theme attribute support */
-[data-theme="light"] .page::before {
+/* Background gradient */
+:global([data-theme="light"]) .page::before {
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(22, 163, 74, 0.1), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.05), transparent),
-    radial-gradient(ellipse 50% 30% at 0% 100%, rgba(34, 211, 238, 0.05), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(22, 163, 74, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.04), transparent),
+    radial-gradient(ellipse 50% 30% at 0% 100%, rgba(34, 211, 238, 0.04), transparent);
 }
 
-[data-theme="light"] .heroContent h1 {
-  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, var(--accent-primary) 100%);
+/* Hero section */
+:global([data-theme="light"]) .heroContent h1 {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #16a34a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-[data-theme="light"] .heroBadge,
-[data-theme="light"] .sectionBadge {
+:global([data-theme="light"]) .heroBadge {
   background: rgba(22, 163, 74, 0.1);
   border: 1px solid rgba(22, 163, 74, 0.2);
+  color: #16a34a;
 }
 
-[data-theme="light"] .mockupWindow {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+/* Stats */
+:global([data-theme="light"]) .stat {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="light"]) .statNumber {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mockup window */
+:global([data-theme="light"]) .mockupWindow {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
-[data-theme="light"] .stat {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+:global([data-theme="light"]) .mockupHeader {
+  background: #f1f5f9;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="light"] .statNumber,
-[data-theme="light"] .priceAmount {
-  background: linear-gradient(135deg, var(--accent-primary), #15803d);
+:global([data-theme="light"]) .mockupNav,
+:global([data-theme="light"]) .mockupCards div {
+  background: #e2e8f0;
+}
+
+:global([data-theme="light"]) .mockupHero {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+/* Section headings */
+:global([data-theme="light"]) .howItWorks h2,
+:global([data-theme="light"]) .features h2,
+:global([data-theme="light"]) .pricing h2 {
+  background: linear-gradient(135deg, #0f172a, #334155);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-[data-theme="light"] .step,
-[data-theme="light"] .featureCard,
-[data-theme="light"] .pricingCard,
-[data-theme="light"] .ctaContent {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+:global([data-theme="light"]) .sectionBadge {
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  color: #16a34a;
 }
 
-[data-theme="light"] .primaryBtn {
-  color: #fff;
+/* Cards */
+:global([data-theme="light"]) .step,
+:global([data-theme="light"]) .featureCard,
+:global([data-theme="light"]) .pricingCard {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="light"] .secondaryBtn,
-[data-theme="light"] .pricingBtn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
+:global([data-theme="light"]) .step:hover,
+:global([data-theme="light"]) .featureCard:hover {
+  border-color: #16a34a;
+  box-shadow: 0 20px 40px -15px rgba(22, 163, 74, 0.12);
 }
 
-[data-theme="light"] .footer {
+:global([data-theme="light"]) .stepNumber {
+  box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+}
+
+/* Pricing */
+:global([data-theme="light"]) .pricingPopular {
+  border-color: #16a34a;
+  box-shadow: 0 0 40px -15px rgba(22, 163, 74, 0.2);
+}
+
+:global([data-theme="light"]) .priceAmount {
+  background: linear-gradient(135deg, #0f172a, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+:global([data-theme="light"]) .pricingHeader {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="light"]) .popularBadge {
+  box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+}
+
+:global([data-theme="light"]) .lifetimeBadge {
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Buttons */
+:global([data-theme="light"]) .primaryBtn {
+  color: #ffffff;
+  box-shadow: 0 4px 20px -5px rgba(22, 163, 74, 0.4);
+}
+
+:global([data-theme="light"]) .primaryBtn:hover {
+  box-shadow: 0 8px 30px -5px rgba(22, 163, 74, 0.5);
+}
+
+:global([data-theme="light"]) .secondaryBtn {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+:global([data-theme="light"]) .secondaryBtn:hover {
+  background: #f8fafc;
+  border-color: #16a34a;
+}
+
+:global([data-theme="light"]) .pricingBtn {
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+:global([data-theme="light"]) .pricingBtn:hover {
   background: #f1f5f9;
+  border-color: #16a34a;
+}
+
+:global([data-theme="light"]) .pricingBtnPrimary {
+  color: #ffffff;
+}
+
+/* CTA Section */
+:global([data-theme="light"]) .ctaContent {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+:global([data-theme="light"]) .ctaContent h2 {
+  background: linear-gradient(135deg, #0f172a, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Footer */
+:global([data-theme="light"]) .footer {
+  background: #f1f5f9;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-theme="light"]) .footerBottom {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
