@@ -1030,6 +1030,230 @@
 }
 
 .footerBottom a:hover {
-  color: #d4ff00;
+  color: var(--accent-primary-hover);
   text-decoration: underline;
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+   ======================================== */
+@media (prefers-color-scheme: light) {
+  .page::before {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(22, 163, 74, 0.1), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.05), transparent),
+      radial-gradient(ellipse 50% 30% at 0% 100%, rgba(34, 211, 238, 0.05), transparent);
+  }
+
+  .heroContent h1 {
+    background: linear-gradient(135deg, #0f172a 0%, #334155 50%, var(--accent-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .heroBadge {
+    background: rgba(22, 163, 74, 0.1);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+  }
+
+  .mockupWindow {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  }
+
+  .mockupHeader {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .mockupNav,
+  .mockupCards div {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+  }
+
+  .mockupHero {
+    background: linear-gradient(135deg, var(--accent-primary), rgba(22, 163, 74, 0.5));
+  }
+
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+
+  .statNumber {
+    background: linear-gradient(135deg, var(--accent-primary), #15803d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .step,
+  .featureCard,
+  .pricingCard {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+
+  .step:hover,
+  .featureCard:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 20px 40px -15px rgba(22, 163, 74, 0.15);
+  }
+
+  .pricingPopular {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 40px -15px rgba(22, 163, 74, 0.3);
+  }
+
+  .priceAmount {
+    background: linear-gradient(135deg, #0f172a, var(--accent-primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .primaryBtn {
+    color: #fff;
+    box-shadow: 0 4px 20px -5px rgba(22, 163, 74, 0.4);
+  }
+
+  .primaryBtn:hover {
+    box-shadow: 0 8px 30px -5px rgba(22, 163, 74, 0.5);
+  }
+
+  .secondaryBtn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .secondaryBtn:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-primary);
+  }
+
+  .pricingBtn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  .pricingBtn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-primary);
+  }
+
+  .ctaContent {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  }
+
+  .ctaContent h2 {
+    background: linear-gradient(135deg, #0f172a, var(--accent-primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .howItWorks h2,
+  .features h2,
+  .pricing h2 {
+    background: linear-gradient(135deg, #0f172a, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .footer {
+    background: #f1f5f9;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .footerBottom {
+    border-top: 1px solid var(--border-color);
+  }
+
+  .sectionBadge {
+    background: rgba(22, 163, 74, 0.1);
+    border: 1px solid rgba(22, 163, 74, 0.2);
+  }
+
+  .stepNumber {
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+  }
+
+  .popularBadge {
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+  }
+
+  .lifetimeBadge {
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  }
+}
+
+/* Data theme attribute support */
+[data-theme="light"] .page::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(22, 163, 74, 0.1), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(99, 102, 241, 0.05), transparent),
+    radial-gradient(ellipse 50% 30% at 0% 100%, rgba(34, 211, 238, 0.05), transparent);
+}
+
+[data-theme="light"] .heroContent h1 {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, var(--accent-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .heroBadge,
+[data-theme="light"] .sectionBadge {
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+[data-theme="light"] .mockupWindow {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .statNumber,
+[data-theme="light"] .priceAmount {
+  background: linear-gradient(135deg, var(--accent-primary), #15803d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .step,
+[data-theme="light"] .featureCard,
+[data-theme="light"] .pricingCard,
+[data-theme="light"] .ctaContent {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="light"] .primaryBtn {
+  color: #fff;
+}
+
+[data-theme="light"] .secondaryBtn,
+[data-theme="light"] .pricingBtn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .footer {
+  background: #f1f5f9;
 }
