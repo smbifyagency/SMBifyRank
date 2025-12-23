@@ -26,7 +26,7 @@ export default function Footer() {
                     <div className={styles.brand}>
                         <Link href="/" className={styles.logo}>
                             <Image
-                                src="/logo-dark.png"
+                                src={resolvedTheme === 'light' ? '/logo-light.png' : '/logo-dark.png'}
                                 alt="SMBify Rank"
                                 width={140}
                                 height={32}
@@ -63,6 +63,7 @@ export default function Footer() {
                             <Link href="/how-it-works">How It Works</Link>
                             <Link href="/pricing">Pricing</Link>
                             <Link href="/app">Dashboard</Link>
+                            <Link href="/changelog">Changelog</Link>
                         </div>
 
                         {/* Company */}
@@ -96,6 +97,9 @@ export default function Footer() {
                 <div className={styles.bottom}>
                     <p className={styles.copyright}>
                         © {currentYear} SMBify Rank. All rights reserved.
+                    </p>
+                    <p className={styles.version}>
+                        <Link href="/changelog">v2.0.0 • Build 3174a82</Link>
                     </p>
                     <p className={styles.agency}>
                         A product of <a href="https://www.smbify.agency" target="_blank" rel="noopener noreferrer">SMBify Agency</a>
