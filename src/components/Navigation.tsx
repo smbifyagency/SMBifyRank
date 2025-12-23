@@ -41,7 +41,7 @@ export default function Navigation() {
                 <div className={styles.container}>
                     <Link href="/" className={styles.logo}>
                         <Image
-                            src="/logo-dark.png"
+                            src={resolvedTheme === 'light' ? '/logo-light.png' : '/logo-dark.png'}
                             alt="SMBify Rank"
                             width={140}
                             height={32}
@@ -90,7 +90,7 @@ export default function Navigation() {
                 <div className={styles.container}>
                     <Link href="/" className={styles.logo}>
                         <Image
-                            src="/logo-dark.png"
+                            src={resolvedTheme === 'light' ? '/logo-light.png' : '/logo-dark.png'}
                             alt="SMBify Rank"
                             width={140}
                             height={32}
@@ -142,7 +142,7 @@ export default function Navigation() {
             <div className={styles.container}>
                 <Link href="/" className={styles.logo}>
                     <Image
-                        src="/logo-dark.png"
+                        src={resolvedTheme === 'light' ? '/logo-light.png' : '/logo-dark.png'}
                         alt="SMBify Rank"
                         width={140}
                         height={32}
