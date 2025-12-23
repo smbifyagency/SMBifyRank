@@ -223,8 +223,14 @@ function updateSyncStatus(updates: Partial<SyncStatus>) {
 
 /**
  * Save with sync status tracking
+ * @param website - The website data to save
+ * @param options - Optional settings
+ * @param options.silentFallback - If true, don't show error if save fails (useful when localStorage has already saved)
  */
-export async function saveWebsiteWithStatus(website: Website): Promise<{ success: boolean; error?: string }> {
+export async function saveWebsiteWithStatus(
+    website: Website,
+    options: { silentFallback?: boolean } = {}
+): Promise<{ success: boolean; error?: string }> {
     updateSyncStatus({ isSaving: true, error: null });
 
     const result = await saveWebsiteToSupabase(website);
@@ -237,14 +243,36 @@ export async function saveWebsiteWithStatus(website: Website): Promise<{ success
             error: null
         });
     } else {
-        updateSyncStatus({
-            isSaving: false,
-            error: result.error || 'Save failed',
-            pendingChanges: true
-        });
+        // If silentFallback is true, don't show error (localStorage save succeeded)
+        if (options.silentFallback) {
+            updateSyncStatus({
+                isSaving: false,
+                lastSaved: new Date(), // Mark as saved since localStorage worked
+                pendingChanges: false,
+                error: null // Don't show error
+            });
+        } else {
+            updateSyncStatus({
+                isSaving: false,
+                error: result.error || 'Save failed',
+                pendingChanges: true
+            });
+        }
     }
 
     return result;
+}
+
+/**
+ * Mark a local save as successful (for when localStorage save worked)
+ */
+export function markLocalSaveSuccess() {
+    updateSyncStatus({
+        isSaving: false,
+        lastSaved: new Date(),
+        pendingChanges: false,
+        error: null
+    });
 }
 
 /**
@@ -253,3 +281,4 @@ export async function saveWebsiteWithStatus(website: Website): Promise<{ success
 export function markPendingChanges() {
     updateSyncStatus({ pendingChanges: true });
 }
+

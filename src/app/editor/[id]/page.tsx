@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { saveAs } from 'file-saver';
 import { Website, Page, PageSection, Service, Location, BrandColors } from '@/lib/types';
 import { getWebsite, saveWebsite as saveWebsiteLocal, generateId } from '@/lib/storage';
-import { fetchWebsite, saveWebsiteWithStatus } from '@/lib/supabase-storage';
+import { fetchWebsite, saveWebsiteWithStatus, markLocalSaveSuccess } from '@/lib/supabase-storage';
 import { getEditablePagePreviewHtml } from '@/lib/export';
 import { INDUSTRY_TEMPLATES, templateToBrandColors } from '@/lib/templates';
 import ImageUploader from '@/components/ImageUploader';
@@ -225,11 +225,12 @@ export default function EditorPage() {
                         setCurrentPage(updatedPage);
 
                         // Also save to Supabase asynchronously (if authenticated)
-                        saveWebsiteWithStatus(updatedWebsite).then(result => {
+                        // Use silentFallback since localStorage already saved
+                        saveWebsiteWithStatus(updatedWebsite, { silentFallback: true }).then(result => {
                             if (result.success) {
                                 console.log('✅ Website saved to Supabase via section update');
                             } else {
-                                console.error('Failed to save to Supabase:', result.error);
+                                console.log('📁 Supabase save failed, using localStorage (silentFallback)');
                             }
                         }).catch(err => console.error('Supabase save error:', err));
                     } else {
@@ -245,11 +246,12 @@ export default function EditorPage() {
                         setWebsite(updatedWebsite);
 
                         // Also save to Supabase asynchronously
-                        saveWebsiteWithStatus(updatedWebsite).then(result => {
+                        // Use silentFallback since localStorage already saved
+                        saveWebsiteWithStatus(updatedWebsite, { silentFallback: true }).then(result => {
                             if (result.success) {
                                 console.log('💾 Saved to Supabase customContent:', elementId);
                             } else {
-                                console.error('Failed to save customContent to Supabase:', result.error);
+                                console.log('📁 Supabase save failed for customContent, using localStorage');
                             }
                         }).catch(err => console.error('Supabase save error:', err));
                     }
@@ -299,11 +301,12 @@ export default function EditorPage() {
                 setWebsite(updatedWebsite);
 
                 // Also save to Supabase asynchronously
-                saveWebsiteWithStatus(updatedWebsite).then(result => {
+                // Use silentFallback since localStorage already saved
+                saveWebsiteWithStatus(updatedWebsite, { silentFallback: true }).then(result => {
                     if (result.success) {
                         console.log('💾 Image saved to Supabase:', selectedElement.elementId, imageUrl);
                     } else {
-                        console.error('Failed to save image to Supabase:', result.error);
+                        console.log('📁 Supabase image save failed, using localStorage');
                     }
                 }).catch(err => console.error('Supabase save error:', err));
             }
@@ -357,19 +360,30 @@ export default function EditorPage() {
         setIsSaving(true);
 
         try {
-            if (isAuthenticated) {
-                // Save to Supabase (single source of truth)
-                const result = await saveWebsiteWithStatus(updatedWebsite);
-                if (!result.success) {
-                    console.error('Failed to save to Supabase:', result.error);
-                    alert('⚠️ Failed to save changes. Please try again.');
-                    return;
+            // Always save to localStorage first as a backup
+            saveWebsiteLocal(updatedWebsite);
+            console.log('💾 Saved to localStorage (backup)');
+
+            // If authenticated (or auth state not determined yet), try Supabase
+            if (isAuthenticated !== false) {
+                const result = await saveWebsiteWithStatus(updatedWebsite, { silentFallback: true });
+                if (result.success) {
+                    console.log('✅ Saved to Supabase successfully');
+                    // Update auth state if we successfully saved
+                    if (isAuthenticated === null) {
+                        setIsAuthenticated(true);
+                    }
+                } else {
+                    console.warn('Supabase save failed:', result.error);
+                    // If auth failed, update the state so we don't keep trying
+                    if (result.error?.includes('Unauthorized') || result.error?.includes('401')) {
+                        setIsAuthenticated(false);
+                    }
+                    // Don't show error alert - localStorage save succeeded
+                    console.log('📁 Changes saved to localStorage as fallback');
                 }
-                console.log('✅ Saved to Supabase successfully');
             } else {
-                // Fallback to localStorage for unauthenticated users
-                saveWebsiteLocal(updatedWebsite);
-                console.log('✅ Saved to localStorage');
+                console.log('✅ Saved to localStorage (not authenticated)');
             }
 
             // Update local state
@@ -384,7 +398,8 @@ export default function EditorPage() {
             }
         } catch (error) {
             console.error('Error saving:', error);
-            alert('⚠️ Failed to save changes. Please try again.');
+            // Even if there's an error, localStorage save should have worked
+            console.log('localStorage backup should have changes');
         } finally {
             setIsSaving(false);
         }

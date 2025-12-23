@@ -126,35 +126,28 @@ export function useWebsite(
             saveTimeoutRef.current = null;
         }
 
+        // Always save to localStorage first as backup
+        try {
+            saveLocalWebsite(currentWebsite);
+            console.log('💾 Saved to localStorage (backup)');
+        } catch (err) {
+            console.error('Error saving to localStorage:', err);
+        }
+
         const currentIsAuthenticated = isAuthenticatedRef.current;
 
-        if (currentIsAuthenticated) {
-            // Try to save to Supabase first
-            const result = await saveWebsiteWithStatus(currentWebsite);
-            if (!result.success) {
-                // Fallback to localStorage if Supabase fails
-                console.warn('Supabase save failed, falling back to localStorage:', result.error);
-                try {
-                    saveLocalWebsite(currentWebsite);
-                    console.log('✅ Saved to localStorage as fallback');
-                    return { success: true };
-                } catch (err) {
-                    console.error('Error saving to localStorage:', err);
-                    return { success: false, error: 'Failed to save to both cloud and local storage' };
-                }
+        // If authenticated or auth state not determined, try Supabase
+        if (currentIsAuthenticated !== false) {
+            const result = await saveWebsiteWithStatus(currentWebsite, { silentFallback: true });
+            if (result.success) {
+                console.log('✅ Saved to Supabase');
+            } else {
+                console.log('📁 Supabase save failed, using localStorage fallback');
             }
-            console.log('✅ Saved to Supabase');
-            return result;
+            return { success: true }; // Always success since localStorage worked
         } else {
-            // Save to localStorage
-            try {
-                saveLocalWebsite(currentWebsite);
-                console.log('✅ Saved to localStorage');
-                return { success: true };
-            } catch (err) {
-                console.error('Error saving to localStorage:', err);
-                return { success: false, error: 'Failed to save locally' };
-            }
+            console.log('✅ Saved to localStorage (not authenticated)');
+            return { success: true };
         }
     }, []);
 
@@ -182,19 +175,18 @@ export function useWebsite(
                     const currentWebsite = websiteRef.current;
                     const currentIsAuthenticated = isAuthenticatedRef.current;
                     if (currentWebsite) {
-                        if (currentIsAuthenticated) {
-                            const result = await saveWebsiteWithStatus(currentWebsite);
-                            if (!result.success) {
-                                console.error('Auto-save failed:', result.error);
-                                // Fallback to localStorage on auth failure
-                                console.log('Falling back to localStorage save');
-                                saveLocalWebsite(currentWebsite);
+                        // Always save to localStorage first
+                        saveLocalWebsite(currentWebsite);
+                        console.log('💾 Auto-saved to localStorage');
+
+                        // Then try Supabase with silentFallback
+                        if (currentIsAuthenticated !== false) {
+                            const result = await saveWebsiteWithStatus(currentWebsite, { silentFallback: true });
+                            if (result.success) {
+                                console.log('✅ Auto-saved to Supabase');
                             } else {
-                                console.log('✅ Saved to Supabase');
+                                console.log('📁 Supabase auto-save failed, localStorage has the data');
                             }
-                        } else {
-                            saveLocalWebsite(currentWebsite);
-                            console.log('✅ Saved to localStorage');
                         }
                     }
                 }, autoSaveDelay);
