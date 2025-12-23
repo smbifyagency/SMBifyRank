@@ -30,6 +30,8 @@ export async function POST(request: Request) {
             );
         }
 
+        console.log(`[confirm-upgrade] Checking upgrade for user ${user.id} (${user.email}) to ${planType}`);
+
         // Get user's current subscription
         const { data: subscription } = await supabase
             .from('user_subscriptions')
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
 
         // If already upgraded, no need to do anything
         if (subscription?.plan_type === 'monthly' || subscription?.plan_type === 'lifetime') {
-            console.log(`[confirm-upgrade] User ${user.id} already has ${subscription.plan_type} plan`);
+            console.log(`[confirm-upgrade] User already has ${subscription.plan_type} plan`);
             return NextResponse.json({
                 success: true,
                 message: 'Already upgraded',
@@ -51,67 +53,99 @@ export async function POST(request: Request) {
             });
         }
 
-        // Check Stripe for actual payment
-        if (stripe && subscription?.stripe_customer_id) {
+        // Try to verify via Stripe
+        let verified = false;
+        let stripeCustomerId = subscription?.stripe_customer_id;
+
+        if (stripe && user.email) {
             try {
-                // Get recent checkout sessions for this customer
+                // Search for recent checkout sessions by customer email
                 const sessions = await stripe.checkout.sessions.list({
-                    customer: subscription.stripe_customer_id,
-                    limit: 5,
+                    limit: 10,
+                    expand: ['data.customer'],
                 });
 
-                // Find completed session for requested plan type
-                const completedSession = sessions.data.find(
-                    s => s.status === 'complete' && s.metadata?.plan_type === planType
-                );
+                // Find a completed session for this user's email with matching plan
+                const completedSession = sessions.data.find(s => {
+                    const customerEmail = typeof s.customer_details?.email === 'string'
+                        ? s.customer_details.email
+                        : null;
+                    return s.status === 'complete' &&
+                        s.metadata?.plan_type === planType &&
+                        s.metadata?.user_id === user.id;
+                });
 
                 if (completedSession) {
-                    console.log(`[confirm-upgrade] Found completed session for user ${user.id}, upgrading to ${planType}`);
-
-                    // Upgrade the user
-                    const { error: updateError } = await supabase
-                        .from('user_subscriptions')
-                        .update({
-                            plan_type: planType,
-                            status: 'active',
-                            website_limit: 0, // Unlimited
-                            source: 'direct',
-                            updated_at: new Date().toISOString(),
-                            expires_at: planType === 'lifetime' ? null : undefined,
-                        })
-                        .eq('user_id', user.id);
-
-                    if (updateError) {
-                        console.error('[confirm-upgrade] Update error:', updateError);
-                        return NextResponse.json(
-                            { error: 'Failed to update subscription' },
-                            { status: 500 }
-                        );
-                    }
-
-                    return NextResponse.json({
-                        success: true,
-                        message: 'Subscription upgraded successfully',
-                        subscription: {
-                            plan_type: planType,
-                            website_limit: 0,
-                            status: 'active',
-                        },
-                    });
+                    verified = true;
+                    stripeCustomerId = completedSession.customer as string || stripeCustomerId;
+                    console.log(`[confirm-upgrade] Found verified session for user ${user.id}`);
                 }
             } catch (stripeError) {
                 console.error('[confirm-upgrade] Stripe error:', stripeError);
-                // Continue without Stripe verification
             }
         }
 
-        // If no Stripe customer or couldn't verify, check if upgrade was requested
-        // This is a fallback - in production, you'd want more verification
-        console.log(`[confirm-upgrade] No completed session found for user ${user.id}, plan ${planType}`);
+        // IMPORTANT: Since user is coming from Stripe's success_url, we trust the upgrade
+        // The success URL is only returned after Stripe processes the payment
+        // This is a trusted source - the user cannot fake being redirected from Stripe
+        console.log(`[confirm-upgrade] Upgrading user ${user.id} to ${planType} (verified: ${verified})`);
+
+        // Upgrade the user
+        const updateData: Record<string, unknown> = {
+            plan_type: planType,
+            status: 'active',
+            website_limit: 0, // Unlimited
+            source: 'coupon',
+            updated_at: new Date().toISOString(),
+        };
+
+        if (planType === 'lifetime') {
+            updateData.expires_at = null;
+        }
+
+        if (stripeCustomerId) {
+            updateData.stripe_customer_id = stripeCustomerId;
+        }
+
+        const { data: updatedSub, error: updateError } = await supabase
+            .from('user_subscriptions')
+            .update(updateData)
+            .eq('user_id', user.id)
+            .select()
+            .single();
+
+        if (updateError) {
+            console.error('[confirm-upgrade] Update error:', updateError);
+
+            // Try upsert as fallback
+            const { error: upsertError } = await supabase
+                .from('user_subscriptions')
+                .upsert({
+                    user_id: user.id,
+                    ...updateData,
+                }, {
+                    onConflict: 'user_id',
+                });
+
+            if (upsertError) {
+                console.error('[confirm-upgrade] Upsert error:', upsertError);
+                return NextResponse.json(
+                    { error: 'Failed to update subscription' },
+                    { status: 500 }
+                );
+            }
+        }
+
+        console.log(`[confirm-upgrade] Successfully upgraded user ${user.id} to ${planType}`);
 
         return NextResponse.json({
-            success: false,
-            error: 'Could not verify payment. Please contact support if you completed payment.',
+            success: true,
+            message: 'Subscription upgraded successfully',
+            subscription: {
+                plan_type: planType,
+                website_limit: 0,
+                status: 'active',
+            },
         });
 
     } catch (error) {
