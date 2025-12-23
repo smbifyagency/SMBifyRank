@@ -386,22 +386,32 @@ function renderHeroSection(content: HeroSectionContent, website: Website): strin
 
 ## Implementation Order
 
-### Week 1: Foundation
-- [ ] Add section content type definitions to `types.ts`
-- [ ] Create migration to structure existing `customContent` into sections
-- [ ] Add `userEdited` flags to existing sections
+### Phase 1: Foundation ✅ COMPLETE (Dec 24, 2024)
+- [x] Add section content type definitions to `types.ts`
+- [x] Create `sectionHelpers.ts` with type guards and utilities
+- [x] Add `userEdited` flags to PageSection interface
+- [x] Create `sectionRenderer.ts` for pure JSON→HTML rendering
 
-### Week 2: Editor Refactor
-- [ ] Create section editor components
-- [ ] Refactor editor page to use panel-based editing
+### Phase 2: Editor Components ✅ COMPLETE (Dec 24, 2024)
+- [x] Create section editor components (Hero, Services, About, Contact, CTA, Testimonials, FAQ, Features, TextBlock, Generic)
+- [x] Create `SectionEditor.tsx` router component
+- [x] Add section locking UI (🔒 badge, unlock button)
+- [x] Add `SectionEditor.module.css` with premium styling
+
+### Phase 3: AI JSON Generation ✅ COMPLETE (Dec 24, 2024)
+- [x] Create `aiSections.ts` for JSON generation
+- [x] Add section-specific prompts
+- [x] Use OpenAI JSON mode (response_format: json_object)
+- [x] Implement `regenerateSection()` with lock check
+- [x] Add fallback content for no-API scenarios
+
+### Phase 4: Editor Integration (NEXT)
+- [ ] Integrate SectionEditor into main editor page
 - [ ] Make iframe preview read-only
+- [ ] Add "Regenerate with AI" button per section
+- [ ] Connect section updates to auto-save
 
-### Week 3: AI Refactor
-- [ ] Update AI prompts to return JSON schemas
-- [ ] Add section locking logic
-- [ ] Create "Regenerate Section" button with lock check
-
-### Week 4: Polish & Deploy
+### Phase 5: Polish & Deploy
 - [ ] Testing all section types
 - [ ] Migration script for existing websites
 - [ ] Documentation update
