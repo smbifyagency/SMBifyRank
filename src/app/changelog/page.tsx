@@ -6,6 +6,12 @@ import styles from './changelog.module.css';
 // This is populated at build time from git log
 const CHANGELOG_ENTRIES = [
     {
+        hash: '212fea9',
+        date: '2025-12-24 02:27:00 PKT',
+        message: 'Add changelog page to track version history',
+        details: 'New /changelog page, version info in footer, helps verify live deployments'
+    },
+    {
         hash: '3174a82',
         date: '2025-12-24 02:04:36 PKT',
         message: 'Phase 4: Editor Panel Integration',
@@ -129,9 +135,9 @@ const CHANGELOG_ENTRIES = [
 
 // Build info - will be updated on each build
 const BUILD_INFO = {
-    latestCommit: '3174a82',
+    latestCommit: '212fea9',
     buildTime: new Date().toISOString(),
-    version: '2.0.0',
+    version: '2.0.1',
 };
 
 export default function ChangelogPage() {

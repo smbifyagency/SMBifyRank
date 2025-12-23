@@ -99,7 +99,7 @@ export default function Footer() {
                         © {currentYear} SMBify Rank. All rights reserved.
                     </p>
                     <p className={styles.version}>
-                        <Link href="/changelog">v2.0.0 • Build 3174a82</Link>
+                        <Link href="/changelog">v2.0.1 • Build 212fea9</Link>
                     </p>
                     <p className={styles.agency}>
                         A product of <a href="https://www.smbify.agency" target="_blank" rel="noopener noreferrer">SMBify Agency</a>
