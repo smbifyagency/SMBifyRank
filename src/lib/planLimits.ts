@@ -70,7 +70,24 @@ export async function checkCanCreateWebsite(): Promise<PlanCheckResult> {
             };
         }
 
-        // Check if plan has limit
+        // IMPORTANT: Monthly and Lifetime plans ALWAYS have unlimited access
+        // This is a fallback for any existing records where website_limit wasn't updated properly
+        if (subscription.plan_type === 'monthly' || subscription.plan_type === 'lifetime') {
+            // If limit is still set to 1 (legacy issue), fix it in database
+            if (subscription.website_limit === 1) {
+                console.log(`[checkCanCreateWebsite] Fixing legacy limit for user with ${subscription.plan_type} plan`);
+                await supabase
+                    .from('user_subscriptions')
+                    .update({ website_limit: 0 })
+                    .eq('user_id', user.id);
+            }
+            return {
+                canCreate: true,
+                subscription: { ...subscription, website_limit: 0 }, // Return corrected value
+            };
+        }
+
+        // Check if plan has limit (for free users)
         const limit = subscription.website_limit;
 
         // null or 0 = unlimited
@@ -168,10 +185,13 @@ export async function upgradePlan(
     try {
         const supabase = await createServerSupabaseClient();
 
+        console.log(`[upgradePlan] Upgrading user ${userId} to ${planType} (source: ${source})`);
+
         const updateData: Partial<DbUserSubscription> = {
+            user_id: userId,
             plan_type: planType,
             status: 'active',
-            website_limit: 0, // 0 = unlimited
+            website_limit: 0, // 0 = unlimited for paid plans
             source,
             updated_at: new Date().toISOString(),
         };
@@ -189,14 +209,31 @@ export async function upgradePlan(
             updateData.expires_at = null;
         }
 
-        const { error } = await supabase
+        // Use upsert to handle cases where subscription might not exist yet
+        // (e.g., race condition between user creation and payment completion)
+        const { data, error } = await supabase
             .from('user_subscriptions')
-            .update(updateData)
-            .eq('user_id', userId);
+            .upsert(updateData, {
+                onConflict: 'user_id',
+                ignoreDuplicates: false,
+            })
+            .select()
+            .single();
 
-        return !error;
+        if (error) {
+            console.error(`[upgradePlan] Error upgrading user ${userId}:`, error);
+            return false;
+        }
+
+        console.log(`[upgradePlan] Successfully upgraded user ${userId}:`, {
+            plan_type: data?.plan_type,
+            website_limit: data?.website_limit,
+            status: data?.status,
+        });
+
+        return true;
     } catch (error) {
-        console.error('Upgrade plan error:', error);
+        console.error('[upgradePlan] Unexpected error:', error);
         return false;
     }
 }

@@ -51,14 +51,30 @@ export async function POST(request: Request) {
                 const planType = session.metadata?.plan_type as 'monthly' | 'lifetime';
 
                 if (userId && planType) {
-                    console.log(`Upgrading user ${userId} to ${planType} plan`);
+                    // Determine source based on discount usage
+                    // Check if discounts were applied (coupon or promotion code)
+                    const hasDiscount = session.total_details?.amount_discount && session.total_details.amount_discount > 0;
+                    const source: 'direct' | 'appsumo' | 'coupon' = hasDiscount ? 'coupon' : 'direct';
 
-                    await upgradePlan(
+                    console.log(`[Webhook] Upgrading user ${userId} to ${planType} plan (source: ${source}, discount: ${hasDiscount ? 'yes' : 'no'})`);
+
+                    const success = await upgradePlan(
                         userId,
                         planType,
                         session.customer as string,
-                        session.subscription as string || undefined
+                        session.subscription as string || undefined,
+                        source
                     );
+
+                    if (!success) {
+                        console.error(`[Webhook] Failed to upgrade user ${userId}`);
+                    }
+                } else {
+                    console.error('[Webhook] Missing userId or planType in session metadata', {
+                        userId,
+                        planType,
+                        metadata: session.metadata,
+                    });
                 }
                 break;
             }
