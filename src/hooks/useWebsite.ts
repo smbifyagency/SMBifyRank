@@ -49,11 +49,16 @@ export function useWebsite(
 
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const websiteRef = useRef<Website | null>(null);
+    const isAuthenticatedRef = useRef<boolean | null>(null);
 
-    // Keep ref in sync
+    // Keep refs in sync for use in async callbacks
     useEffect(() => {
         websiteRef.current = website;
     }, [website]);
+
+    useEffect(() => {
+        isAuthenticatedRef.current = isAuthenticated;
+    }, [isAuthenticated]);
 
     // Subscribe to sync status
     useEffect(() => {
@@ -108,7 +113,7 @@ export function useWebsite(
         loadWebsite();
     }, [websiteId, fallbackToLocalStorage]);
 
-    // Save function
+    // Save function with localStorage fallback
     const saveWebsite = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
         const currentWebsite = websiteRef.current;
         if (!currentWebsite) {
@@ -121,20 +126,37 @@ export function useWebsite(
             saveTimeoutRef.current = null;
         }
 
-        if (isAuthenticated) {
-            // Save to Supabase
-            return await saveWebsiteWithStatus(currentWebsite);
+        const currentIsAuthenticated = isAuthenticatedRef.current;
+
+        if (currentIsAuthenticated) {
+            // Try to save to Supabase first
+            const result = await saveWebsiteWithStatus(currentWebsite);
+            if (!result.success) {
+                // Fallback to localStorage if Supabase fails
+                console.warn('Supabase save failed, falling back to localStorage:', result.error);
+                try {
+                    saveLocalWebsite(currentWebsite);
+                    console.log('✅ Saved to localStorage as fallback');
+                    return { success: true };
+                } catch (err) {
+                    console.error('Error saving to localStorage:', err);
+                    return { success: false, error: 'Failed to save to both cloud and local storage' };
+                }
+            }
+            console.log('✅ Saved to Supabase');
+            return result;
         } else {
             // Save to localStorage
             try {
                 saveLocalWebsite(currentWebsite);
+                console.log('✅ Saved to localStorage');
                 return { success: true };
             } catch (err) {
                 console.error('Error saving to localStorage:', err);
                 return { success: false, error: 'Failed to save locally' };
             }
         }
-    }, [isAuthenticated]);
+    }, []);
 
     // Update website with auto-save
     const updateWebsite = useCallback((updates: Partial<Website>) => {
@@ -158,14 +180,21 @@ export function useWebsite(
 
                 saveTimeoutRef.current = setTimeout(async () => {
                     const currentWebsite = websiteRef.current;
+                    const currentIsAuthenticated = isAuthenticatedRef.current;
                     if (currentWebsite) {
-                        if (isAuthenticated) {
+                        if (currentIsAuthenticated) {
                             const result = await saveWebsiteWithStatus(currentWebsite);
                             if (!result.success) {
                                 console.error('Auto-save failed:', result.error);
+                                // Fallback to localStorage on auth failure
+                                console.log('Falling back to localStorage save');
+                                saveLocalWebsite(currentWebsite);
+                            } else {
+                                console.log('✅ Saved to Supabase');
                             }
                         } else {
                             saveLocalWebsite(currentWebsite);
+                            console.log('✅ Saved to localStorage');
                         }
                     }
                 }, autoSaveDelay);
@@ -175,18 +204,38 @@ export function useWebsite(
         });
     }, [autoSave, autoSaveDelay, isAuthenticated]);
 
-    // Refresh website from server
+    // Refresh website from server or localStorage based on auth state
     const refreshWebsite = useCallback(async () => {
         setIsLoading(true);
         try {
+            // If we know we're not authenticated, use localStorage directly
+            if (isAuthenticated === false && fallbackToLocalStorage) {
+                const localWebsite = getLocalWebsite(websiteId);
+                if (localWebsite) {
+                    setWebsite(localWebsite);
+                }
+                return;
+            }
+
+            // Try to fetch from Supabase
             const supabaseWebsite = await fetchWebsite(websiteId);
             if (supabaseWebsite) {
                 setWebsite(supabaseWebsite);
+                setIsAuthenticated(true);
+            } else if (fallbackToLocalStorage) {
+                // Supabase failed (possibly auth issue), fall back to localStorage
+                // and preserve any local changes
+                const localWebsite = getLocalWebsite(websiteId);
+                if (localWebsite) {
+                    setWebsite(localWebsite);
+                    setIsAuthenticated(false);
+                }
+                // If no local website either, keep current state
             }
         } finally {
             setIsLoading(false);
         }
-    }, [websiteId]);
+    }, [websiteId, isAuthenticated, fallbackToLocalStorage]);
 
     // Cleanup on unmount
     useEffect(() => {

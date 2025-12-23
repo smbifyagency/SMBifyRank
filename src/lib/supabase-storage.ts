@@ -32,6 +32,7 @@ export async function fetchWebsites(): Promise<Website[]> {
 
 /**
  * Fetch a single website by ID from Supabase
+ * Returns null if not found or not authenticated
  */
 export async function fetchWebsite(id: string): Promise<Website | null> {
     try {
@@ -39,6 +40,11 @@ export async function fetchWebsite(id: string): Promise<Website | null> {
             method: 'GET',
             credentials: 'include',
         });
+
+        if (response.status === 401) {
+            console.warn('Fetch website: Not authenticated, will use localStorage fallback');
+            return null;
+        }
 
         if (!response.ok) {
             console.error('Failed to fetch website:', response.status);
