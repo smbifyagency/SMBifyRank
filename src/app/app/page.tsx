@@ -88,10 +88,26 @@ function AppDashboardContent() {
         const upgraded = searchParams.get('upgraded');
         const plan = searchParams.get('plan');
 
-        if (upgraded === 'true') {
+        if (upgraded === 'true' && plan) {
             setShowUpgradeBanner(true);
             setUpgradedPlan(plan);
             toast.success(`🎉 Welcome to ${plan === 'lifetime' ? 'Lifetime' : 'Pro'}! You now have unlimited access.`);
+
+            // Call confirm-upgrade API to ensure subscription is updated
+            // (fallback in case webhook didn't fire, e.g., 100% off coupon)
+            fetch('/api/subscription/confirm-upgrade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ planType: plan }),
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Subscription confirmed:', data);
+                        setIsPaidUser(true);
+                    }
+                })
+                .catch(err => console.error('Confirm upgrade error:', err));
 
             // Clean up URL params without reload
             const newUrl = window.location.pathname;

@@ -97,8 +97,9 @@ export default function BillingPage() {
         return null;
     }
 
-    const isPaidPlan = subscription?.plan_type !== 'free';
-    const isUnlimited = subscription?.website_limit === 0 || subscription?.website_limit === null;
+    const isPaidPlan = subscription?.plan_type === 'monthly' || subscription?.plan_type === 'lifetime';
+    // Unlimited if: website_limit is 0/null OR plan is monthly/lifetime (fallback for legacy data)
+    const isUnlimited = subscription?.website_limit === 0 || subscription?.website_limit === null || isPaidPlan;
 
     return (
         <div className={styles.page}>
