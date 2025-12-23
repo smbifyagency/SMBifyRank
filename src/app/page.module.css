@@ -147,9 +147,9 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-light);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-full);
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -174,7 +174,7 @@
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: var(--space-lg);
-  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 50%, var(--accent-primary) 100%);
+  background: linear-gradient(135deg, var(--text-primary) 0%, rgba(255, 255, 255, 0.7) 50%, var(--accent-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -254,18 +254,18 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-xl);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-light);
   backdrop-filter: blur(10px);
   color: var(--text-primary);
   font-weight: 600;
   font-size: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .secondaryBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-border);
   border-color: var(--accent-primary);
   transform: translateY(-2px);
 }
@@ -296,14 +296,14 @@
   display: flex;
   flex-direction: column;
   padding: var(--space-md);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--glass-bg-light);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-bg-light);
   transition: all 0.3s ease;
 }
 
 .stat:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--glass-bg-light);
   border-color: rgba(180, 245, 0, 0.2);
   transform: translateY(-2px);
 }
@@ -349,14 +349,14 @@
 }
 
 .mockupWindow {
-  background: rgba(21, 21, 31, 0.9);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow:
     0 50px 100px -30px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    0 0 0 1px var(--glass-bg-light) inset;
   transform: perspective(1000px) rotateY(-8deg) rotateX(5deg);
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -370,7 +370,7 @@
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
   background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--glass-bg-light);
 }
 
 .mockupHeader span {
@@ -398,7 +398,7 @@
 
 .mockupNav {
   height: 40px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-light);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-lg);
 }
@@ -442,14 +442,14 @@
 
 .mockupCards div {
   height: 80px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   transition: all 0.3s ease;
 }
 
 .mockupCards div:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--glass-bg-light);
   border-color: rgba(180, 245, 0, 0.2);
 }
 
@@ -467,7 +467,7 @@
 .howItWorks h2 {
   font-size: clamp(2rem, 4vw, 2.5rem);
   margin-bottom: var(--space-3xl);
-  background: linear-gradient(135deg, #ffffff, var(--text-secondary));
+  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -511,9 +511,9 @@
 .step {
   position: relative;
   padding: var(--space-2xl) var(--space-xl);
-  background: rgba(21, 21, 31, 0.6);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-bg-light);
   border-radius: var(--radius-lg);
   text-align: center;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -575,7 +575,7 @@
 .features h2 {
   font-size: clamp(2rem, 4vw, 2.5rem);
   margin-bottom: var(--space-3xl);
-  background: linear-gradient(135deg, #ffffff, var(--text-secondary));
+  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -601,9 +601,9 @@
 
 .featureCard {
   padding: var(--space-2xl);
-  background: rgba(21, 21, 31, 0.5);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-bg-light);
   border-radius: var(--radius-lg);
   text-align: center;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -671,7 +671,7 @@
 .pricing h2 {
   font-size: clamp(2rem, 4vw, 2.5rem);
   margin-bottom: var(--space-sm);
-  background: linear-gradient(135deg, #ffffff, var(--text-secondary));
+  background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -702,9 +702,9 @@
 .pricingCard {
   position: relative;
   padding: var(--space-2xl);
-  background: rgba(21, 21, 31, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-bg-light);
   border-radius: var(--radius-xl);
   text-align: left;
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
@@ -718,7 +718,7 @@
 .pricingPopular {
   border-color: var(--accent-primary);
   transform: scale(1.05);
-  background: rgba(21, 21, 31, 0.9);
+  background: var(--glass-bg);
   box-shadow:
     0 0 60px -15px rgba(180, 245, 0, 0.3),
     0 25px 50px -15px rgba(0, 0, 0, 0.4);
@@ -780,7 +780,7 @@
 .pricingHeader {
   margin-bottom: var(--space-xl);
   padding-bottom: var(--space-xl);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--glass-bg-light);
 }
 
 .pricingHeader h3 {
@@ -798,7 +798,7 @@
 .priceAmount {
   font-size: 3.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff, var(--accent-primary));
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -831,18 +831,18 @@
   display: block;
   width: 100%;
   padding: var(--space-md);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-light);
   color: var(--text-primary);
   font-weight: 600;
   text-align: center;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
 }
 
 .pricingBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-border);
   border-color: var(--accent-primary);
   transform: translateY(-2px);
 }
@@ -901,16 +901,16 @@
   margin: 0 auto;
   position: relative;
   padding: var(--space-2xl);
-  background: rgba(21, 21, 31, 0.6);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-bg-light);
   border-radius: var(--radius-xl);
 }
 
 .ctaContent h2 {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
   margin-bottom: var(--space-md);
-  background: linear-gradient(135deg, #ffffff, var(--accent-primary));
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -928,7 +928,7 @@
 .footer {
   padding: var(--space-3xl) 0 var(--space-xl);
   background: rgba(10, 10, 15, 0.98);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--glass-bg-light);
   position: relative;
   z-index: 1;
 }
@@ -1008,7 +1008,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: var(--space-xl);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--glass-bg-light);
 }
 
 @media (max-width: 640px) {

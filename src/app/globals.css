@@ -19,10 +19,19 @@
   --accent-warning: #f59e0b;
   --accent-danger: #ef4444;
 
+  /* Glass & Overlay Effects */
+  --glass-bg: rgba(21, 21, 31, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg-light: rgba(255, 255, 255, 0.03);
+  --overlay-bg: rgba(0, 0, 0, 0.85);
+  --shimmer-color: rgba(255, 255, 255, 0.1);
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #b4f500 0%, #8bc500 50%, #6b9d00 100%);
   --gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
   --gradient-dark: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%);
+  --gradient-text: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 50%, var(--accent-primary) 100%);
+  --gradient-text-accent: linear-gradient(135deg, #ffffff, var(--accent-primary));
 
   /* Borders */
   --border-color: rgba(255, 255, 255, 0.08);
@@ -75,6 +84,13 @@
   --accent-primary: #16a34a;
   --accent-primary-hover: #22c55e;
 
+  /* Light mode glass effects */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-bg-light: rgba(0, 0, 0, 0.03);
+  --overlay-bg: rgba(255, 255, 255, 0.9);
+  --shimmer-color: rgba(0, 0, 0, 0.05);
+
   --border-color: rgba(0, 0, 0, 0.08);
   --border-color-hover: rgba(0, 0, 0, 0.15);
 
@@ -85,6 +101,8 @@
 
   --gradient-primary: linear-gradient(135deg, #16a34a 0%, #22c55e 50%, #4ade80 100%);
   --gradient-dark: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  --gradient-text: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, var(--accent-primary) 100%);
+  --gradient-text-accent: linear-gradient(135deg, #0f172a, var(--accent-primary));
 }
 
 * {
