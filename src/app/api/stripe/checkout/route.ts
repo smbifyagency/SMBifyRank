@@ -17,7 +17,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { planType, couponCode } = body; // 'monthly' or 'lifetime', optional coupon
+        const { planType } = body; // 'monthly' or 'lifetime'
 
         if (!planType || !['monthly', 'lifetime'].includes(planType)) {
             return NextResponse.json(
@@ -81,33 +81,8 @@ export async function POST(request: Request) {
             );
         }
 
-        // Validate coupon if provided
-        let discounts: { coupon?: string; promotion_code?: string }[] | undefined;
-        if (couponCode) {
-            try {
-                // First try as a promotion code
-                const promoCodes = await stripe.promotionCodes.list({
-                    code: couponCode,
-                    active: true,
-                    limit: 1,
-                });
-
-                if (promoCodes.data.length > 0) {
-                    discounts = [{ promotion_code: promoCodes.data[0].id }];
-                } else {
-                    // Try as a direct coupon ID
-                    const coupon = await stripe.coupons.retrieve(couponCode);
-                    if (coupon && coupon.valid) {
-                        discounts = [{ coupon: coupon.id }];
-                    }
-                }
-            } catch {
-                // Coupon not found or invalid - continue without discount
-                console.log(`Coupon "${couponCode}" not found or invalid`);
-            }
-        }
-
         // Build checkout session options
+        // All coupon/promotion code handling is done directly on Stripe's checkout page
         const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
         const sessionOptions: Stripe.Checkout.SessionCreateParams = {
             customer: customerId,
@@ -120,23 +95,18 @@ export async function POST(request: Request) {
                 },
             ],
             success_url: `${baseUrl}/app?upgraded=true&plan=${planType}`,
-            cancel_url: `${baseUrl}/checkout?plan=${planType}&canceled=true`,
+            cancel_url: `${baseUrl}/pricing?canceled=true`,
             metadata: {
                 user_id: user.id,
                 plan_type: planType,
             },
-            // Allow customers to enter promotion codes on Stripe checkout page
-            allow_promotion_codes: !discounts,
+            // Always allow customers to enter promotion codes on Stripe checkout page
+            allow_promotion_codes: true,
             // Pre-fill customer email
             customer_update: {
                 address: 'auto',
             },
         };
-
-        // Apply discounts if we have them
-        if (discounts) {
-            sessionOptions.discounts = discounts;
-        }
 
         // Create checkout session
         const session = await stripe.checkout.sessions.create(sessionOptions);
