@@ -11,11 +11,22 @@ import Stripe from 'stripe';
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(request: Request) {
+    console.log('[Stripe Webhook] Received webhook request');
+
     try {
-        if (!stripe || !webhookSecret) {
-            console.error('Stripe or webhook secret not configured');
+        // Check configuration
+        if (!stripe) {
+            console.error('[Stripe Webhook] ❌ Stripe not initialized - check STRIPE_SECRET_KEY');
             return NextResponse.json(
-                { error: 'Webhook not configured' },
+                { error: 'Stripe not configured' },
+                { status: 500 }
+            );
+        }
+
+        if (!webhookSecret) {
+            console.error('[Stripe Webhook] ❌ Webhook secret not set - check STRIPE_WEBHOOK_SECRET');
+            return NextResponse.json(
+                { error: 'Webhook secret not configured' },
                 { status: 500 }
             );
         }
@@ -25,6 +36,7 @@ export async function POST(request: Request) {
         const signature = headersList.get('stripe-signature');
 
         if (!signature) {
+            console.error('[Stripe Webhook] ❌ No stripe-signature header');
             return NextResponse.json(
                 { error: 'No signature' },
                 { status: 400 }
@@ -35,8 +47,9 @@ export async function POST(request: Request) {
         let event: Stripe.Event;
         try {
             event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+            console.log(`[Stripe Webhook] ✅ Signature verified, event type: ${event.type}`);
         } catch (err) {
-            console.error('Webhook signature verification failed:', err);
+            console.error('[Stripe Webhook] ❌ Signature verification failed:', err);
             return NextResponse.json(
                 { error: 'Invalid signature' },
                 { status: 400 }
